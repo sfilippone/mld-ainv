@@ -1,0 +1,123 @@
+GFORTRAN module version '6' created from data_input.f90 on Fri Apr  8 14:21:04 2011
+MD5:610605a3f96b48e8f2595b5413b842bc -- If you edit this, you'll get what you deserve.
+
+(() ()
+() () () () () () () () () () () () () () () () () () () () () () () ()
+())
+
+()
+
+(('read_data' 'data_input' 2 3 4 5 6 7 8 9) ('trim_string' 'data_input'
+10))
+
+()
+
+()
+
+()
+
+(11 'data_input' 'data_input' 'data_input' 1 ((MODULE UNKNOWN-INTENT
+UNKNOWN-PROC UNKNOWN UNKNOWN 0 0) (UNKNOWN 0 0 0 UNKNOWN ()) 0 0 () () 0
+() () () 0 0)
+9 'read_char' 'data_input' 'read_char' 1 ((PROCEDURE UNKNOWN-INTENT
+MODULE-PROC DECL UNKNOWN 0 0 SUBROUTINE ALWAYS_EXPLICIT) (UNKNOWN 0 0 0
+UNKNOWN ()) 12 0 (13 14 15) () 0 () () () 0 0)
+7 'read_double' 'data_input' 'read_double' 1 ((PROCEDURE UNKNOWN-INTENT
+MODULE-PROC DECL UNKNOWN 0 0 SUBROUTINE ALWAYS_EXPLICIT) (UNKNOWN 0 0 0
+UNKNOWN ()) 16 0 (17 18 19) () 0 () () () 0 0)
+8 'read_int' 'data_input' 'read_int' 1 ((PROCEDURE UNKNOWN-INTENT
+MODULE-PROC DECL UNKNOWN 0 0 SUBROUTINE ALWAYS_EXPLICIT) (UNKNOWN 0 0 0
+UNKNOWN ()) 20 0 (21 22 23) () 0 () () () 0 0)
+6 'read_single' 'data_input' 'read_single' 1 ((PROCEDURE UNKNOWN-INTENT
+MODULE-PROC DECL UNKNOWN 0 0 SUBROUTINE ALWAYS_EXPLICIT) (UNKNOWN 0 0 0
+UNKNOWN ()) 24 0 (25 26 27) () 0 () () () 0 0)
+5 'string_read_char' 'data_input' 'string_read_char' 1 ((PROCEDURE
+UNKNOWN-INTENT MODULE-PROC DECL UNKNOWN 0 0 SUBROUTINE IMPLICIT_PURE
+ALWAYS_EXPLICIT) (UNKNOWN 0 0 0 UNKNOWN ()) 28 0 (29 30 31) () 0 () () ()
+0 0)
+3 'string_read_double' 'data_input' 'string_read_double' 1 ((PROCEDURE
+UNKNOWN-INTENT MODULE-PROC DECL UNKNOWN 0 0 SUBROUTINE IMPLICIT_PURE
+ALWAYS_EXPLICIT) (UNKNOWN 0 0 0 UNKNOWN ()) 32 0 (33 34 35) () 0 () () ()
+0 0)
+4 'string_read_int' 'data_input' 'string_read_int' 1 ((PROCEDURE
+UNKNOWN-INTENT MODULE-PROC DECL UNKNOWN 0 0 SUBROUTINE IMPLICIT_PURE
+ALWAYS_EXPLICIT) (UNKNOWN 0 0 0 UNKNOWN ()) 36 0 (37 38 39) () 0 () () ()
+0 0)
+2 'string_read_single' 'data_input' 'string_read_single' 1 ((PROCEDURE
+UNKNOWN-INTENT MODULE-PROC DECL UNKNOWN 0 0 SUBROUTINE IMPLICIT_PURE
+ALWAYS_EXPLICIT) (UNKNOWN 0 0 0 UNKNOWN ()) 40 0 (41 42 43) () 0 () () ()
+0 0)
+10 'trim_string' 'data_input' 'trim_string' 1 ((PROCEDURE UNKNOWN-INTENT
+MODULE-PROC DECL UNKNOWN 0 0 FUNCTION GENERIC IMPLICIT_PURE
+ALWAYS_EXPLICIT) (CHARACTER 1 0 0 CHARACTER ((FUNCTION (INTEGER 4 0 0
+INTEGER ()) 0 44 (('' (VARIABLE (CHARACTER 1 0 0 CHARACTER (())) 0 45 ()))
+('' ())) '__len_1_i4' 0 'len'))) 46 0 (45 47) () 10 () () () 0 0)
+13 'val' '' 'val' 12 ((VARIABLE OUT UNKNOWN-PROC UNKNOWN UNKNOWN 0 0
+DUMMY) (CHARACTER 1 0 0 CHARACTER (())) 0 0 () () 0 () () () 0 0)
+14 'file' '' 'file' 12 ((VARIABLE IN UNKNOWN-PROC UNKNOWN UNKNOWN 0 0
+DUMMY) (INTEGER 4 0 0 INTEGER ()) 0 0 () () 0 () () () 0 0)
+15 'marker' '' 'marker' 12 ((VARIABLE IN UNKNOWN-PROC UNKNOWN UNKNOWN 0
+0 OPTIONAL DUMMY) (CHARACTER 1 0 0 CHARACTER ((CONSTANT (INTEGER 4 0 0
+INTEGER ()) 0 '1'))) 0 0 () () 0 () () () 0 0)
+21 'val' '' 'val' 20 ((VARIABLE OUT UNKNOWN-PROC UNKNOWN UNKNOWN 0 0
+DUMMY) (INTEGER 4 0 0 INTEGER ()) 0 0 () () 0 () () () 0 0)
+22 'file' '' 'file' 20 ((VARIABLE IN UNKNOWN-PROC UNKNOWN UNKNOWN 0 0
+DUMMY) (INTEGER 4 0 0 INTEGER ()) 0 0 () () 0 () () () 0 0)
+23 'marker' '' 'marker' 20 ((VARIABLE IN UNKNOWN-PROC UNKNOWN UNKNOWN 0
+0 OPTIONAL DUMMY) (CHARACTER 1 0 0 CHARACTER ((CONSTANT (INTEGER 4 0 0
+INTEGER ()) 0 '1'))) 0 0 () () 0 () () () 0 0)
+25 'val' '' 'val' 24 ((VARIABLE OUT UNKNOWN-PROC UNKNOWN UNKNOWN 0 0
+DUMMY) (REAL 4 0 0 REAL ()) 0 0 () () 0 () () () 0 0)
+26 'file' '' 'file' 24 ((VARIABLE IN UNKNOWN-PROC UNKNOWN UNKNOWN 0 0
+DUMMY) (INTEGER 4 0 0 INTEGER ()) 0 0 () () 0 () () () 0 0)
+27 'marker' '' 'marker' 24 ((VARIABLE IN UNKNOWN-PROC UNKNOWN UNKNOWN 0
+0 OPTIONAL DUMMY) (CHARACTER 1 0 0 CHARACTER ((CONSTANT (INTEGER 4 0 0
+INTEGER ()) 0 '1'))) 0 0 () () 0 () () () 0 0)
+30 'file' '' 'file' 28 ((VARIABLE IN UNKNOWN-PROC UNKNOWN UNKNOWN 0 0
+DUMMY) (CHARACTER 1 0 0 CHARACTER (())) 0 0 () () 0 () () () 0 0)
+31 'marker' '' 'marker' 28 ((VARIABLE IN UNKNOWN-PROC UNKNOWN UNKNOWN 0
+0 OPTIONAL DUMMY) (CHARACTER 1 0 0 CHARACTER ((CONSTANT (INTEGER 4 0 0
+INTEGER ()) 0 '1'))) 0 0 () () 0 () () () 0 0)
+38 'file' '' 'file' 36 ((VARIABLE IN UNKNOWN-PROC UNKNOWN UNKNOWN 0 0
+DUMMY) (CHARACTER 1 0 0 CHARACTER (())) 0 0 () () 0 () () () 0 0)
+37 'val' '' 'val' 36 ((VARIABLE OUT UNKNOWN-PROC UNKNOWN UNKNOWN 0 0
+DUMMY) (INTEGER 4 0 0 INTEGER ()) 0 0 () () 0 () () () 0 0)
+41 'val' '' 'val' 40 ((VARIABLE OUT UNKNOWN-PROC UNKNOWN UNKNOWN 0 0
+DUMMY) (REAL 4 0 0 REAL ()) 0 0 () () 0 () () () 0 0)
+43 'marker' '' 'marker' 40 ((VARIABLE IN UNKNOWN-PROC UNKNOWN UNKNOWN 0
+0 OPTIONAL DUMMY) (CHARACTER 1 0 0 CHARACTER ((CONSTANT (INTEGER 4 0 0
+INTEGER ()) 0 '1'))) 0 0 () () 0 () () () 0 0)
+42 'file' '' 'file' 40 ((VARIABLE IN UNKNOWN-PROC UNKNOWN UNKNOWN 0 0
+DUMMY) (CHARACTER 1 0 0 CHARACTER (())) 0 0 () () 0 () () () 0 0)
+34 'file' '' 'file' 32 ((VARIABLE IN UNKNOWN-PROC UNKNOWN UNKNOWN 0 0
+DUMMY) (CHARACTER 1 0 0 CHARACTER (())) 0 0 () () 0 () () () 0 0)
+39 'marker' '' 'marker' 36 ((VARIABLE IN UNKNOWN-PROC UNKNOWN UNKNOWN 0
+0 OPTIONAL DUMMY) (CHARACTER 1 0 0 CHARACTER ((CONSTANT (INTEGER 4 0 0
+INTEGER ()) 0 '1'))) 0 0 () () 0 () () () 0 0)
+44 'len' '(intrinsic)' 'len' 46 ((PROCEDURE UNKNOWN-INTENT UNKNOWN-PROC
+UNKNOWN UNKNOWN 0 0 FUNCTION) (INTEGER 4 0 0 INTEGER ()) 0 0 () () 44 ()
+() () 0 0)
+17 'val' '' 'val' 16 ((VARIABLE OUT UNKNOWN-PROC UNKNOWN UNKNOWN 0 0
+DUMMY) (REAL 8 0 0 REAL ()) 0 0 () () 0 () () () 0 0)
+18 'file' '' 'file' 16 ((VARIABLE IN UNKNOWN-PROC UNKNOWN UNKNOWN 0 0
+DUMMY) (INTEGER 4 0 0 INTEGER ()) 0 0 () () 0 () () () 0 0)
+19 'marker' '' 'marker' 16 ((VARIABLE IN UNKNOWN-PROC UNKNOWN UNKNOWN 0
+0 OPTIONAL DUMMY) (CHARACTER 1 0 0 CHARACTER ((CONSTANT (INTEGER 4 0 0
+INTEGER ()) 0 '1'))) 0 0 () () 0 () () () 0 0)
+29 'val' '' 'val' 28 ((VARIABLE OUT UNKNOWN-PROC UNKNOWN UNKNOWN 0 0
+DUMMY) (CHARACTER 1 0 0 CHARACTER (())) 0 0 () () 0 () () () 0 0)
+33 'val' '' 'val' 32 ((VARIABLE OUT UNKNOWN-PROC UNKNOWN UNKNOWN 0 0
+DUMMY) (REAL 8 0 0 REAL ()) 0 0 () () 0 () () () 0 0)
+35 'marker' '' 'marker' 32 ((VARIABLE IN UNKNOWN-PROC UNKNOWN UNKNOWN 0
+0 OPTIONAL DUMMY) (CHARACTER 1 0 0 CHARACTER ((CONSTANT (INTEGER 4 0 0
+INTEGER ()) 0 '1'))) 0 0 () () 0 () () () 0 0)
+47 'marker' '' 'marker' 46 ((VARIABLE IN UNKNOWN-PROC UNKNOWN UNKNOWN 0
+0 OPTIONAL DUMMY) (CHARACTER 1 0 0 CHARACTER ((CONSTANT (INTEGER 4 0 0
+INTEGER ()) 0 '1'))) 0 0 () () 0 () () () 0 0)
+45 'string' '' 'string' 46 ((VARIABLE IN UNKNOWN-PROC UNKNOWN UNKNOWN 0
+0 DUMMY) (CHARACTER 1 0 0 CHARACTER (())) 0 0 () () 0 () () () 0 0)
+)
+
+('data_input' 0 11 'read_char' 0 9 'read_double' 0 7 'read_int' 0 8
+'read_single' 0 6 'string_read_char' 0 5 'string_read_double' 0 3
+'string_read_int' 0 4 'string_read_single' 0 2 'trim_string' 0 10)
