@@ -9,8 +9,8 @@ HERE=.
 FINCLUDES=$(FMFLAG). $(FMFLAG)$(LIBDIR) $(FMFLAG)$(MLDINCDIR)  $(FMFLAG)$(PSBINCDIR) 
 
 
-MODOBJS=mld_d_ainvt_solver.o mld_d_ainv_bld_mod.o mld_base_ainv_mod.o mld_d_ainvk_solver.o \
-	mld_d_aorth_bld_mod.o 
+MODOBJS=mld_d_ainvt_solver.o mld_d_ainv_bld_mod.o mld_base_ainv_mod.o \
+	mld_d_ainvk_solver.o mld_d_aorth_bld_mod.o 
 
 F90OBJS=mld_dainvt_impl.o mld_dainvk_impl.o mld_daorth_impl.o  
 

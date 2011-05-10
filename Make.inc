@@ -1,4 +1,4 @@
-MLDDIR=/usr/local/MLD2P4/V2/gnu46
+MLDDIR=/usr/local/MLD2P4/TypeVect/gnu46-dbg
 include $(MLDDIR)/Make.inc
 
 

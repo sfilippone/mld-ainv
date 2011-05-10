@@ -8,12 +8,12 @@ CSR                         ! Storage format CSR COO JAD
 1.d-6                       ! EPS
 3L-M-RAS-I-D4               ! Longer descriptive name for preconditioner (up to 20 chars) 
 ML                          ! Preconditioner NONE  JACOBI  BJAC  AS ML
-1                           ! Number of overlap layers for AS preconditioner at finest level
+1                           ! Number of overlap layers AS preconditioner at finest level
 HALO                        ! Restriction operator NONE HALO 
 NONE                        ! Prolongation operator NONE SUM AVG
 ILU                         ! Subdomain solver DSCALE ILU MILU ILUT UMF SLU 
-2                           ! Level-set N for ILU(N)
-1.d-4                       ! Threshold T for ILU(T,P) 
+1                           ! Level-set N for ILU(N)
+1.d-3                       ! Threshold T for ILU(T,P) 
 1                           ! Smoother/Jacobi  sweeps 
 AS                          ! Smoother type  JACOBI BJAC AS; ignored for non-ML
 3                           ! Number of levels in a multilevel preconditioner
@@ -24,7 +24,7 @@ POST                        ! Side of correction PRE POST TWOSIDE (ignored for A
 DIST                        ! Coarse level: matrix distribution DIST  REPL           
 BJAC                        ! Coarse level: solver JACOBI BJAC UMF SLU  SLUDIST
 UMF                         ! Coarse level: subsolver DSCALE  ILU UMF SLU  SLUDIST
-0                           ! Coarse level: Level-set N for ILU(N)
-1.d-4                       ! Coarse level: Threshold T for ILU(T,P) 
+1                           ! Coarse level: Level-set N for ILU(N)
+1.d-3                       ! Coarse level: Threshold T for ILU(T,P) 
 4                           ! Coarse level: Number of Jacobi sweeps 
 0.10d0                      ! Smoother Aggregation Threshold: >= 0.0

@@ -174,7 +174,7 @@ program ppde
 !!$  end if  
   call mld_precinit(prec,'BJAC',info)
   call mld_inner_precset(prec,ainvtsv,info) 
-  call mld_inner_precset(prec,ainvksv,info) 
+!  call mld_inner_precset(prec,ainvksv,info) 
   call mld_precset(prec,mld_sub_fillin_,   prectype%fill1,   info)
   call mld_precset(prec,mld_sub_iluthrs_,  prectype%thr1,    info)
   call mld_precset(prec,mld_inv_fillin_,   prectype%cfill,   info)
