@@ -333,7 +333,7 @@ subroutine mld_dsparse_ainvk(n,a,z,fill_in,sp_thresh,info,inlevs)
   zcsr%val(ipz1) = done
   zcsr%ja(ipz1)  = n
   zcsr%irp(n+1)  = ipz1+1 
-  
+  call zcsr%set_sorted()  
   call z%mv_from(zcsr)
 
   call psb_erractionrestore(err_act)

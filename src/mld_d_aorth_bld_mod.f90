@@ -2,23 +2,25 @@ module mld_d_aorth_bld_mod
   
   use mld_base_ainv_mod
   
-  
+
+  use mld_d_orthbase_mod
+
   interface mld_ainv_orth_bld
     module procedure mld_d_ainv_orth_bld
   end interface mld_ainv_orth_bld
 
-  interface mld_sparse_orthbase
-    subroutine mld_dsparse_orthbase(alg,n,a,p,z,nzrmax,sp_thresh,info)
-      use psb_base_mod, only :psb_d_csr_sparse_mat, psb_dspmat_type, psb_dpk_
-      integer, intent(in)                    :: alg,n
-      type(psb_d_csr_sparse_mat), intent(in) :: a
-      type(psb_dspmat_type), intent(out)     :: z
-      integer, intent(in)                    :: nzrmax
-      real(psb_dpk_), intent(in)             :: sp_thresh
-      real(psb_dpk_), intent(out)            :: p(:)
-      integer, intent(out)                   :: info
-    end subroutine mld_dsparse_orthbase
-  end interface mld_sparse_orthbase
+!!$  interface mld_sparse_orthbase
+!!$    subroutine mld_dsparse_orthbase(alg,n,a,p,z,nzrmax,sp_thresh,info)
+!!$      use psb_base_mod, only :psb_d_csr_sparse_mat, psb_dspmat_type, psb_dpk_
+!!$      integer, intent(in)                    :: alg,n
+!!$      type(psb_d_csr_sparse_mat), intent(in) :: a
+!!$      type(psb_dspmat_type), intent(out)     :: z
+!!$      integer, intent(in)                    :: nzrmax
+!!$      real(psb_dpk_), intent(in)             :: sp_thresh
+!!$      real(psb_dpk_), intent(out)            :: p(:)
+!!$      integer, intent(out)                   :: info
+!!$    end subroutine mld_dsparse_orthbase
+!!$  end interface mld_sparse_orthbase
 
 contains
 
@@ -84,7 +86,7 @@ contains
     nzrmax    = fillin
     sp_thresh = thresh
     !
-    ! Ok, let's start first with W. 
+    ! Ok, let's start first with W (i.e. Lower) 
     !
     call a%cp_to(acsr)
     call acsr%transp()
@@ -92,7 +94,7 @@ contains
     call mld_sparse_orthbase(alg,n_row,acsr,pq,&
          & wmat,nzrmax,sp_thresh,info)
     call wmat%transp()
-    ! Now for Z
+    ! Now for Z  (i.e. Upper) 
     if (info == psb_success_) call acsr%transp() 
     if (info == psb_success_) &
          & call mld_sparse_orthbase(alg,n_row,acsr,pq,&

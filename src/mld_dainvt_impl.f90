@@ -43,7 +43,7 @@ subroutine mld_dinvt_copyin(i,m,a,jd,jmin,jmax,nlw,nup,jmaxup,nrmi,row,heap,&
   jmaxup = 0
   dmaxup = dzero
   nrmi   = dzero
-  irwt(:) = 0
+!!$  irwt(:) = 0
 
   do j = a%irp(i), a%irp(i+1) - 1
     k = a%ja(j)

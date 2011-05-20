@@ -167,12 +167,12 @@ contains
   subroutine d_sp_drop(idiag,nzrmax,sp_thresh,nz,iz,valz,info)
     use psb_base_mod
     implicit none 
-    real(psb_dpk_), intent(in)  :: sp_thresh
-    integer, intent(in)         :: idiag, nzrmax
+    real(psb_dpk_), intent(in)    :: sp_thresh
+    integer, intent(in)           :: idiag, nzrmax
     integer, intent(inout)        :: nz
     integer, intent(inout)        :: iz(:)
     real(psb_dpk_), intent(inout) :: valz(:)
-    integer, intent(out)        :: info
+    integer, intent(out)          :: info
 
     integer :: i, j, idf, nw
     real(psb_dpk_)     :: witem
@@ -182,14 +182,26 @@ contains
 
 
     info = psb_success_
+    if (nz <= nzrmax) return 
+!!$    write(0,*) 'sp_drop start',nz
+!!$    write(0,*) 'sp_drop start',nz,size(iz),size(valz)
 
+    if (nz > min(size(iz),size(valz))) then 
+      write(0,*) 'Serious size problem ',nz,size(iz),size(valz)
+      info = -2
+      return
+    end if
+!!$    write(0,*) 'sp_drop allocation',nz
     allocate(xw(nz),xwid(nz),indx(nz),stat=info) 
+!!$    write(0,*) 'sp_drop allocation',nz
     if (info /= psb_success_) then 
       write(psb_err_unit,*) ' Memory allocation in sp_drop'
       return
     endif
 
     ! Always keep the diagonal element
+!!$    write(0,*) 'sp_drop looking for diag ',idiag
+    call flush(0)
     idf = -1 
     do i=1, nz
       if (iz(i) == idiag) then 
@@ -203,6 +215,7 @@ contains
         exit
       end if
     end do
+!!$    write(0,*) 'sp_drop diag found :',idf
 
     if (idf == -1) then
 
@@ -211,7 +224,7 @@ contains
       do i=1, nz
         xwid(i) = iz(indx(i))
       end do
-      nw = min(nw,nzrmax)
+      nw = min(nz,nzrmax)
       do 
         if (nw <= 1) exit
         if (abs(xw(nw)) < sp_thresh) then 
@@ -246,6 +259,7 @@ contains
       xw(nw)   = valz(1)
       xwid(nw) = iz(1)
     end if
+!!$    write(0,*) 'sp_drop into msort ',nw
 
     call psb_msort(xwid(1:nw),indx(1:nw),dir=psb_sort_up_)
     do i=1, nw
@@ -253,6 +267,11 @@ contains
       iz(i)   = xwid(i)
     end do
     nz = nw
+    deallocate(xw,xwid,indx,stat=info) 
+    if (info /= psb_success_) then 
+      write(psb_err_unit,*) ' Memory allocation in sp_drop'
+      return
+    endif
 
     return
   end subroutine d_sp_drop

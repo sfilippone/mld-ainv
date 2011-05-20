@@ -11,13 +11,7 @@ subroutine mld_dsparse_orthbase(alg,n,a,p,z,nzrmax,sp_thresh,info)
   real(psb_dpk_), intent(out)          :: p(:)
   integer, intent(out)                 :: info
 
-!!$  integer :: i,j,k, kc, kr, err_act, nz, nzra, nzrz, ipzi,ipzj,&
-!!$       & nzzi,nzzj, nzz, ip1, ip2, ipza,ipzz, ipzn, nzzn,ifnz
-!!$  integer, allocatable        :: ia(:), ja(:), iz(:),jz(:), icr(:), ikr(:), ljr(:)
-!!$  real(psb_dpk_), allocatable :: zw(:), val(:), valz(:)
-!!$  type(psb_dspmat_type) :: znew, ztmp
-!!$  type(psb_int_heap) :: heap 
-!!$  real(psb_dpk_)     :: alpha
+
   integer :: err_act
   character(len=20)  :: name='mld_sp_orthbase'
   integer, parameter :: variant=1
