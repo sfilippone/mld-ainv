@@ -12,9 +12,14 @@ FINCLUDES=$(FMFLAG). $(FMFLAG)$(AINVLIBDIR) $(FMFLAG)$(MLDINCDIR)  $(FMFLAG)$(PS
 
 PDOBJS=ppde.o  data_input.o 
 PSOBJS=spde.o  data_input.o 
+MLOBJS=mldpde.o data_input.o
 EXEDIR=./runs
 
-all: ppde spde
+all: ppde spde mldpde
+
+mldpde: $(MLOBJS)
+	$(F90LINK) $(MLOBJS) -o mldpde $(AINV_LIB) $(MLD_LIB) $(PSBLAS_LIB) $(LDLIBS)
+	/bin/mv mldpde $(EXEDIR)
 
 ppde: $(PDOBJS)
 	$(F90LINK) $(PDOBJS) -o ppde $(AINV_LIB) $(MLD_LIB) $(PSBLAS_LIB) $(LDLIBS)

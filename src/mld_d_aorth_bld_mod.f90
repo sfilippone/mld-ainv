@@ -85,20 +85,20 @@ contains
 
     nzrmax    = fillin
     sp_thresh = thresh
+
     !
-    ! Ok, let's start first with W (i.e. Lower) 
+    ! Ok, let's start first with Z (i.e. Upper) 
     !
     call a%cp_to(acsr)
-    call acsr%transp()
-    
+
     call mld_sparse_orthbase(alg,n_row,acsr,pq,&
-         & wmat,nzrmax,sp_thresh,info)
-    call wmat%transp()
-    ! Now for Z  (i.e. Upper) 
+         & zmat,nzrmax,sp_thresh,info)
+    ! Now for W  (i.e. Lower) 
     if (info == psb_success_) call acsr%transp() 
     if (info == psb_success_) &
          & call mld_sparse_orthbase(alg,n_row,acsr,pq,&
-         & zmat,nzrmax,sp_thresh,info)
+         &   wmat,nzrmax,sp_thresh,info)
+    call wmat%transp()
 
     ! Done. Hopefully.... 
 

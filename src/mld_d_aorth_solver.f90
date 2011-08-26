@@ -411,11 +411,13 @@ contains
     if (debug_level >= psb_debug_outer_) &
          & write(debug_unit,*) me,' ',trim(name),' start'
 
-
     call mld_ainv_orth_bld(a,sv%alg,sv%fill_in,sv%thresh,&
          & sv%w,sv%d,sv%z,desc_a,info,b)    
-
     if ((info == psb_success_) .and.present(amold)) then 
+      call sv%w%set_asb()
+      call sv%w%trim()
+      call sv%z%set_asb()
+      call sv%z%trim()
       call sv%w%cscnv(info,mold=amold)
       if (info == psb_success_) &
            & call sv%z%cscnv(info,mold=amold)
@@ -663,7 +665,7 @@ contains
     if (allocated(sv%d)) val = val + psb_sizeof_dp * size(sv%d)
     val = val + psb_sizeof(sv%w)
     val = val + psb_sizeof(sv%z)
-
+    
     return
   end function d_aorth_solver_sizeof
 

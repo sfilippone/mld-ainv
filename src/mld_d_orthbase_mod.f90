@@ -18,9 +18,12 @@ contains
     integer, intent(out)                   :: info
 
     type(psb_d_csc_sparse_mat)             :: zcsc
+    type(psb_d_csr_sparse_mat)             :: zcsr
+    integer :: i,j,k,nrm
     integer :: err_act
     character(len=20)  :: name='mld_sp_orthbase'
     integer, parameter :: variant=1
+    
 
 
     if (psb_get_errstatus() /= psb_success_) return 
@@ -52,10 +55,27 @@ contains
       call psb_errpush(psb_err_internal_error_,name,a_err='Invalid alg')
       goto 9999      
     end select
+    if (info /= 0) then 
+      info = psb_err_from_subroutine_
+      call psb_errpush(info,name,a_err='sparse_orth')
+      goto 9999
+    end if
 
+!!$    write(0,*) 'Check after sparse_orth:',&
+!!$         & size(zcsc%icp),size(zcsc%ia),size(zcsc%val)
     call z%mv_from(zcsc)
     call z%cscnv(info,type='CSR')
-
+!!$    call z%print('orth_bld.mtx',head='check out of orth')
+!!$    call z%cp_to(zcsr)
+!!$    nrm = 0
+!!$    do i=1,zcsr%get_nrows()
+!!$      if (zcsr%irp(i+1)-zcsr%irp(i)>nrm) then      
+!!$        nrm = zcsr%irp(i+1)-zcsr%irp(i)
+!!$        k = i
+!!$      end if
+!!$    end do
+!!$    write(0,*) 'NRM ',nrm,size(zcsr%val),size(zcsr%ja),k
+!!$    write(0,*) zcsr%irp(k),zcsr%irp(k+1),':',zcsr%ja(zcsr%irp(k):zcsr%irp(k+1)-1)
     call psb_erractionrestore(err_act)
     return
 
@@ -108,6 +128,7 @@ contains
       icr(i) = n
       ikr(i) = 0
       ljr(n) = 0
+      zw(i)  = dzero
     end do
     do i=1, n
       do j=a%irp(i),a%irp(i+1)-1
@@ -172,6 +193,9 @@ contains
           ip2 = ip2 -1 
         end do
         nzra = max(0,ip2 - ip1 + 1) 
+!!$        if (a%ja(ip2) > n) then 
+!!$          write(0,*) 'Out of bounds in orth_sds? ',j,ip1,ip2,a%ja(ip2)
+!!$        end if
         p(i) = psb_spge_dot(nzra,a%ja(ip1:ip2),a%val(ip1:ip2),zw)
         ! !$          write(psb_err_unit,*) j,i,p(i)
 
@@ -213,7 +237,8 @@ contains
         call psb_errpush(info,name,a_err='sparsify')
         return
       end if
-      call psb_ensure_size(nzz+nzrz, z%ia,   info)
+!!$      write(0,*) i,'nzz+nzrz ',nzz,nzrz,size(z%ia),size(z%val)
+      call psb_ensure_size(nzz+nzrz, z%ia,  info)
       call psb_ensure_size(nzz+nzrz, z%val, info)
       ipz1 = z%icp(i)
       do j=1, nzrz
