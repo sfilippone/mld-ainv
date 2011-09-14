@@ -269,7 +269,7 @@ contains
     real(psb_dpk_), intent(out)          :: p(:)
     integer, intent(out)                 :: info
     integer, allocatable        :: ia(:), ja(:), iz(:),jz(:), lcr(:)
-    real(psb_dpk_), allocatable :: zw(:), val(:), valz(:)
+    real(psb_dpk_), allocatable :: zw(:), val(:), valz(:), ddtmp(:)
     integer :: i,j,k, kc, kr, err_act, nz, nzra, nzrz, ipzi,ipzj,&
          & nzzi,nzzj, nzz, ip1, ip2, ipza,ipzz, ipzn, nzzn,ifnz, ljr
     integer :: debug_unit, debug_level, me
@@ -282,7 +282,7 @@ contains
     debug_level = psb_get_debug_level()
     me          = -1 
     ! !$    debug_level = psb_debug_outer_
-    allocate(iz(n),jz(n),valz(n),lcr(n),stat=info)
+    allocate(iz(n),jz(n),valz(n),lcr(n),ddtmp(n),stat=info)
     if (info /= psb_success_) then 
       call psb_errpush(psb_err_from_subroutine_,name,a_err='Allocate')
       return      
@@ -315,6 +315,7 @@ contains
       zmat%cols(i)%idx(1) = i
       zmat%cols(i)%val(1) = done
       p(i)                = dzero
+      ddtmp(i)            = dzero
       lcr(i)              = i
     end do
 
@@ -337,9 +338,16 @@ contains
 !!$          p(j) = dzero
 !!$          cycle
 !!$        end if
-        nzrz = zmat%cols(j)%nz
-        p(j) = psb_spdot_srtd(nzra,a%ja(ipza:ipza+nzra-1),a%val(ipza:ipza+nzra-1),&
-             & nzrz,zmat%cols(j)%idx,zmat%cols(j)%val)
+        if (.true.) then 
+          nzrz = zmat%cols(j)%nz
+          p(j) = psb_spdot_srtd(nzra,a%ja(ipza:ipza+nzra-1),a%val(ipza:ipza+nzra-1),&
+               & nzrz,zmat%cols(j)%idx,zmat%cols(j)%val)
+        else
+          nzrz = zmat%cols(j)%nz
+          call cp_sp2dn(nzrz,zmat%cols(j)%idx,zmat%cols(j)%val,ddtmp)
+          p(j) = psb_spge_dot(nzra,a%ja(ipza:ipza+nzra-1),a%val(ipza:ipza+nzra-1),ddtmp)
+          call zero_sp2dn(nzrz,zmat%cols(j)%idx,ddtmp)
+        endif
       end do
       if (p(i) == dzero) then 
         write(psb_err_unit,*) 'Breakdown!! '
@@ -758,5 +766,32 @@ contains
       vy(1:ny) = vv(1:ny) 
     end do
   end subroutine psb_d_spmspv
+  
+  subroutine cp_sp2dn(nz,ia,val,v)
+    use psb_base_mod, only : psb_dpk_, dzero
+    implicit none 
+    integer :: nz,ia(*)
+    real(psb_dpk_) :: val(*),v(*)
+    
+    integer :: i
+    
+    do i=1, nz
+      v(ia(i)) = val(i)
+    end do
+  end subroutine cp_sp2dn
+
+  subroutine zero_sp2dn(nz,ia,v)
+    use psb_base_mod, only : psb_dpk_, dzero
+    implicit none 
+    integer :: nz,ia(*)
+    real(psb_dpk_) :: v(*)
+    
+    integer :: i
+    
+    do i=1, nz
+      v(ia(i)) = dzero
+    end do
+  end subroutine zero_sp2dn
+  
 
 end module mld_d_orthbase_mod

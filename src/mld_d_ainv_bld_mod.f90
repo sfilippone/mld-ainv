@@ -242,7 +242,7 @@ contains
 
 
     !
-    ! Compute the aprox U^-1  and L^-1
+    ! Compute the approx U^-1  and L^-1
     !
     nzrmax    = invfill
     call mld_sparse_ainvt(n_row,umat,atmp,nzrmax,sp_thresh,info)
