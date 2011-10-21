@@ -362,7 +362,7 @@ subroutine mld_dinvt_copyout(fill_in,thres,i,m,nlw,nup,jmaxup,nrmi,row, &
       ! 
       ! Figure out a good reallocation size!
       ! 
-      isz  = max((l2/i)*m,int(1.2*l2),l2+100)
+      isz  = max(int(1.2*l2),l2+100)
       call psb_realloc(isz,val,info) 
       if (info == psb_success_) call psb_realloc(isz,ja,info) 
       if (info /= psb_success_) then 
@@ -442,7 +442,7 @@ subroutine mld_dsparse_ainvt(n,a,z,nzrmax,sp_thresh,info)
     goto 9999      
   end if
 
-  call zcsr%allocate(n,n,n+1)
+  call zcsr%allocate(n,n,n*nzrmax)
   call zcsr%set_triangle()
   call zcsr%set_unit(.false.)
   call zcsr%set_upper()
@@ -457,6 +457,7 @@ subroutine mld_dsparse_ainvt(n,a,z,nzrmax,sp_thresh,info)
     ! ZW = e_i
     call mld_invt_copyin(i,n,acsr,i,1,n,nlw,nup,jmaxup,nrmi,row,&
          & heap,rowlevs,ktrw,trw,info,sign=-done)
+    if (info /= 0) exit
     row(i) = done
     ! Adjust norm
     if (nrmi < done) then 
@@ -467,9 +468,11 @@ subroutine mld_dsparse_ainvt(n,a,z,nzrmax,sp_thresh,info)
 
     call mld_invt(sp_thresh,i,nrmi,row,heap,rowlevs,&
          & acsr%ja,acsr%irp,acsr%val,nidx,idxs,info)
-
+    if (info /= 0) exit
+!!$    write(0,*) 'Calling copyout ',nzrmax,nlw,nup,nidx,l2
     call mld_invt_copyout(nzrmax,sp_thresh,i,n,nlw,nup,jmaxup,nrmi,row,&
          & nidx,idxs,l2,zcsr%ja,zcsr%irp,zcsr%val,info)
+    if (info /= 0) exit
     nzz = l2
   end do outer
   if (info /= psb_success_) then 

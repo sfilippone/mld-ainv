@@ -67,6 +67,7 @@ module mld_d_ainvk_solver
     procedure, pass(sv) :: descr   => d_ainvk_solver_descr
     procedure, pass(sv) :: sizeof  => d_ainvk_solver_sizeof
     procedure, pass(sv) :: default => d_ainvk_solver_default
+    procedure, pass(sv) :: get_nzeros => d_ainvk_get_nzeros
   end type mld_d_ainvk_solver_type
 
 
@@ -75,7 +76,7 @@ module mld_d_ainvk_solver
        &  d_ainvk_solver_setc,   d_ainvk_solver_setr,&
        &  d_ainvk_solver_descr,  d_ainvk_solver_sizeof, &
        &  d_ainvk_solver_default, d_ainvk_solver_dmp,&
-       &  d_ainvk_solver_apply_vect
+       &  d_ainvk_solver_apply_vect,  d_ainvk_get_nzeros
 
 
 contains
@@ -650,8 +651,25 @@ contains
     return
   end subroutine d_ainvk_solver_descr
 
+  function d_ainvk_get_nzeros(sv) result(val)
+    use psb_base_mod, only : psb_long_int_k_
+    implicit none 
+    ! Arguments
+    class(mld_d_ainvk_solver_type), intent(in) :: sv
+    integer(psb_long_int_k_) :: val
+    integer             :: i
+
+    val = 0
+    if (allocated(sv%d)) val = val + size(sv%d)
+    val = val + sv%l%get_nzeros()
+    val = val + sv%u%get_nzeros()
+
+    return
+  end function d_ainvk_get_nzeros
+
+
   function d_ainvk_solver_sizeof(sv) result(val)
-    use psb_base_mod
+    use psb_base_mod, only : psb_long_int_k_
     implicit none 
     ! Arguments
     class(mld_d_ainvk_solver_type), intent(in) :: sv

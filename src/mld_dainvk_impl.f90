@@ -205,7 +205,7 @@ subroutine mld_dinvk_copyout(fill_in,i,m,row,rowlevs,nidx,idxs,&
           ! 
           ! Figure out a good reallocation size!
           !
-          isz  = max((l2/i)*m,int(1.2*l2),l2+100)
+          isz  = max(int(1.2*l2),l2+100)
           call psb_realloc(isz,uaspk,info) 
           if (info == psb_success_) call psb_realloc(isz,uia1,info) 
           if (info /= psb_success_) then 
@@ -294,7 +294,7 @@ subroutine mld_dsparse_ainvk(n,a,z,fill_in,sp_thresh,info,inlevs)
   row(:)     = dzero
   rowlevs(:) = -(n+1)
 
-  call zcsr%allocate(n,n,n+1)
+  call zcsr%allocate(n,n,n*fill_in)
   call zcsr%set_triangle()
   call zcsr%set_unit(.false.)
   call zcsr%set_upper()

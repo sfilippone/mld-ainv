@@ -65,6 +65,7 @@ module mld_d_aorth_solver
     procedure, pass(sv) :: descr   => d_aorth_solver_descr
     procedure, pass(sv) :: sizeof  => d_aorth_solver_sizeof
     procedure, pass(sv) :: default => d_aorth_solver_default
+    procedure, pass(sv) :: get_nzeros => d_aorth_get_nzeros
   end type mld_d_aorth_solver_type
 
 
@@ -73,7 +74,7 @@ module mld_d_aorth_solver
        &  d_aorth_solver_setc,   d_aorth_solver_setr,&
        &  d_aorth_solver_descr,  d_aorth_solver_sizeof, &
        &  d_aorth_solver_default, d_aorth_solver_dmp, &
-       &  d_aorth_solver_apply_vect
+       &  d_aorth_solver_apply_vect,  d_aorth_get_nzeros
 
 
 contains
@@ -383,6 +384,7 @@ contains
   subroutine d_aorth_solver_bld(a,desc_a,sv,upd,info,b,amold,vmold)
 
     use psb_base_mod
+    use mld_prec_mod
     use mld_d_aorth_bld_mod
     Implicit None
 
@@ -412,7 +414,7 @@ contains
          & write(debug_unit,*) me,' ',trim(name),' start'
 
     call mld_ainv_orth_bld(a,sv%alg,sv%fill_in,sv%thresh,&
-         & sv%w,sv%d,sv%z,desc_a,info,b)    
+         & sv%w,sv%d,sv%z,desc_a,info,b,iscale=mld_ilu_scale_maxval_)    
     if ((info == psb_success_) .and.present(amold)) then 
       call sv%w%set_asb()
       call sv%w%trim()
@@ -653,8 +655,24 @@ contains
     return
   end subroutine d_aorth_solver_descr
 
+  function d_aorth_get_nzeros(sv) result(val)
+    use psb_base_mod, only : psb_long_int_k_
+    implicit none 
+    ! Arguments
+    class(mld_d_aorth_solver_type), intent(in) :: sv
+    integer(psb_long_int_k_) :: val
+    integer             :: i
+
+    val = 0
+    if (allocated(sv%d)) val = val + size(sv%d)
+    val = val + sv%w%get_nzeros()
+    val = val + sv%z%get_nzeros()
+
+    return
+  end function d_aorth_get_nzeros
+
   function d_aorth_solver_sizeof(sv) result(val)
-    use psb_base_mod
+    use psb_base_mod, only : psb_long_int_k_
     implicit none 
     ! Arguments
     class(mld_d_aorth_solver_type), intent(in) :: sv

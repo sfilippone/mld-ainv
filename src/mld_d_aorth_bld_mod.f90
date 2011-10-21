@@ -24,9 +24,10 @@ module mld_d_aorth_bld_mod
 
 contains
 
-  subroutine mld_d_ainv_orth_bld(a,alg,fillin,thresh,wmat,d,zmat,desc,info,blck)
+  subroutine mld_d_ainv_orth_bld(a,alg,fillin,thresh,wmat,d,zmat,desc,info,blck,iscale)
 
     use psb_base_mod
+    use mld_prec_mod
     implicit none
 
     ! Arguments                                                     
@@ -38,13 +39,14 @@ contains
     Type(psb_desc_type), Intent(in)             :: desc
     integer, intent(out)                        :: info
     type(psb_dspmat_type), intent(in), optional :: blck
+    integer, intent(in), optional               :: iscale
     integer   :: i, nztota, err_act, n_row, nrow_a
     type(psb_d_csr_sparse_mat)  :: acsr
     real(psb_dpk_), allocatable :: pq(:)
-    integer   :: debug_level, debug_unit
-    integer   :: ictxt,np,me
-    integer            :: nzrmax
-    real(psb_dpk_)     :: sp_thresh
+    integer            :: debug_level, debug_unit
+    integer            :: ictxt,np,me
+    integer            :: nzrmax, iscale_
+    real(psb_dpk_)     :: sp_thresh, weight
     character(len=20)  :: name, ch_err
 
 
@@ -59,7 +61,9 @@ contains
     if (debug_level >= psb_debug_outer_) &
          & write(debug_unit,*) me,' ',trim(name),' start'
 
-
+    iscale_ = mld_ilu_scale_none_
+    if (present(iscale)) iscale_ = iscale
+    weight = done
     !
     ! Check the memory available to hold the W and Z factors
     ! and allocate it if needed
@@ -90,6 +94,17 @@ contains
     ! Ok, let's start first with Z (i.e. Upper) 
     !
     call a%cp_to(acsr)
+    select case(iscale_)
+    case(mld_ilu_scale_none_) 
+      ! Ok, do nothing.
+    case(mld_ilu_scale_maxval_) 
+      weight = acsr%maxval()
+      weight = done/weight
+      call acsr%scal(weight,info)
+    case default
+      call psb_errpush(psb_err_from_subroutine_,name,a_err='wrong iscale')
+      goto 9999      
+    end select
 
     call mld_sparse_orthbase(alg,n_row,acsr,pq,&
          & zmat,nzrmax,sp_thresh,info)
@@ -113,6 +128,7 @@ contains
       else
         pq(i) = done/pq(i)
       end if
+      pq(i) = pq(i)*weight
     end do
 
     call psb_move_alloc(pq,d,info)

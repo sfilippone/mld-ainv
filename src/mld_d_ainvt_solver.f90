@@ -54,7 +54,7 @@ module mld_d_ainvt_solver
     class(psb_d_vect), allocatable :: dv
     real(psb_dpk_), allocatable :: d(:)
     integer                     :: fill_in, inv_fill
-    real(psb_dpk_)              :: thresh
+    real(psb_dpk_)              :: thresh, inv_thresh
   contains
     procedure, pass(sv) :: dump    => d_ainvt_solver_dmp
     procedure, pass(sv) :: build   => d_ainvt_solver_bld
@@ -67,6 +67,7 @@ module mld_d_ainvt_solver
     procedure, pass(sv) :: descr   => d_ainvt_solver_descr
     procedure, pass(sv) :: sizeof  => d_ainvt_solver_sizeof
     procedure, pass(sv) :: default => d_ainvt_solver_default
+    procedure, pass(sv) :: get_nzeros => d_ainvt_get_nzeros
   end type mld_d_ainvt_solver_type
 
 
@@ -75,7 +76,7 @@ module mld_d_ainvt_solver
        &  d_ainvt_solver_setc,   d_ainvt_solver_setr,&
        &  d_ainvt_solver_descr,  d_ainvt_solver_sizeof, &
        &  d_ainvt_solver_default, d_ainvt_solver_dmp, &
-       &  d_ainvt_solver_apply_vect
+       &  d_ainvt_solver_apply_vect,  d_ainvt_get_nzeros
 
 
 contains
@@ -89,9 +90,10 @@ contains
     ! Arguments
     class(mld_d_ainvt_solver_type), intent(inout) :: sv
 
-    sv%fill_in   = 0
-    sv%inv_fill  = 0
-    sv%thresh    = dzero
+    sv%fill_in    = 0
+    sv%inv_fill   = 0
+    sv%thresh     = dzero
+    sv%inv_thresh = dzero
 
     return
   end subroutine d_ainvt_solver_default
@@ -116,6 +118,8 @@ contains
     call mld_check_def(sv%inv_fill,&
          & 'Level',0,is_legal_ml_lev)
     call mld_check_def(sv%thresh,&
+         & 'Eps',dzero,is_legal_fact_thrs)
+    call mld_check_def(sv%inv_thresh,&
          & 'Eps',dzero,is_legal_fact_thrs)
     
     if (info /= psb_success_) goto 9999
@@ -414,7 +418,8 @@ contains
          & write(debug_unit,*) me,' ',trim(name),' start'
 
 
-    call mld_ainv_invt_bld(a,sv%fill_in,sv%inv_fill,sv%thresh,&
+    call mld_ainv_invt_bld(a,sv%fill_in,sv%inv_fill,&
+         & sv%thresh,sv%inv_thresh,&
          & sv%l,sv%d,sv%u,desc_a,info,b)    
 
     if ((info == psb_success_) .and.present(amold)) then 
@@ -554,6 +559,8 @@ contains
     select case(what)
     case(mld_sub_iluthrs_) 
       sv%thresh = val
+    case(mld_inv_thresh_) 
+      sv%inv_thresh = val
     case default
 !!$      write(0,*) name,': Error: invalid WHAT'
 !!$      info = -2
@@ -637,9 +644,10 @@ contains
     endif
     
     write(iout_,*) '  AINVT Approximate Inverse with ILU(T,P) '
-    write(iout_,*) '  Fill level:',sv%fill_in
-    write(iout_,*) '  Inverse fill level:',sv%inv_fill
-    write(iout_,*) '  Fill threshold :',sv%thresh
+    write(iout_,*) '  Fill level             :',sv%fill_in
+    write(iout_,*) '  Fill threshold         :',sv%thresh
+    write(iout_,*) '  Inverse fill level     :',sv%inv_fill
+    write(iout_,*) '  Inverse fill threshold :',sv%inv_thresh
 
     call psb_erractionrestore(err_act)
     return
@@ -653,8 +661,24 @@ contains
     return
   end subroutine d_ainvt_solver_descr
 
+  function d_ainvt_get_nzeros(sv) result(val)
+    use psb_base_mod, only : psb_long_int_k_
+    implicit none 
+    ! Arguments
+    class(mld_d_ainvt_solver_type), intent(in) :: sv
+    integer(psb_long_int_k_) :: val
+    integer             :: i
+
+    val = 0
+    if (allocated(sv%d)) val = val + size(sv%d)
+    val = val + sv%l%get_nzeros()
+    val = val + sv%u%get_nzeros()
+
+    return
+  end function d_ainvt_get_nzeros
+
   function d_ainvt_solver_sizeof(sv) result(val)
-    use psb_base_mod
+    use psb_base_mod, only : psb_long_int_k_
     implicit none 
     ! Arguments
     class(mld_d_ainvt_solver_type), intent(in) :: sv

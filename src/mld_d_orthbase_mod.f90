@@ -39,10 +39,10 @@ contains
 
     select case(alg)
     case (mld_ainv_orth1_)
-      call mld_dsparse_orth_sds(n,a,p,zcsc,nzrmax,sp_thresh,info)
+      call mld_dsparse_orth_llk(n,a,p,zcsc,nzrmax,sp_thresh,info)
       if (info /= 0) goto 9999
     case (mld_ainv_orth2_) 
-      call mld_dsparse_orth_dds(n,a,p,zcsc,nzrmax,sp_thresh,info)
+      call mld_dsparse_orth_rlk(n,a,p,zcsc,nzrmax,sp_thresh,info)
 !!$    if (info /= 0) goto 9999
 !!$  case (mld_ainv_orth3_) 
 !!$    call mld_dsparse_orth_3(n,a,p,z,nzrmax,sp_thresh,info)
@@ -88,11 +88,11 @@ contains
     return
   end subroutine mld_dsparse_orthbase
 
-  subroutine mld_dsparse_orth_sds(n,a,p,z,nzrmax,sp_thresh,info)
+  subroutine mld_dsparse_orth_llk(n,a,p,z,nzrmax,sp_thresh,info)
     use psb_base_mod
     use mld_base_ainv_mod
     !
-    ! Need to figure out how I am doing this.... 
+    ! Left-looking variant
     !
     !
     implicit none 
@@ -249,15 +249,17 @@ contains
       nzz        = nzz + nzrz
     end do
 
-  end subroutine mld_dsparse_orth_sds
+  end subroutine mld_dsparse_orth_llk
 
-  subroutine mld_dsparse_orth_dds(n,a,p,z,nzrmax,sp_thresh,info)
+  subroutine mld_dsparse_orth_rlk(n,a,p,z,nzrmax,sp_thresh,info)
     use psb_base_mod
     use mld_base_ainv_mod
     use psb_d_dsc_mat_mod
     !
+    !
     ! Benzi-Tuma (98): alg biconjugation (section 4).
     !  dds implementation. Is this really what they claim it is?? 
+    !  right looking variant.
     !
 
     implicit none 
@@ -305,7 +307,7 @@ contains
          & write(debug_unit,*) me,' ',trim(name),' start'
 
     ljr = 0
-    call zmat%allocate(n,n,n*10*nzrmax)
+    call zmat%allocate(n,n,n*nzrmax)
     ! Init Z to identity 
     if (debug_level >= psb_debug_outer_) &
          & write(debug_unit,*) me,' ',trim(name),' Init ZMAT'
@@ -417,7 +419,7 @@ contains
     if (debug_level >= psb_debug_outer_) &
          & write(debug_unit,*) me,' ',trim(name),' end'
 
-  end subroutine mld_dsparse_orth_dds
+  end subroutine mld_dsparse_orth_rlk
 
 !!$  subroutine mld_dsparse_orth_3(n,a,p,z,nzrmax,sp_thresh,info)
 !!$    !

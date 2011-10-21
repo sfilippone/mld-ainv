@@ -162,7 +162,8 @@ module mld_d_ainv_bld_mod
 
 contains
 
-  subroutine mld_d_ainv_invt_bld(a,fillin,invfill,thresh,lmat,d,umat,desc,info,blck)
+  subroutine mld_d_ainv_invt_bld(a,fillin,invfill,thresh,invthresh,&
+       & lmat,d,umat,desc,info,blck)
 
     use psb_base_mod
 
@@ -172,6 +173,7 @@ contains
     type(psb_dspmat_type), intent(in), target   :: a
     integer, intent(in)                         :: fillin,invfill
     real(psb_dpk_), intent(in)                  :: thresh
+    real(psb_dpk_), intent(in)                  :: invthresh
     type(psb_dspmat_type), intent(inout)        :: lmat, umat
     real(psb_dpk_), allocatable                 :: d(:)
     Type(psb_desc_type), Intent(in)             :: desc
@@ -179,13 +181,13 @@ contains
     type(psb_dspmat_type), intent(in), optional :: blck
     integer   :: i, nztota, err_act, n_row, nrow_a, n_col
     type(psb_dspmat_type)          :: atmp
-    real(psb_dpk_), allocatable :: pq(:), pd(:)
+    real(psb_dpk_), allocatable :: pq(:), pd(:), w(:)
     integer   :: debug_level, debug_unit
     integer   :: ictxt,np,me
     integer            :: nzrmax
     real(psb_dpk_)     :: sp_thresh
 
-    character(len=20)  :: name, ch_err
+    character(len=20)  :: name, ch_err, fname
 
 
     if(psb_get_errstatus() /= psb_success_) return 
@@ -217,7 +219,7 @@ contains
 
     n_row  = psb_cd_get_local_rows(desc)
     n_col  = psb_cd_get_local_cols(desc)
-    allocate(pd(n_row),stat=info)
+    allocate(pd(n_row),w(n_row),stat=info)
     if (info /= psb_success_) then 
       call psb_errpush(psb_err_from_subroutine_,name,a_err='Allocate')
       goto 9999      
@@ -228,9 +230,9 @@ contains
 
     call lmat%csall(n_row,n_row,info,nz=nztota)
     if (info == psb_success_) call umat%csall(n_row,n_row,info,nz=nztota)
-
-    call mld_ilut_fact(nzrmax,sp_thresh,&
-         & a,lmat,umat,pd,info,blck=blck)
+    
+    if (info == 0) call mld_ilut_fact(nzrmax,sp_thresh,&
+         & a,lmat,umat,pd,info,blck=blck,iscale=mld_ilu_scale_maxval_)
 
     if (info == psb_success_) call atmp%csall(n_row,n_row,info,nz=nztota)
     if(info/=0) then
@@ -240,15 +242,22 @@ contains
       goto 9999
     end if
 
+    if (.false.) then 
+!!$    if (debug_level >= psb_debug_inner_) then 
+      write(fname,'(a,i0,a)') 'invt-lo-',me,'.mtx'
+      call lmat%print(fname,head="INVTLOW")
+      write(fname,'(a,i0,a)') 'invt-up-',me,'.mtx'
+      call umat%print(fname,head="INVTUPP")
+    end if
 
     !
     ! Compute the approx U^-1  and L^-1
     !
     nzrmax    = invfill
-    call mld_sparse_ainvt(n_row,umat,atmp,nzrmax,sp_thresh,info)
+    call mld_sparse_ainvt(n_row,umat,atmp,nzrmax,invthresh,info)
     if (info == psb_success_) call psb_move_alloc(atmp,umat,info)
     if (info == psb_success_) call lmat%transp()
-    if (info == psb_success_) call mld_sparse_ainvt(n_row,lmat,atmp,nzrmax,sp_thresh,info)
+    if (info == psb_success_) call mld_sparse_ainvt(n_row,lmat,atmp,nzrmax,invthresh,info)
     if (info == psb_success_) call psb_move_alloc(atmp,lmat,info)
     if (info == psb_success_) call lmat%transp()
     ! Done. Hopefully.... 
