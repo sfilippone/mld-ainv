@@ -384,8 +384,8 @@ contains
                & write(debug_unit,*) me,' ',trim(name),&
                & ' done drop', nzrz
           ! Copy into znew(j) 
-!!$          if (info == psb_success_) call psb_ensure_size(nzrz,zmat%cols(j)%idx,info)
-!!$          if (info == psb_success_) call psb_ensure_size(nzrz,zmat%cols(j)%val,info)
+          if (info == psb_success_) call psb_ensure_size(nzrz,zmat%cols(j)%idx,info)
+          if (info == psb_success_) call psb_ensure_size(nzrz,zmat%cols(j)%val,info)
           if (info /= psb_success_) then 
             info = psb_err_internal_error_
             call psb_errpush(psb_err_internal_error_,name,a_err='Inner loop ')

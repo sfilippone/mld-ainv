@@ -47,11 +47,11 @@ module mld_d_ainvt_solver
 
   use mld_d_prec_type
   use mld_base_ainv_mod 
-  use psb_base_mod, only : psb_d_vect
+  use psb_base_mod, only : psb_d_vect_type
 
   type, extends(mld_d_base_solver_type) :: mld_d_ainvt_solver_type
     type(psb_dspmat_type)       :: l, u
-    class(psb_d_vect), allocatable :: dv
+    type(psb_d_vect_type)       :: dv
     real(psb_dpk_), allocatable :: d(:)
     integer                     :: fill_in, inv_fill
     real(psb_dpk_)              :: thresh, inv_thresh
@@ -257,8 +257,8 @@ contains
     use psb_base_mod
     type(psb_desc_type), intent(in)      :: desc_data
     class(mld_d_ainvt_solver_type), intent(inout) :: sv
-    class(psb_d_vect),intent(inout)      :: x
-    class(psb_d_vect),intent(inout)      :: y
+    type(psb_d_vect_type),intent(inout)  :: x
+    type(psb_d_vect_type),intent(inout)  :: y
     real(psb_dpk_),intent(in)            :: alpha,beta
     character(len=1),intent(in)          :: trans
     real(psb_dpk_),target, intent(inout) :: work(:)
@@ -266,7 +266,7 @@ contains
 
     integer    :: n_row,n_col
     real(psb_dpk_), pointer :: ww(:), aux(:)
-    class(psb_d_vect), allocatable :: tx,ty
+    type(psb_d_vect_type) :: tx,ty
     integer    :: ictxt,np,me,i, err_act
     character          :: trans_
     character(len=20)  :: name='d_ainvt_solver_apply'
@@ -284,8 +284,8 @@ contains
       goto 9999
     end select
 
-    n_row = psb_cd_get_local_rows(desc_data)
-    n_col = psb_cd_get_local_cols(desc_data)
+    n_row = desc_data%get_local_rows()
+    n_col = desc_data%get_local_cols()
 
     if (n_col <= size(work)) then 
       ww => work(1:n_col)
@@ -309,18 +309,9 @@ contains
         goto 9999      
       end if
     endif
-    
-    allocate(tx,mold=x,stat=info)
-    if (info == psb_success_) allocate(ty,mold=x,stat=info)
-    
-    if (info /= psb_success_) then 
-      info=psb_err_alloc_request_
-      call psb_errpush(info,name,i_err=(/2*n_col,0,0,0,0/),&
-           & a_err='real(psb_dpk_)')
-      goto 9999      
-    end if
-    call tx%bld(x%get_nrows())
-    call ty%bld(x%get_nrows())
+
+    call tx%bld(x%get_nrows(),mold=x%v)
+    call ty%bld(x%get_nrows(),mold=x%v)
 
     select case(trans_)
     case('N')
@@ -356,7 +347,6 @@ contains
 
     call tx%free(info) 
     if (info == psb_success_) call ty%free(info)
-    deallocate(tx,ty,stat=info) 
     if (n_col <= size(work)) then 
       if ((4*n_col+n_col) <= size(work)) then 
       else
@@ -398,9 +388,9 @@ contains
     class(mld_d_ainvt_solver_type), intent(inout) :: sv
     character, intent(in)                      :: upd
     integer, intent(out)                       :: info
-    type(psb_dspmat_type), intent(in), target, optional  :: b
-    class(psb_d_base_sparse_mat), intent(in), optional :: amold
-    class(psb_d_vect), intent(in), optional            :: vmold
+    type(psb_dspmat_type), intent(in), target, optional :: b
+    class(psb_d_base_sparse_mat), intent(in), optional  :: amold
+    class(psb_d_base_vect_type), intent(in), optional   :: vmold
 
     ! Local variables
     integer :: n_row,n_col, nrow_a, nztota
@@ -429,16 +419,7 @@ contains
     end if
 
     if (info == psb_success_) then 
-      if (present(vmold)) then 
-        allocate(sv%dv,mold=vmold,stat=info) 
-      else
-        allocate(psb_d_vect :: sv%dv,stat=info) 
-      end if
-      if (info == psb_success_) then 
-        call sv%dv%bld(sv%d)
-      else 
-        write(0,*) 'Error on sv%dv%bld ', info
-      end if
+      call sv%dv%bld(sv%d,mold=vmold)
     end if
 
     if (info /= psb_success_) then 
@@ -604,6 +585,7 @@ contains
     end if
     call sv%l%free()
     call sv%u%free()
+    call sv%dv%free(info)
 
     call psb_erractionrestore(err_act)
     return
@@ -670,7 +652,7 @@ contains
     integer             :: i
 
     val = 0
-    if (allocated(sv%d)) val = val + size(sv%d)
+    val = val + sv%dv%get_nrows()
     val = val + sv%l%get_nzeros()
     val = val + sv%u%get_nzeros()
 
@@ -686,9 +668,9 @@ contains
     integer             :: i
 
     val = 2*psb_sizeof_int + psb_sizeof_dp
-    if (allocated(sv%d)) val = val + psb_sizeof_dp * size(sv%d)
-    val = val + psb_sizeof(sv%l)
-    val = val + psb_sizeof(sv%u)
+    val = val + sv%dv%sizeof()
+    val = val + sv%l%sizeof()
+    val = val + sv%u%sizeof()
 
     return
   end function d_ainvt_solver_sizeof

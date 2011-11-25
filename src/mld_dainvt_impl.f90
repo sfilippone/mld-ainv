@@ -482,6 +482,8 @@ subroutine mld_dsparse_ainvt(n,a,z,nzrmax,sp_thresh,info)
   end if
 
   ipz1 = nzz+1
+  call psb_ensure_size(ipz1,zcsr%val,info)
+  call psb_ensure_size(ipz1,zcsr%ja,info)
   zcsr%val(ipz1) = done
   zcsr%ja(ipz1)  = n
   zcsr%irp(n+1)  = ipz1+1 
