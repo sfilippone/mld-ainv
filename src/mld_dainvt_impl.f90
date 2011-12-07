@@ -43,7 +43,6 @@ subroutine mld_dinvt_copyin(i,m,a,jd,jmin,jmax,nlw,nup,jmaxup,nrmi,row,heap,&
   jmaxup = 0
   dmaxup = dzero
   nrmi   = dzero
-!!$  irwt(:) = 0
 
   do j = a%irp(i), a%irp(i+1) - 1
     k = a%ja(j)
@@ -180,8 +179,9 @@ subroutine mld_dinvt(thres,i,nrmi,row,heap,irwt,ja,irp,val,nidx,idxs,info)
     call psb_ensure_size(nidx,idxs,info,addsz=psb_heap_resize)      
     if (info /= psb_success_) return
     idxs(nidx) = k
-
+    irwt(k)    = 0
   end do
+  irwt(i) = 0
 
 end subroutine mld_dinvt
 
@@ -448,9 +448,10 @@ subroutine mld_dsparse_ainvt(n,a,z,nzrmax,sp_thresh,info)
   call zcsr%set_upper()
   ! 
   !
-  nzz       = 0
-  row(:)    = dzero 
-  l2        = 0
+  nzz        = 0
+  row(:)     = dzero 
+  rowlevs(:) = 0
+  l2         = 0
   zcsr%irp(1) = 1 
   
   outer: do i = 1, n-1
