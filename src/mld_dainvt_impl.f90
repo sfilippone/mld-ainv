@@ -110,7 +110,7 @@ subroutine mld_dinvt(thres,i,nrmi,row,heap,irwt,ja,irp,val,nidx,idxs,info)
   idxs(1) = i
   lastk   = i
   irwt(i) = 1 
-
+!!$  write(0,*) 'Drop Threshold ',thres*nrmi
   !
   ! Do while there are indices to be processed
   !
@@ -136,7 +136,8 @@ subroutine mld_dinvt(thres,i,nrmi,row,heap,irwt,ja,irp,val,nidx,idxs,info)
       ! 
       ! Drop the entry.
       !
-      row(k) = dzero
+      row(k)  = dzero
+      irwt(k) = 0
       cycle
     else
       !
@@ -153,28 +154,30 @@ subroutine mld_dinvt(thres,i,nrmi,row,heap,irwt,ja,irp,val,nidx,idxs,info)
         ! Update row(j) and, if it is not to be discarded, insert
         ! its index into the heap for further processing.
         !
+        
         row(j)     = row(j) - rwk * val(jj)
-        if (abs(row(j)) < thres*nrmi) then
-          ! 
-          ! Drop the entry.
-          !
-          row(j) = dzero
-        else
-          !
-          ! Do the insertion.
-          !
-          if (irwt(j) == 0) then 
+        if (irwt(j) == 0) then 
+          if (abs(row(j)) < thres*nrmi) then
+            ! 
+            ! Drop the entry.
+            !
+            row(j)  = dzero
+          else
+            !
+            ! Do the insertion.
+            !
             call psb_insert_heap(j,heap,info)
             if (info /= psb_success_) return
             irwt(j) = 1
           end if
-        endif
+        end if
       end do
     end if
 
     !
     ! If we get here it is an index we need to keep on copyout.
     !
+   
     nidx       = nidx + 1
     call psb_ensure_size(nidx,idxs,info,addsz=psb_heap_resize)      
     if (info /= psb_success_) return
@@ -225,7 +228,7 @@ subroutine mld_dinvt_copyout(fill_in,thres,i,m,nlw,nup,jmaxup,nrmi,row, &
   ! The heap goes down on the entry absolute value, so the first item
   ! is the largest absolute value. 
   !
-
+!!$  write(0,*) 'invt_copyout ',nidx,nup+fill_in
   call psb_init_heap(heap,info,dir=psb_asort_down_)
 
   if (info == psb_success_) allocate(xwid(nidx),xw(nidx),indx(nidx),stat=info)

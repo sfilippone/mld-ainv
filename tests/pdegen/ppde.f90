@@ -57,7 +57,8 @@ program ppde
   ! descriptor
   type(psb_desc_type)   :: desc_a
   ! dense matrices
-  real(psb_dpk_), allocatable :: b(:), x(:)
+  type(psb_d_vect_type)  :: x,b, vtst
+  real(psb_dpk_), allocatable :: tst(:)
   ! blacs parameters
   integer            :: ictxt, iam, np
 
@@ -178,6 +179,7 @@ program ppde
   call mld_precset(prec,mld_sub_fillin_,   prectype%fill1,   info)
   call mld_precset(prec,mld_sub_iluthrs_,  prectype%thr1,    info)
   call mld_precset(prec,mld_inv_fillin_,   prectype%cfill,   info)
+  call mld_precset(prec,mld_inv_thresh_,   prectype%cthres,  info)
   call psb_barrier(ictxt)
   t1 = psb_wtime()
   call mld_precbld(a,desc_a,prec,info)
@@ -216,8 +218,8 @@ program ppde
   t2 = psb_wtime() - t1
   call psb_amx(ictxt,t2)
 
-  amatsize = psb_sizeof(a)
-  descsize = psb_sizeof(desc_a)
+  amatsize = a%sizeof()
+  descsize = desc_a%sizeof()
   precsize = mld_sizeof(prec)
   call psb_sum(ictxt,amatsize)
   call psb_sum(ictxt,descsize)
@@ -289,21 +291,19 @@ contains
       call read_data(prectype%fill1,5)       ! Fill-in for factorization 1
       call read_data(prectype%thr1,5)        ! Threshold for fact. 1 ILU(T)
       call read_data(prectype%jsweeps,5)     ! Jacobi sweeps for PJAC
-      if (psb_toupper(prectype%prec) == 'ML') then 
-        call read_data(prectype%smther,5)      ! Smoother type.
-        call read_data(prectype%nlev,5)        ! Number of levels in multilevel prec. 
-        call read_data(prectype%aggrkind,5)    ! smoothed/raw aggregatin
-        call read_data(prectype%aggr_alg,5)    ! local or global aggregation
-        call read_data(prectype%mltype,5)      ! additive or multiplicative 2nd level prec
-        call read_data(prectype%smthpos,5)     ! side: pre, post, both smoothing
-        call read_data(prectype%cmat,5)        ! coarse mat
-        call read_data(prectype%csolve,5)      ! Factorization type: ILU, SuperLU, UMFPACK. 
-        call read_data(prectype%csbsolve,5)    ! Factorization type: ILU, SuperLU, UMFPACK. 
-        call read_data(prectype%cfill,5)       ! Fill-in for factorization 1
-        call read_data(prectype%cthres,5)      ! Threshold for fact. 1 ILU(T)
-        call read_data(prectype%cjswp,5)       ! Jacobi sweeps
-        call read_data(prectype%athres,5)      ! smoother aggr thresh
-      end if
+      call read_data(prectype%smther,5)      ! Smoother type.
+      call read_data(prectype%nlev,5)        ! Number of levels in multilevel prec. 
+      call read_data(prectype%aggrkind,5)    ! smoothed/raw aggregatin
+      call read_data(prectype%aggr_alg,5)    ! local or global aggregation
+      call read_data(prectype%mltype,5)      ! additive or multiplicative 2nd level prec
+      call read_data(prectype%smthpos,5)     ! side: pre, post, both smoothing
+      call read_data(prectype%cmat,5)        ! coarse mat
+      call read_data(prectype%csolve,5)      ! Factorization type: ILU, SuperLU, UMFPACK. 
+      call read_data(prectype%csbsolve,5)    ! Factorization type: ILU, SuperLU, UMFPACK. 
+      call read_data(prectype%cfill,5)       ! Fill-in for factorization 1
+      call read_data(prectype%cthres,5)      ! Threshold for fact. 1 ILU(T)
+      call read_data(prectype%cjswp,5)       ! Jacobi sweeps
+      call read_data(prectype%athres,5)      ! smoother aggr thresh
     end if
 
     ! broadcast parameters to all processors
@@ -326,21 +326,19 @@ contains
     call psb_bcast(ictxt,prectype%fill1)       ! Fill-in for factorization 1
     call psb_bcast(ictxt,prectype%thr1)        ! Threshold for fact. 1 ILU(T)
     call psb_bcast(ictxt,prectype%jsweeps)        ! Jacobi sweeps
-    if (psb_toupper(prectype%prec) == 'ML') then 
-      call psb_bcast(ictxt,prectype%smther)      ! Smoother type.
-      call psb_bcast(ictxt,prectype%nlev)        ! Number of levels in multilevel prec. 
-      call psb_bcast(ictxt,prectype%aggrkind)    ! smoothed/raw aggregatin
-      call psb_bcast(ictxt,prectype%aggr_alg)    ! local or global aggregation
-      call psb_bcast(ictxt,prectype%mltype)      ! additive or multiplicative 2nd level prec
-      call psb_bcast(ictxt,prectype%smthpos)     ! side: pre, post, both smoothing
-      call psb_bcast(ictxt,prectype%cmat)        ! coarse mat
-      call psb_bcast(ictxt,prectype%csolve)      ! Factorization type: ILU, SuperLU, UMFPACK. 
-      call psb_bcast(ictxt,prectype%csbsolve)    ! Factorization type: ILU, SuperLU, UMFPACK. 
-      call psb_bcast(ictxt,prectype%cfill)       ! Fill-in for factorization 1
-      call psb_bcast(ictxt,prectype%cthres)      ! Threshold for fact. 1 ILU(T)
-      call psb_bcast(ictxt,prectype%cjswp)       ! Jacobi sweeps
-      call psb_bcast(ictxt,prectype%athres)      ! smoother aggr thresh
-    end if
+    call psb_bcast(ictxt,prectype%smther)      ! Smoother type.
+    call psb_bcast(ictxt,prectype%nlev)        ! Number of levels in multilevel prec. 
+    call psb_bcast(ictxt,prectype%aggrkind)    ! smoothed/raw aggregatin
+    call psb_bcast(ictxt,prectype%aggr_alg)    ! local or global aggregation
+    call psb_bcast(ictxt,prectype%mltype)      ! additive or multiplicative 2nd level prec
+    call psb_bcast(ictxt,prectype%smthpos)     ! side: pre, post, both smoothing
+    call psb_bcast(ictxt,prectype%cmat)        ! coarse mat
+    call psb_bcast(ictxt,prectype%csolve)      ! Factorization type: ILU, SuperLU, UMFPACK. 
+    call psb_bcast(ictxt,prectype%csbsolve)    ! Factorization type: ILU, SuperLU, UMFPACK. 
+    call psb_bcast(ictxt,prectype%cfill)       ! Fill-in for factorization 1
+    call psb_bcast(ictxt,prectype%cthres)      ! Threshold for fact. 1 ILU(T)
+    call psb_bcast(ictxt,prectype%cjswp)       ! Jacobi sweeps
+    call psb_bcast(ictxt,prectype%athres)      ! smoother aggr thresh
 
     if (iam == psb_root_) then 
       write(*,'("Solving matrix       : ell1")')      
@@ -385,7 +383,7 @@ contains
     !   discretize the partial diferential equation
     ! 
     !   b1 dd(u)  b2 dd(u)    b3 dd(u)    a1 d(u)   a2 d(u)  a3 d(u)  
-    ! -   ------ -  ------ -  ------ -  -----  -  ------  -  ------ + a4 u 
+    ! -   ------ -  ------ -  ------ -  -----  -  ------  -  ------ + a4 u = 0
     !      dxdx     dydy       dzdz        dx       dy         dz   
     !
     ! with Dirichlet boundary conditions, on the unit cube  0<=x,y,z<=1.
@@ -401,11 +399,11 @@ contains
     implicit none
     integer                        :: idim
     integer, parameter             :: nb=20
-    real(psb_dpk_), allocatable    :: b(:),xv(:)
+    type(psb_d_vect_type)          :: b,xv
     type(psb_desc_type)            :: desc_a
     integer                        :: ictxt, info
     character                      :: afmt*5
-    type(psb_dspmat_type)         :: a
+    type(psb_dspmat_type)    :: a
     real(psb_dpk_)           :: zt(nb),x,y,z
     integer                  :: m,n,nnz,glob_row,nlr,i,ii,ib,k
     integer                  :: ix,iy,iz,ia,indx_owner
@@ -415,8 +413,8 @@ contains
     real(psb_dpk_), allocatable :: val(:)
     ! deltah dimension of each grid cell
     ! deltat discretization time
-    real(psb_dpk_)         :: deltah
-    real(psb_dpk_),parameter   :: rhs=0.d0,one=1.d0,zero=0.d0
+    real(psb_dpk_)            :: deltah, deltah2
+    real(psb_dpk_), parameter :: rhs=0.d0,one=1.d0,zero=0.d0
     real(psb_dpk_)   :: t0, t1, t2, t3, tasb, talc, ttot, tgen 
     real(psb_dpk_)   :: a1, a2, a3, a4, b1, b2, b3 
     external           :: a1, a2, a3, a4, b1, b2, b3
@@ -430,7 +428,8 @@ contains
 
     call psb_info(ictxt, iam, np)
 
-    deltah = 1.d0/(idim-1)
+    deltah  = 1.d0/(idim-1)
+    deltah2 = deltah*deltah
 
     ! initialize array descriptor and sparse matrix storage. provide an
     ! estimate of the number of non zeroes 
@@ -448,7 +447,7 @@ contains
 
     nt = nr
     call psb_sum(ictxt,nt) 
-    if (nt /= m) write(0,*) iam, 'Initialization error ',nr,nt,m
+    if (nt /= m) write(psb_err_unit,*) iam, 'Initialization error ',nr,nt,m
     call psb_barrier(ictxt)
     t0 = psb_wtime()
     call psb_cdall(ictxt,desc_a,info,nl=nr)
@@ -456,7 +455,7 @@ contains
     ! define  rhs from boundary conditions; also build initial guess 
     if (info == psb_success_) call psb_geall(b,desc_a,info)
     if (info == psb_success_) call psb_geall(xv,desc_a,info)
-    nlr = psb_cd_get_local_rows(desc_a)
+    nlr = desc_a%get_local_rows()
     call psb_barrier(ictxt)
     talc = psb_wtime()-t0
 
@@ -522,79 +521,66 @@ contains
         !  term depending on   (x-1,y,z)
         !
         if (ix == 1) then 
-          val(element)=-b1(x,y,z)-a1(x,y,z)
-          val(element) = val(element)/(deltah*&
-               & deltah)
-          zt(k) = exp(-y**2-z**2)*(-val(element))
+          val(element) = -b1(x,y,z)/deltah2-a1(x,y,z)/deltah
+          zt(k) = exp(-x**2-y**2-z**2)*(-val(element))
         else
-          val(element)=-b1(x,y,z)-a1(x,y,z)
-          val(element) = val(element)/(deltah*&
-               & deltah)
+          val(element)  = -b1(x,y,z)/deltah2-a1(x,y,z)/deltah
           icol(element) = (ix-2)*idim*idim+(iy-1)*idim+(iz)
           irow(element) = glob_row
           element       = element+1
         endif
         !  term depending on     (x,y-1,z)
         if (iy == 1) then 
-          val(element)=-b2(x,y,z)-a2(x,y,z)
-          val(element) = val(element)/(deltah*&
-               & deltah)
-          zt(k) = exp(-y**2-z**2)*exp(-x)*(-val(element))  
+          val(element)  = -b2(x,y,z)/deltah2-a2(x,y,z)/deltah
+          zt(k) = exp(-x**2-y**2-z**2)*exp(-x)*(-val(element))  
         else
-          val(element)=-b2(x,y,z)-a2(x,y,z)
-          val(element) = val(element)/(deltah*deltah)
+          val(element)  = -b2(x,y,z)/deltah2-a2(x,y,z)/deltah
           icol(element) = (ix-1)*idim*idim+(iy-2)*idim+(iz)
           irow(element) = glob_row
           element       = element+1
         endif
         !  term depending on     (x,y,z-1)
         if (iz == 1) then 
-          val(element)=-b3(x,y,z)-a3(x,y,z)
-          val(element) = val(element)/(deltah*deltah)
-          zt(k) = exp(-y**2-z**2)*exp(-x)*(-val(element))  
+          val(element)=-b3(x,y,z)/deltah2-a3(x,y,z)/deltah
+          zt(k) = exp(-x**2-y**2-z**2)*exp(-x)*(-val(element))  
         else
-          val(element)=-b3(x,y,z)-a3(x,y,z)
-          val(element) = val(element)/(deltah*deltah)
+          val(element)=-b3(x,y,z)/deltah2-a3(x,y,z)/deltah
           icol(element) = (ix-1)*idim*idim+(iy-1)*idim+(iz-1)
           irow(element) = glob_row
           element       = element+1
         endif
         !  term depending on     (x,y,z)
-        val(element)=2*b1(x,y,z) + 2*b2(x,y,z)&
-             & + 2*b3(x,y,z) + a1(x,y,z)&
-             & + a2(x,y,z) + a3(x,y,z)
-        val(element) = val(element)/(deltah*deltah)
+        val(element)=(2*b1(x,y,z) + 2*b2(x,y,z) + 2*b3(x,y,z))/deltah2&
+             & + (a1(x,y,z) + a2(x,y,z) + a3(x,y,z)+ a4(x,y,z))/deltah
         icol(element) = (ix-1)*idim*idim+(iy-1)*idim+(iz)
         irow(element) = glob_row
         element       = element+1                  
         !  term depending on     (x,y,z+1)
         if (iz == idim) then 
-          val(element)=-b1(x,y,z)
-          val(element) = val(element)/(deltah*deltah)
-          zt(k) = exp(-y**2-z**2)*exp(-x)*(-val(element))  
+          val(element)=-b1(x,y,z)/deltah2
+          zt(k) = exp(-x**2-y**2-z**2)*exp(-x)*(-val(element))  
         else
-          val(element)=-b1(x,y,z)
-          val(element) = val(element)/(deltah*deltah)
+          val(element)=-b1(x,y,z)/deltah2
           icol(element) = (ix-1)*idim*idim+(iy-1)*idim+(iz+1)
           irow(element) = glob_row
           element       = element+1
         endif
         !  term depending on     (x,y+1,z)
         if (iy == idim) then 
-          val(element)=-b2(x,y,z)
-          val(element) = val(element)/(deltah*deltah)
-          zt(k) = exp(-y**2-z**2)*exp(-x)*(-val(element))  
+          val(element)=-b2(x,y,z)/deltah2
+          zt(k) = exp(-x**2-y**2-z**2)*exp(-x)*(-val(element))  
         else
-          val(element)=-b2(x,y,z)
-          val(element) = val(element)/(deltah*deltah)
+          val(element)=-b2(x,y,z)/deltah2
           icol(element) = (ix-1)*idim*idim+(iy)*idim+(iz)
           irow(element) = glob_row
           element       = element+1
         endif
         !  term depending on     (x+1,y,z)
-        if (ix<idim) then 
-          val(element)=-b3(x,y,z)
-          val(element) = val(element)/(deltah*deltah)
+        if (ix==idim) then 
+          val(element)=-b3(x,y,z)/deltah2
+          zt(k) = exp(-y**2-z**2)*exp(-x)*(-val(element))  
+        else
+          val(element)=-b3(x,y,z)/deltah2
           icol(element) = (ix)*idim*idim+(iy-1)*idim+(iz)
           irow(element) = glob_row
           element       = element+1
