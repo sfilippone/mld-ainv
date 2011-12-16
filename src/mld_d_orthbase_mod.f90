@@ -18,12 +18,9 @@ contains
     integer, intent(out)                   :: info
 
     type(psb_d_csc_sparse_mat)             :: zcsc
-    type(psb_d_csr_sparse_mat)             :: zcsr
-    integer :: i,j,k,nrm
     integer :: err_act
     character(len=20)  :: name='mld_sp_orthbase'
     integer, parameter :: variant=1
-    
 
 
     if (psb_get_errstatus() /= psb_success_) return 
@@ -39,10 +36,10 @@ contains
 
     select case(alg)
     case (mld_ainv_orth1_)
-      call mld_dsparse_orth_llk(n,a,p,zcsc,nzrmax,sp_thresh,info)
+      call mld_dsparse_orth_sds(n,a,p,zcsc,nzrmax,sp_thresh,info)
       if (info /= 0) goto 9999
     case (mld_ainv_orth2_) 
-      call mld_dsparse_orth_rlk(n,a,p,zcsc,nzrmax,sp_thresh,info)
+      call mld_dsparse_orth_dds(n,a,p,zcsc,nzrmax,sp_thresh,info)
 !!$    if (info /= 0) goto 9999
 !!$  case (mld_ainv_orth3_) 
 !!$    call mld_dsparse_orth_3(n,a,p,z,nzrmax,sp_thresh,info)
@@ -55,27 +52,10 @@ contains
       call psb_errpush(psb_err_internal_error_,name,a_err='Invalid alg')
       goto 9999      
     end select
-    if (info /= 0) then 
-      info = psb_err_from_subroutine_
-      call psb_errpush(info,name,a_err='sparse_orth')
-      goto 9999
-    end if
 
-!!$    write(0,*) 'Check after sparse_orth:',&
-!!$         & size(zcsc%icp),size(zcsc%ia),size(zcsc%val)
     call z%mv_from(zcsc)
     call z%cscnv(info,type='CSR')
-!!$    call z%print('orth_bld.mtx',head='check out of orth')
-!!$    call z%cp_to(zcsr)
-!!$    nrm = 0
-!!$    do i=1,zcsr%get_nrows()
-!!$      if (zcsr%irp(i+1)-zcsr%irp(i)>nrm) then      
-!!$        nrm = zcsr%irp(i+1)-zcsr%irp(i)
-!!$        k = i
-!!$      end if
-!!$    end do
-!!$    write(0,*) 'NRM ',nrm,size(zcsr%val),size(zcsr%ja),k
-!!$    write(0,*) zcsr%irp(k),zcsr%irp(k+1),':',zcsr%ja(zcsr%irp(k):zcsr%irp(k+1)-1)
+
     call psb_erractionrestore(err_act)
     return
 
@@ -88,11 +68,11 @@ contains
     return
   end subroutine mld_dsparse_orthbase
 
-  subroutine mld_dsparse_orth_llk(n,a,p,z,nzrmax,sp_thresh,info)
+  subroutine mld_dsparse_orth_sds(n,a,p,z,nzrmax,sp_thresh,info)
     use psb_base_mod
     use mld_base_ainv_mod
     !
-    ! Left-looking variant
+    ! Need to figure out how I am doing this.... 
     !
     !
     implicit none 
@@ -128,7 +108,6 @@ contains
       icr(i) = n
       ikr(i) = 0
       ljr(n) = 0
-      zw(i)  = dzero
     end do
     do i=1, n
       do j=a%irp(i),a%irp(i+1)-1
@@ -193,9 +172,6 @@ contains
           ip2 = ip2 -1 
         end do
         nzra = max(0,ip2 - ip1 + 1) 
-!!$        if (a%ja(ip2) > n) then 
-!!$          write(0,*) 'Out of bounds in orth_sds? ',j,ip1,ip2,a%ja(ip2)
-!!$        end if
         p(i) = psb_spge_dot(nzra,a%ja(ip1:ip2),a%val(ip1:ip2),zw)
         ! !$          write(psb_err_unit,*) j,i,p(i)
 
@@ -237,7 +213,6 @@ contains
         call psb_errpush(info,name,a_err='sparsify')
         return
       end if
-!!$      write(0,*) i,'nzz+nzrz ',nzz,nzrz,size(z%ia),size(z%val)
       call psb_ensure_size(nzz+nzrz, z%ia,  info)
       call psb_ensure_size(nzz+nzrz, z%val, info)
       ipz1 = z%icp(i)
@@ -249,17 +224,15 @@ contains
       nzz        = nzz + nzrz
     end do
 
-  end subroutine mld_dsparse_orth_llk
+  end subroutine mld_dsparse_orth_sds
 
-  subroutine mld_dsparse_orth_rlk(n,a,p,z,nzrmax,sp_thresh,info)
+  subroutine mld_dsparse_orth_dds(n,a,p,z,nzrmax,sp_thresh,info)
     use psb_base_mod
     use mld_base_ainv_mod
     use psb_d_dsc_mat_mod
     !
-    !
     ! Benzi-Tuma (98): alg biconjugation (section 4).
     !  dds implementation. Is this really what they claim it is?? 
-    !  right looking variant.
     !
 
     implicit none 
@@ -270,8 +243,8 @@ contains
     real(psb_dpk_), intent(in)           :: sp_thresh
     real(psb_dpk_), intent(out)          :: p(:)
     integer, intent(out)                 :: info
-    integer, allocatable        :: ia(:), ja(:), iz(:),jz(:), lcr(:)
-    real(psb_dpk_), allocatable :: zw(:), val(:), valz(:), ddtmp(:)
+    integer, allocatable        :: ia(:), ja(:), iz(:),jz(:)
+    real(psb_dpk_), allocatable :: zw(:), val(:), valz(:)
     integer :: i,j,k, kc, kr, err_act, nz, nzra, nzrz, ipzi,ipzj,&
          & nzzi,nzzj, nzz, ip1, ip2, ipza,ipzz, ipzn, nzzn,ifnz, ljr
     integer :: debug_unit, debug_level, me
@@ -284,24 +257,13 @@ contains
     debug_level = psb_get_debug_level()
     me          = -1 
     ! !$    debug_level = psb_debug_outer_
-    allocate(iz(n),jz(n),valz(n),lcr(n),ddtmp(n),stat=info)
+    allocate(iz(n),jz(n),valz(n),stat=info)
     if (info /= psb_success_) then 
       call psb_errpush(psb_err_from_subroutine_,name,a_err='Allocate')
       return      
     end if
 
     ! Init z_1=e_1 and p_1=a_11
-    ! !$    p(1) = dzero
-    ! !$    i   = 1
-    ! !$    nz  = a%irp(i+1) - a%irp(i)
-    ! !$    do j=1,nz
-    ! !$      if (a%ja(j) == 1) then 
-    ! !$        p(1) = a%val(j)
-    ! !$        exit
-    ! !$      end if
-    ! !$    end do
-    ! !$    if (abs(p(1)) < d_epstol) &
-    ! !$         & p(1) = 1.d-3 
     
     if (debug_level >= psb_debug_outer_) &
          & write(debug_unit,*) me,' ',trim(name),' start'
@@ -313,12 +275,9 @@ contains
          & write(debug_unit,*) me,' ',trim(name),' Init ZMAT'
 
     do i=1, n
-      zmat%cols(i)%nz     = 1
+      zmat%cols(i)%nz = 1
       zmat%cols(i)%idx(1) = i
       zmat%cols(i)%val(1) = done
-      p(i)                = dzero
-      ddtmp(i)            = dzero
-      lcr(i)              = i
     end do
 
     if (debug_level >= psb_debug_outer_) &
@@ -335,21 +294,14 @@ contains
 
       ljr = a%ja(a%irp(i+1)-1)
 
-      do j=i, lcr(ljr)
-!!$        if (ljr < zmat%cols(j)%idx(1)) then 
-!!$          p(j) = dzero
-!!$          cycle
-!!$        end if
-        if (.true.) then 
-          nzrz = zmat%cols(j)%nz
-          p(j) = psb_spdot_srtd(nzra,a%ja(ipza:ipza+nzra-1),a%val(ipza:ipza+nzra-1),&
-               & nzrz,zmat%cols(j)%idx,zmat%cols(j)%val)
-        else
-          nzrz = zmat%cols(j)%nz
-          call cp_sp2dn(nzrz,zmat%cols(j)%idx,zmat%cols(j)%val,ddtmp)
-          p(j) = psb_spge_dot(nzra,a%ja(ipza:ipza+nzra-1),a%val(ipza:ipza+nzra-1),ddtmp)
-          call zero_sp2dn(nzrz,zmat%cols(j)%idx,ddtmp)
-        endif
+      do j=i, n
+        if (ljr < zmat%cols(j)%idx(1)) then 
+          p(j) = dzero
+          cycle
+        end if
+        nzrz = zmat%cols(j)%nz
+        p(j) = psb_spdot_srtd(nzra,a%ja(ipza:ipza+nzra-1),a%val(ipza:ipza+nzra-1),&
+             & nzrz,zmat%cols(j)%idx,zmat%cols(j)%val)
       end do
       if (p(i) == dzero) then 
         write(psb_err_unit,*) 'Breakdown!! '
@@ -360,7 +312,7 @@ contains
            & write(debug_unit,*) me,' ',trim(name),' p(i)',p(i)
 
       nzzi = zmat%cols(i)%nz
-      do j=i+1,lcr(ljr)
+      do j=i+1,n 
         ! New kernel psb_aspxpbspy 
         alpha = (-p(j)/p(i))
         if (debug_level >= psb_debug_outer_) &
@@ -396,8 +348,6 @@ contains
             zmat%cols(j)%idx(k) = iz(k)
             zmat%cols(j)%val(k) = valz(k)
           end do
-          k = zmat%cols(j)%idx(1)
-          lcr(k) = max(lcr(k),j)
         end if
         if (debug_level >= psb_debug_outer_) &
              & write(debug_unit,*) me,' ',trim(name),' completed inner iteration ',j
@@ -419,7 +369,7 @@ contains
     if (debug_level >= psb_debug_outer_) &
          & write(debug_unit,*) me,' ',trim(name),' end'
 
-  end subroutine mld_dsparse_orth_rlk
+  end subroutine mld_dsparse_orth_dds
 
 !!$  subroutine mld_dsparse_orth_3(n,a,p,z,nzrmax,sp_thresh,info)
 !!$    !
@@ -768,32 +718,5 @@ contains
       vy(1:ny) = vv(1:ny) 
     end do
   end subroutine psb_d_spmspv
-  
-  subroutine cp_sp2dn(nz,ia,val,v)
-    use psb_base_mod, only : psb_dpk_, dzero
-    implicit none 
-    integer :: nz,ia(*)
-    real(psb_dpk_) :: val(*),v(*)
-    
-    integer :: i
-    
-    do i=1, nz
-      v(ia(i)) = val(i)
-    end do
-  end subroutine cp_sp2dn
-
-  subroutine zero_sp2dn(nz,ia,v)
-    use psb_base_mod, only : psb_dpk_, dzero
-    implicit none 
-    integer :: nz,ia(*)
-    real(psb_dpk_) :: v(*)
-    
-    integer :: i
-    
-    do i=1, nz
-      v(ia(i)) = dzero
-    end do
-  end subroutine zero_sp2dn
-  
 
 end module mld_d_orthbase_mod

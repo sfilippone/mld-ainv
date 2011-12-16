@@ -194,15 +194,15 @@ contains
     end if
 !!$    write(0,*) 'sp_drop allocation',nz
     allocate(xw(nz),xwid(nz),indx(nz),stat=info) 
-!!$    write(0,*) 'sp_drop allocation',nz
+!!$    write(0,*) 'sp_drop allocation',nz,info
     if (info /= psb_success_) then 
-      write(psb_err_unit,*) ' Memory allocation in sp_drop'
+      write(psb_err_unit,*) ' Memory allocation failure in sp_drop',nz,info
       return
     endif
 
     ! Always keep the diagonal element
 !!$    write(0,*) 'sp_drop looking for diag ',idiag
-    call flush(0)
+!!$    call flush(0)
     idf = -1 
     do i=1, nz
       if (iz(i) == idiag) then 
@@ -260,9 +260,11 @@ contains
       xw(nw)   = valz(1)
       xwid(nw) = iz(1)
     end if
-!!$    write(0,*) 'sp_drop into msort ',nw
+!!$    write(0,*) 'sp_drop into msort ',nw,xwid(1:nw),indx(1:nw)
 
     call psb_msort(xwid(1:nw),indx(1:nw),dir=psb_sort_up_)
+!!$    write(0,*) 'sp_drop done msort ',nw
+    
     do i=1, nw
       valz(i) = xw(indx(i))
       iz(i)   = xwid(i)
@@ -270,10 +272,10 @@ contains
     nz = nw
     deallocate(xw,xwid,indx,stat=info) 
     if (info /= psb_success_) then 
-      write(psb_err_unit,*) ' Memory allocation in sp_drop'
+      write(psb_err_unit,*) ' Memory deallocation failure in sp_drop',info
       return
     endif
-
+    call flush(0)
     return
   end subroutine d_sp_drop
 

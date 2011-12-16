@@ -38,6 +38,7 @@ program ppde
   use data_input
   use mld_d_ainvt_solver
   use mld_d_ainvk_solver
+  use mld_d_aorth_solver
   implicit none
 
   ! input parameters
@@ -54,6 +55,7 @@ program ppde
   type(mld_dprec_type)  :: prec
   type(mld_d_ainvt_solver_type) :: ainvtsv
   type(mld_d_ainvk_solver_type) :: ainvksv
+  type(mld_d_aorth_solver_type) :: ainvort
   ! descriptor
   type(psb_desc_type)   :: desc_a
   ! dense matrices
@@ -173,13 +175,21 @@ program ppde
 !!$    call mld_precset(prec,mld_sub_fillin_,      prectype%fill1,   info)
 !!$    call mld_precset(prec,mld_sub_iluthrs_,     prectype%thr1,    info)
 !!$  end if  
+  
   call mld_precinit(prec,'BJAC',info)
-  call mld_inner_precset(prec,ainvtsv,info) 
-!  call mld_inner_precset(prec,ainvksv,info) 
+  select case (psb_toupper(prectype%solve)) 
+  case ('AINVK') 
+    call mld_inner_precset(prec,ainvksv,info) 
+  case ('AINVT') 
+    call mld_inner_precset(prec,ainvtsv,info) 
+  case ('AORTH') 
+    call mld_inner_precset(prec,ainvort,info) 
+  end select
   call mld_precset(prec,mld_sub_fillin_,   prectype%fill1,   info)
   call mld_precset(prec,mld_sub_iluthrs_,  prectype%thr1,    info)
   call mld_precset(prec,mld_inv_fillin_,   prectype%cfill,   info)
   call mld_precset(prec,mld_inv_thresh_,   prectype%cthres,  info)
+  call mld_precset(prec,mld_ainv_alg_,     prectype%cjswp,  info)
   call psb_barrier(ictxt)
   t1 = psb_wtime()
   call mld_precbld(a,desc_a,prec,info)

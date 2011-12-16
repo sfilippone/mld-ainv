@@ -99,8 +99,8 @@ subroutine mld_dinvt(thres,i,nrmi,row,heap,irwt,ja,irp,val,nidx,idxs,info)
   real(psb_dpk_), intent(inout)       :: row(:)
 
   ! Local Variables
-  integer               :: k,j,jj,lastk,iret
-  real(psb_dpk_)      :: rwk
+  integer             :: k,j,jj,lastk,iret
+  real(psb_dpk_)      :: rwk, alpha
 
   info  = psb_success_
 
@@ -154,7 +154,6 @@ subroutine mld_dinvt(thres,i,nrmi,row,heap,irwt,ja,irp,val,nidx,idxs,info)
         ! Update row(j) and, if it is not to be discarded, insert
         ! its index into the heap for further processing.
         !
-        
         row(j)     = row(j) - rwk * val(jj)
         if (irwt(j) == 0) then 
           if (abs(row(j)) < thres*nrmi) then
@@ -162,7 +161,7 @@ subroutine mld_dinvt(thres,i,nrmi,row,heap,irwt,ja,irp,val,nidx,idxs,info)
             ! Drop the entry.
             !
             row(j)  = dzero
-          else
+           else
             !
             ! Do the insertion.
             !

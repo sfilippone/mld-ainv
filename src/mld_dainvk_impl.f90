@@ -252,9 +252,9 @@ subroutine mld_dsparse_ainvk(n,a,z,fill_in,sp_thresh,info,inlevs)
   integer, intent(in), optional        :: inlevs(:)
 
   integer :: i,j,k, err_act, nz, nzra, nzrz, ipz1,ipz2, nzz, ip1, ip2, l2 
-  integer, allocatable        :: ia(:), ja(:), iz(:),jz(:) 
+  integer, allocatable        :: ia(:), ja(:), iz(:), jz(:) 
   real(psb_dpk_), allocatable :: zw(:), val(:), valz(:)
-  integer, allocatable        :: uplevs(:), rowlevs(:),idxs(:)
+  integer, allocatable        :: uplevs(:), rowlevs(:), idxs(:)
   real(psb_dpk_), allocatable :: row(:)
   type(psb_d_coo_sparse_mat)  :: trw
   type(psb_d_csr_sparse_mat)  :: acsr, zcsr
