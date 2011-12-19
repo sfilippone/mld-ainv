@@ -1,9 +1,9 @@
 BICGSTAB                    ! Iterative method: BiCGSTAB BiCG CGS RGMRES BiCGSTABL CG
 CSR                         ! Storage format CSR COO JAD 
-80                          ! IDIM; domain size is idim**3
+40                          ! IDIM; domain size is idim**3
 2                           ! ISTOPC
 0200                        ! ITMAX
-01                          ! ITRACE
+-1                          ! ITRACE
 30                          ! IRST     (restart for RGMRES and BiCGSTABL) 
 1.d-6                       ! EPS
 3L-M-RAS-I-D4               ! Longer descriptive name for preconditioner (up to 20 chars) 
@@ -24,7 +24,7 @@ POST                        ! Side of correction PRE POST TWOSIDE (ignored for A
 DIST                        ! Coarse level: matrix distribution DIST  REPL           
 BJAC                        ! Coarse level: solver JACOBI BJAC UMF SLU  SLUDIST
 UMF                         ! Coarse level: subsolver DSCALE  ILU UMF SLU  SLUDIST
-1                           ! Coarse level: Level-set N for ILU(N)
+0                           ! Coarse level: Level-set N for ILU(N)
 1.d-2                       ! Coarse level: Threshold T for ILU(T,P) 
 13                          ! Coarse level: Number of Jacobi sweeps 
 0.10d0                      ! Smoother Aggregation Threshold: >= 0.0

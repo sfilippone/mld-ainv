@@ -285,69 +285,121 @@ subroutine mld_dinvt_copyout(fill_in,thres,i,m,nlw,nup,jmaxup,nrmi,row, &
   idxp = idxp - 1 
   nz   = 0
   wmin=HUGE(wmin)
-  do
+  if (.false.) then 
+    do
 
-    idxp = idxp + 1
-    if (idxp > nidx) exit
-    widx      = idxs(idxp)
-    if (widx < i) then 
-      write(psb_err_unit,*) 'Warning: lower triangle in upper copy',widx,i,idxp,idxs(idxp)
-      cycle
-    end if
-    if (widx > m) then 
-      cycle
-    end if
-    witem     = row(widx)
-    !
-    ! Dropping rule based on the 2-norm. But keep the jmaxup-th entry anyway.
-    !
-    if ((widx /= jmaxup) .and. (widx /= i) .and. (abs(witem) < thres*nrmi)) then 
-      cycle 
-    end if
-    if ((widx/=jmaxup).and.(nz > nup+fill_in)) then
-      if (abs(witem) < wmin) cycle
-    endif
-    wmin = min(abs(witem),wmin)
-    nz       = nz + 1
-    xw(nz)   = witem 
-    xwid(nz) = widx
-    call psb_insert_heap(witem,widx,heap,info)
-    if (info /= psb_success_) then
-      info=psb_err_from_subroutine_
-      call psb_errpush(info,name,a_err='psb_insert_heap')
-      goto 9999
-    end if
-
-  end do
-
-  !
-  ! Now we have to take out the first nup-fill_in entries. But make sure
-  ! we include entry jmaxup.
-  !
-  if (nz <= nup+fill_in) then
-    ! 
-    ! Just copy everything from xw
-    !
-    fndmaxup=.true.
-  else
-    fndmaxup = .false.
-    nz = nup+fill_in
-    do k=1,nz
-      call psb_heap_get_first(witem,widx,heap,info)
-      xw(k)   = witem
-      xwid(k) = widx
-      if (widx == jmaxup) fndmaxup=.true.
-    end do
-  end if
-  if ((i<jmaxup).and.(jmaxup<=m)) then 
-    if (.not.fndmaxup) then 
-      ! 
-      ! Include entry jmaxup, if it is not already there.
-      ! Put it in the place of the smallest coefficient. 
+      idxp = idxp + 1
+      if (idxp > nidx) exit
+      widx      = idxs(idxp)
+      if (widx < i) then 
+        write(psb_err_unit,*) 'Warning: lower triangle in upper copy',widx,i,idxp,idxs(idxp)
+        cycle
+      end if
+      if (widx > m) then 
+        cycle
+      end if
+      witem     = row(widx)
       !
-      xw(nz)   = row(jmaxup) 
-      xwid(nz) = jmaxup
-    endif
+      ! Dropping rule based on the 2-norm. But keep the jmaxup-th entry anyway.
+      !
+      if ((widx /= jmaxup) .and. (widx /= i) .and. (abs(witem) < thres*nrmi)) then 
+        cycle 
+      end if
+      if ((widx/=jmaxup).and.(nz > nup+fill_in)) then
+        if (abs(witem) < wmin) cycle
+      endif
+      wmin = min(abs(witem),wmin)
+      nz       = nz + 1
+      xw(nz)   = witem 
+      xwid(nz) = widx
+      call psb_insert_heap(witem,widx,heap,info)
+      if (info /= psb_success_) then
+        info=psb_err_from_subroutine_
+        call psb_errpush(info,name,a_err='psb_insert_heap')
+        goto 9999
+      end if
+
+    end do
+
+    !
+    ! Now we have to take out the first nup-fill_in entries. But make sure
+    ! we include entry jmaxup.
+    !
+    if (nz <= nup+fill_in) then
+      ! 
+      ! Just copy everything from xw
+      !
+      fndmaxup=.true.
+    else
+      fndmaxup = .false.
+      nz = nup+fill_in
+      do k=1,nz
+        call psb_heap_get_first(witem,widx,heap,info)
+        xw(k)   = witem
+        xwid(k) = widx
+        if (widx == jmaxup) fndmaxup=.true.
+      end do
+    end if
+    if ((i<jmaxup).and.(jmaxup<=m)) then 
+      if (.not.fndmaxup) then 
+        ! 
+        ! Include entry jmaxup, if it is not already there.
+        ! Put it in the place of the smallest coefficient. 
+        !
+        xw(nz)   = row(jmaxup) 
+        xwid(nz) = jmaxup
+      endif
+    end if
+
+  else if (.true.) then 
+
+    do
+
+      idxp = idxp + 1
+      if (idxp > nidx) exit
+      widx      = idxs(idxp)
+      if (widx < i) then 
+        write(psb_err_unit,*) 'Warning: lower triangle in upper copy',widx,i,idxp,idxs(idxp)
+        cycle
+      end if
+      if (widx > m) then 
+        cycle
+      end if
+      witem     = row(widx)
+      !
+      ! Dropping rule based on the 2-norm. But keep the jmaxup-th entry anyway.
+      !
+      if ((widx /= i) .and. (abs(witem) < thres*nrmi)) then 
+        cycle 
+      end if
+      if (nz > nup+fill_in) then
+        if (abs(witem) < wmin) cycle
+      endif
+      wmin = min(abs(witem),wmin)
+      nz       = nz + 1
+      xw(nz)   = witem 
+      xwid(nz) = widx
+      call psb_insert_heap(witem,widx,heap,info)
+      if (info /= psb_success_) then
+        info=psb_err_from_subroutine_
+        call psb_errpush(info,name,a_err='psb_insert_heap')
+        goto 9999
+      end if
+
+    end do
+
+    !
+    ! Now we have to take out the first nup-fill_in entries. But make sure
+    ! we include entry jmaxup.
+    !
+    if (nz >  nup+fill_in) then
+      nz = nup+fill_in
+      do k=1,nz
+        call psb_heap_get_first(witem,widx,heap,info)
+        xw(k)   = witem
+        xwid(k) = widx
+      end do
+    end if
   end if
 
   !
