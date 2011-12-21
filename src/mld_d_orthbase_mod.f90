@@ -354,6 +354,8 @@ contains
             zmat%cols(j)%idx(k) = iz(k)
             zmat%cols(j)%val(k) = valz(k)
           end do
+          k = zmat%cols(j)%idx(1)
+          lcr(k) = max(lcr(k),j)
         end if
         if (debug_level >= psb_debug_outer_) &
              & write(debug_unit,*) me,' ',trim(name),' completed inner iteration ',j
