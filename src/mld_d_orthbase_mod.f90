@@ -72,7 +72,7 @@ contains
     use psb_base_mod
     use mld_base_ainv_mod
     !
-    ! Need to figure out how I am doing this.... 
+    ! Left-looking variant
     !
     !
     implicit none 
@@ -108,6 +108,7 @@ contains
       icr(i) = n
       ikr(i) = 0
       ljr(n) = 0
+      zw(i)  = dzero
     end do
     do i=1, n
       do j=a%irp(i),a%irp(i+1)-1
@@ -231,8 +232,10 @@ contains
     use mld_base_ainv_mod
     use psb_d_dsc_mat_mod
     !
+    !
     ! Benzi-Tuma (98): alg biconjugation (section 4).
     !  dds implementation. Is this really what they claim it is?? 
+    !  right looking variant.
     !
 
     implicit none 
@@ -243,8 +246,8 @@ contains
     real(psb_dpk_), intent(in)           :: sp_thresh
     real(psb_dpk_), intent(out)          :: p(:)
     integer, intent(out)                 :: info
-    integer, allocatable        :: ia(:), ja(:), iz(:),jz(:)
-    real(psb_dpk_), allocatable :: zw(:), val(:), valz(:)
+    integer, allocatable        :: ia(:), ja(:), iz(:), jz(:), lcr(:)
+    real(psb_dpk_), allocatable :: zw(:), val(:), valz(:), ddtmp(:)
     integer :: i,j,k, kc, kr, err_act, nz, nzra, nzrz, ipzi,ipzj,&
          & nzzi,nzzj, nzz, ip1, ip2, ipza,ipzz, ipzn, nzzn,ifnz, ljr
     integer :: debug_unit, debug_level, me
@@ -257,7 +260,7 @@ contains
     debug_level = psb_get_debug_level()
     me          = -1 
     ! !$    debug_level = psb_debug_outer_
-    allocate(iz(n),jz(n),valz(n),stat=info)
+    allocate(iz(n),jz(n),valz(n),lcr(n),ddtmp(n),stat=info)
     if (info /= psb_success_) then 
       call psb_errpush(psb_err_from_subroutine_,name,a_err='Allocate')
       return      
@@ -278,6 +281,9 @@ contains
       zmat%cols(i)%nz = 1
       zmat%cols(i)%idx(1) = i
       zmat%cols(i)%val(1) = done
+      p(i)                = dzero
+      ddtmp(i)            = dzero
+      lcr(i)              = i
     end do
 
     if (debug_level >= psb_debug_outer_) &
