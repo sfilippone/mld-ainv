@@ -36,10 +36,10 @@ contains
 
     select case(alg)
     case (mld_ainv_orth1_)
-      call mld_dsparse_orth_sds(n,a,p,zcsc,nzrmax,sp_thresh,info)
+      call mld_dsparse_orth_llk(n,a,p,zcsc,nzrmax,sp_thresh,info)
       if (info /= 0) goto 9999
     case (mld_ainv_orth2_) 
-      call mld_dsparse_orth_dds(n,a,p,zcsc,nzrmax,sp_thresh,info)
+      call mld_dsparse_orth_rlk(n,a,p,zcsc,nzrmax,sp_thresh,info)
 !!$    if (info /= 0) goto 9999
 !!$  case (mld_ainv_orth3_) 
 !!$    call mld_dsparse_orth_3(n,a,p,z,nzrmax,sp_thresh,info)
@@ -68,7 +68,7 @@ contains
     return
   end subroutine mld_dsparse_orthbase
 
-  subroutine mld_dsparse_orth_sds(n,a,p,z,nzrmax,sp_thresh,info)
+  subroutine mld_dsparse_orth_llk(n,a,p,z,nzrmax,sp_thresh,info)
     use psb_base_mod
     use mld_base_ainv_mod
     !
@@ -91,7 +91,7 @@ contains
          & nzzi,nzzj, nzz, ip1, ip2, ipza,ipzz, ipzn, nzzn,ifnz, ipz1, ipz2
     type(psb_int_heap) :: heap 
     real(psb_dpk_)     :: alpha
-    character(len=20)  :: name='mld_orth_sds'
+    character(len=20)  :: name='mld_orth_llk'
 
     allocate(zw(n),iz(n),valz(n),icr(n),ikr(n),ljr(n),stat=info)
     if (info /= psb_success_) then 
@@ -224,9 +224,9 @@ contains
       nzz        = nzz + nzrz
     end do
 
-  end subroutine mld_dsparse_orth_sds
+  end subroutine mld_dsparse_orth_llk
 
-  subroutine mld_dsparse_orth_dds(n,a,p,z,nzrmax,sp_thresh,info)
+  subroutine mld_dsparse_orth_rlk(n,a,p,z,nzrmax,sp_thresh,info)
     use psb_base_mod
     use mld_base_ainv_mod
     use psb_d_dsc_mat_mod
@@ -251,7 +251,7 @@ contains
     type(psb_int_heap) :: heap 
     real(psb_dpk_)     :: alpha
     type(psb_d_dsc_sparse_mat) :: zmat
-    character(len=20)  :: name='mld_orth_dds'
+    character(len=20)  :: name='mld_orth_rlk'
 
     debug_unit  = psb_get_debug_unit()
     debug_level = psb_get_debug_level()
@@ -369,7 +369,7 @@ contains
     if (debug_level >= psb_debug_outer_) &
          & write(debug_unit,*) me,' ',trim(name),' end'
 
-  end subroutine mld_dsparse_orth_dds
+  end subroutine mld_dsparse_orth_rlk
 
 !!$  subroutine mld_dsparse_orth_3(n,a,p,z,nzrmax,sp_thresh,info)
 !!$    !
