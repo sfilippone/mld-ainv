@@ -117,7 +117,7 @@ contains
     call mld_check_def(sv%inv_fill,&
          & 'Level',0,is_legal_ml_lev)
     call mld_check_def(sv%thresh,&
-         & 'Eps',dzero,is_legal_fact_thrs)
+         & 'Eps',dzero,is_legal_d_fact_thrs)
     
     if (info /= psb_success_) goto 9999
     
