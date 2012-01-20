@@ -26,7 +26,7 @@ lib: $(OBJS)
 	$(AR) $(HERE)/$(LIBNAME) $(OBJS)
 	$(RANLIB) $(HERE)/$(LIBNAME)
 	/bin/cp -p $(HERE)/$(LIBNAME) $(LIBDIR)
-	/bin/cp -p $(LIBMOD) $(LOCAL_MODS) $(LIBDIR)
+	/bin/cp -p $(LIBMOD) $(LOCAL_MODS) *$(.mod) $(LIBDIR)
 
 
 mld_d_ainv_bld_mod.o:	mld_base_ainv_mod.o

@@ -275,7 +275,7 @@ contains
       write(psb_err_unit,*) ' Memory deallocation failure in sp_drop',info
       return
     endif
-    call flush(0)
+!!$    call flush(0)
     return
   end subroutine d_sp_drop
 

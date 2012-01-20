@@ -18,9 +18,12 @@ contains
     integer, intent(out)                   :: info
 
     type(psb_d_csc_sparse_mat)             :: zcsc
+    type(psb_d_csr_sparse_mat)             :: zcsr
+    integer :: i,j,k,nrm
     integer :: err_act
     character(len=20)  :: name='mld_sp_orthbase'
     integer, parameter :: variant=1
+    
 
 
     if (psb_get_errstatus() /= psb_success_) return 
@@ -53,9 +56,17 @@ contains
       call psb_errpush(psb_err_internal_error_,name,a_err='Invalid alg')
       goto 9999      
     end select
+    if (info /= 0) then 
+      info = psb_err_from_subroutine_
+      call psb_errpush(info,name,a_err='sparse_orth')
+      goto 9999
+    end if
 
+!!$    write(0,*) 'Check after sparse_orth:',&
+!!$         & size(zcsc%icp),size(zcsc%ia),size(zcsc%val)
     call z%mv_from(zcsc)
     call z%cscnv(info,type='CSR')
+!!$    call z%print('orth_bld.mtx',head='check out of orth')
 
     call psb_erractionrestore(err_act)
     return
@@ -174,6 +185,9 @@ contains
           ip2 = ip2 -1 
         end do
         nzra = max(0,ip2 - ip1 + 1) 
+!!$        if (a%ja(ip2) > n) then 
+!!$          write(0,*) 'Out of bounds in orth_sds? ',j,ip1,ip2,a%ja(ip2)
+!!$        end if
         p(i) = psb_spge_dot(nzra,a%ja(ip1:ip2),a%val(ip1:ip2),zw)
         ! !$          write(psb_err_unit,*) j,i,p(i)
 
@@ -215,6 +229,7 @@ contains
         call psb_errpush(info,name,a_err='sparsify')
         return
       end if
+!!$      write(0,*) i,'nzz+nzrz ',nzz,nzrz,size(z%ia),size(z%val)
       call psb_ensure_size(nzz+nzrz, z%ia,  info)
       call psb_ensure_size(nzz+nzrz, z%val, info)
       ipz1 = z%icp(i)
@@ -267,8 +282,6 @@ contains
       return      
     end if
 
-    ! Init z_1=e_1 and p_1=a_11
-    
     if (debug_level >= psb_debug_outer_) &
          & write(debug_unit,*) me,' ',trim(name),' start'
 
@@ -279,7 +292,7 @@ contains
          & write(debug_unit,*) me,' ',trim(name),' Init ZMAT'
 
     do i=1, n
-      zmat%cols(i)%nz = 1
+      zmat%cols(i)%nz     = 1
       zmat%cols(i)%idx(1) = i
       zmat%cols(i)%val(1) = done
       p(i)                = dzero
@@ -295,32 +308,35 @@ contains
       ipza = a%irp(i)
       nzra = a%irp(i+1) - ipza
 
-      ! !$      write(psb_err_unit,*) 'Into sparse dot: ',nzra,a%ja(ipza:ipza+nzra-1),a%val(ipza:ipza+nzra-1)
+!!$      write(psb_err_unit,*) i,'Into sparse dot: ',ipza,nzra
       if (debug_level >= psb_debug_outer_) &
            & write(debug_unit,*) me,' ',trim(name),' Main loop',i
 
       ljr = a%ja(a%irp(i+1)-1)
       
-      do j=i, n
-        if (ljr < zmat%cols(j)%idx(1)) then 
-          p(j) = dzero
-          cycle
-        end if
+      nzzi = zmat%cols(i)%nz
+      p(i) = psb_spdot_srtd(nzra,a%ja(ipza:ipza+nzra-1),a%val(ipza:ipza+nzra-1),&
+           & nzzi,zmat%cols(i)%idx,zmat%cols(i)%val)
+      if (p(i) == dzero) then 
+        write(psb_err_unit,*) 'Breakdown!! ',nzzi,i
+        p(i) = 1.d-3
+      end if
+!!$      write(psb_err_unit,*) i,' Main loop: ',nzzi,p(i)
+      if (debug_level >= psb_debug_outer_) &
+           & write(debug_unit,*) me,' ',trim(name),' p(i)',p(i)
+      
+!!$      do j=i+1,lcr(ljr)
+      j = i
+      do 
+        j = j +1 
+        if (j > lcr(ljr)) exit
         nzrz = zmat%cols(j)%nz
         p(j) = psb_spdot_srtd(nzra,a%ja(ipza:ipza+nzra-1),a%val(ipza:ipza+nzra-1),&
              & nzrz,zmat%cols(j)%idx,zmat%cols(j)%val)
-      end do
-      if (p(i) == dzero) then 
-        write(psb_err_unit,*) 'Breakdown!! '
-        p(i) = 1.d-3
-      end if
-
-      if (debug_level >= psb_debug_outer_) &
-           & write(debug_unit,*) me,' ',trim(name),' p(i)',p(i)
-
-      nzzi = zmat%cols(i)%nz
-      do j=i+1,n 
+!!$        write(psb_err_unit,*) i,j,lcr(ljr),' Inner loop: ',nzrz,p(j)
+        
         ! New kernel psb_aspxpbspy 
+
         alpha = (-p(j)/p(i))
         if (debug_level >= psb_debug_outer_) &
              & write(debug_unit,*) me,' ',trim(name),&
@@ -333,6 +349,7 @@ contains
                & alpha, nzzi, zmat%cols(i)%idx, zmat%cols(i)%val,&
                & done, nzzj, zmat%cols(j)%idx, zmat%cols(j)%val,&
                & info)
+!!$          write(psb_err_unit,*) j,' update: ',nzrz,alpha
           if (debug_level >= psb_debug_outer_) &
                & write(debug_unit,*) me,' ',trim(name),&
                & ' done nspaxpby',nzrz,size(iz),size(valz)
@@ -342,7 +359,10 @@ contains
           if (debug_level >= psb_debug_outer_) &
                & write(debug_unit,*) me,' ',trim(name),&
                & ' done drop', nzrz
+!!$          write(psb_err_unit,*) j,' done drop: ',nzrz
+!!$          call flush(0)
           ! Copy into znew(j) 
+!!$          write(0,*) allocated(zmat%cols(j)%idx), size(zmat%cols(j)%idx)
           if (info == psb_success_) call psb_ensure_size(nzrz,zmat%cols(j)%idx,info)
           if (info == psb_success_) call psb_ensure_size(nzrz,zmat%cols(j)%val,info)
           if (info /= psb_success_) then 
@@ -350,7 +370,10 @@ contains
             call psb_errpush(psb_err_internal_error_,name,a_err='Inner loop ')
             return      
           end if
-          zmat%cols(j)%nz          = nzrz
+!!$          write(0,*) allocated(zmat%cols(j)%idx), size(zmat%cols(j)%idx), nzrz,&
+!!$               &     allocated(zmat%cols(j)%val), size(zmat%cols(j)%val)
+!!$          write(psb_err_unit,*) j,' esured size: ',nzrz
+          zmat%cols(j)%nz       = nzrz
           do k=1,nzrz
             zmat%cols(j)%idx(k) = iz(k)
             zmat%cols(j)%val(k) = valz(k)
@@ -360,8 +383,8 @@ contains
         end if
         if (debug_level >= psb_debug_outer_) &
              & write(debug_unit,*) me,' ',trim(name),' completed inner iteration ',j
-
-        
+!!$        write(psb_err_unit,*) j,' done inner iteration'
+!!$        call flush(0)
       end do
       if (debug_level >= psb_debug_outer_) &
            & write(debug_unit,*) me,' ',trim(name),' completed outer iteration ',i
@@ -775,5 +798,32 @@ contains
       vy(1:ny) = vv(1:ny) 
     end do
   end subroutine psb_d_spmspv
+  
+  subroutine cp_sp2dn(nz,ia,val,v)
+    use psb_base_mod, only : psb_dpk_, dzero
+    implicit none 
+    integer :: nz,ia(*)
+    real(psb_dpk_) :: val(*),v(*)
+    
+    integer :: i
+    
+    do i=1, nz
+      v(ia(i)) = val(i)
+    end do
+  end subroutine cp_sp2dn
+
+  subroutine zero_sp2dn(nz,ia,v)
+    use psb_base_mod, only : psb_dpk_, dzero
+    implicit none 
+    integer :: nz,ia(*)
+    real(psb_dpk_) :: v(*)
+    
+    integer :: i
+    
+    do i=1, nz
+      v(ia(i)) = dzero
+    end do
+  end subroutine zero_sp2dn
+  
 
 end module mld_d_orthbase_mod

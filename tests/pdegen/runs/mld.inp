@@ -1,0 +1,16 @@
+BICGSTAB                 Iterative method BICGSTAB CGS  BICG BICGSTABL RGMRES
+AINV                     Preconditioner NONE  DIAG  BJAC AINV
+CSR                      Storage format for matrix A:  CSR COO JAD 
+NONE                     Renum 
+040                      Domain size (acutal system is this**3)
+2                        Stopping criterion
+1000                     MAXIT
+-001                     ITRACE
+02                       IRST    restart for RGMRES  and BiCGSTABL
+AORTH                    AINV variant: AINVK, AINVT, AORTH
+05                       Direct fill
+05                       Inverse fill
+1.d-3		         Threshold
+1.d-3                    Inverse threshold
+13                       AORTH variant: 12 or 13
+
