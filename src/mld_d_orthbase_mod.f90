@@ -488,6 +488,11 @@ contains
       end if
 
       ! Update loop
+      ! The idea is to keep track in zwcols
+      ! of the indices of the nonzeros in zw, so as to only
+      ! do the dot products on the rows which have nonzeros
+      ! in their positions; to do this we keep an extra
+      ! copy of A in CSC.
       j = zwcols(1)
       do 
         ip1 = a%irp(j)
