@@ -2812,7 +2812,7 @@ subroutine  psb_d_dsc_allocate_mnnz(m,n,a,nz)
 
 end subroutine psb_d_dsc_allocate_mnnz
 
-subroutine psb_d_dsc_print(iout,a,iv,eirs,eics,head,ivr,ivc)
+subroutine psb_d_dsc_print(iout,a,iv,head,ivr,ivc)
   use psb_string_mod
   use psb_d_dsc_mat_mod, psb_protect_name => psb_d_dsc_print
   implicit none 
@@ -2820,7 +2820,6 @@ subroutine psb_d_dsc_print(iout,a,iv,eirs,eics,head,ivr,ivc)
   integer, intent(in)               :: iout
   class(psb_d_dsc_sparse_mat), intent(in) :: a   
   integer, intent(in), optional     :: iv(:)
-  integer, intent(in), optional     :: eirs,eics
   character(len=*), optional        :: head
   integer, intent(in), optional     :: ivr(:), ivc(:)
 
@@ -2830,17 +2829,6 @@ subroutine psb_d_dsc_print(iout,a,iv,eirs,eics,head,ivr,ivc)
 
   character(len=80)                 :: frmtv 
   integer  :: irs,ics,i,j, nmx, ni, nr, nc, nz
-
-  if (present(eirs)) then 
-    irs = eirs
-  else
-    irs = 0
-  endif
-  if (present(eics)) then 
-    ics = eics
-  else
-    ics = 0
-  endif
 
   if (present(head)) then 
     write(iout,'(a)') '%%MatrixMarket matrix coordinate real general'
