@@ -41,8 +41,9 @@ contains
     type(psb_dspmat_type), intent(in), optional :: blck
     integer, intent(in), optional               :: iscale
     integer   :: i, nztota, err_act, n_row, nrow_a
+    type(psb_d_coo_sparse_mat)  :: acoo
     type(psb_d_csr_sparse_mat)  :: acsr
-    real(psb_dpk_), allocatable :: pq(:)
+    real(psb_dpk_), allocatable :: pq(:), arws(:), acls(:), ad(:)
     integer            :: debug_level, debug_unit
     integer            :: ictxt,np,me
     integer            :: nzrmax, iscale_
@@ -93,14 +94,29 @@ contains
     !
     ! Ok, let's start first with Z (i.e. Upper) 
     !
-    call a%cp_to(acsr)
+    call a%csclip(acoo,info,imax=n_row,jmax=n_row)
+    call acsr%mv_from_coo(acoo,info)
     select case(iscale_)
     case(mld_ilu_scale_none_) 
       ! Ok, do nothing.
+
     case(mld_ilu_scale_maxval_) 
       weight = acsr%maxval()
       weight = done/weight
       call acsr%scal(weight,info)
+
+    case(mld_ilu_scale_arcsum_) 
+      allocate(arws(n_row),acls(n_row),ad(n_row),stat=info)
+      if (info /= psb_success_) then 
+        call psb_errpush(psb_err_from_subroutine_,name,a_err='Allocate')
+        goto 9999      
+      end if
+      call acsr%arwsum(arws)
+      call acsr%aclsum(acls)
+      ad(1:n_row) = sqrt(arws(1:n_row)*acls(1:n_row))
+      ad(1:n_row) = done/ad(1:n_row)
+      call acsr%scal(ad,info,side='L')
+      call acsr%scal(ad,info,side='R')
     case default
       call psb_errpush(psb_err_from_subroutine_,name,a_err='wrong iscale')
       goto 9999      
@@ -128,8 +144,22 @@ contains
       else
         pq(i) = done/pq(i)
       end if
-      pq(i) = pq(i)*weight
     end do
+
+    select case(iscale_)
+    case(mld_ilu_scale_none_) 
+      ! Ok, do nothing.
+    case(mld_ilu_scale_maxval_) 
+      pq(:) = pq(:)*weight
+
+    case(mld_ilu_scale_arcsum_) 
+      call zmat%scal(ad,info,side='L')
+      call wmat%scal(ad,info,side='R') 
+
+    case default
+      call psb_errpush(psb_err_from_subroutine_,name,a_err='wrong iscale')
+      goto 9999      
+    end select
 
     call psb_move_alloc(pq,d,info)
 

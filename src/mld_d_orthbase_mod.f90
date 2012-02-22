@@ -62,11 +62,8 @@ contains
       goto 9999
     end if
 
-!!$    write(0,*) 'Check after sparse_orth:',&
-!!$         & size(zcsc%icp),size(zcsc%ia),size(zcsc%val)
     call z%mv_from(zcsc)
     call z%cscnv(info,type='CSR')
-!!$    call z%print('orth_bld.mtx',head='check out of orth')
 
     call psb_erractionrestore(err_act)
     return
@@ -424,11 +421,12 @@ contains
     real(psb_dpk_), allocatable :: zw(:), val(:), valz(:)
     integer :: i,j,k, kc, kr, err_act, nz, nzra, nzrz, ipzi,ipzj,&
          & nzzi,nzzj, nzz, ip1, ip2, ipza,ipzz, ipzn, nzzn,ifnz, ipz1, ipz2,&
-         & nzwc, nzwadd, ipj
-    type(psb_int_heap) :: heap 
+         & nzwc, nzwadd, ipj, lastj
+    type(psb_int_heap) :: heap, rheap
     type(psb_d_csc_sparse_mat) :: ac
     real(psb_dpk_)     :: alpha
     character(len=20)  :: name='mld_orth_llk'
+    logical, parameter :: debug=.false.
 
     allocate(zw(n),iz(n),valz(n),zwcols(n),ikr(n),stat=info)
     if (info == psb_success_) call ac%cp_from_fmt(a,info)
@@ -470,6 +468,7 @@ contains
     nzz       = 1
 
     do i = 2, n
+      if (debug) write(0,*) 'Main loop iteration ',i,n
       ! ZW = e_i
       ! !$        do j=1, i-1
       ! !$          zw(j) = dzero
@@ -481,6 +480,10 @@ contains
       zwcols(1:nzwc) = ac%ia(ac%icp(i):ac%icp(i+1)-1)
       call psb_init_heap(heap,info)
       if (info == psb_success_) call psb_insert_heap(i,heap,info)
+      if (info == psb_success_) call psb_init_heap(rheap,info)
+      do j = ac%icp(i), ac%icp(i+1)-1
+        if (info == psb_success_) call psb_insert_heap(ac%ia(j),rheap,info)
+      end do
       if (info /= psb_success_) then
         info=psb_err_from_subroutine_
         call psb_errpush(info,name,a_err='psb_init_heap')
@@ -488,13 +491,22 @@ contains
       end if
 
       ! Update loop
-      ! The idea is to keep track in zwcols
-      ! of the indices of the nonzeros in zw, so as to only
-      ! do the dot products on the rows which have nonzeros
+      ! The idea is to keep track  of the indices of the nonzeros in zw,
+      ! so as to only do the dot products on the rows which have nonzeros
       ! in their positions; to do this we keep an extra
       ! copy of A in CSC.
-      j = zwcols(1)
-      do 
+      lastj = -1 
+      outer: do 
+        inner: do 
+          call psb_heap_get_first(j,rheap,info)
+          if (debug) write(0,*) 'from get_first: ',j,info
+          if (info == -1) exit outer ! Empty heap
+          if (j > lastj) then 
+            lastj = j 
+            exit inner
+          end if
+        end do inner
+        if (debug) write(0,*) 'update loop, using row: ',j
         ip1 = a%irp(j)
         ip2 = a%irp(j+1) - 1
         do 
@@ -511,9 +523,7 @@ contains
         nzrz = ipz2-ipz1
         alpha = (-p(i)/p(j))
         if (abs(alpha) > sp_thresh) then 
-          ! !$          call psb_aspxpby(alpha,nzrz,&
-          ! !$               & z%ia(ipz1:ipz2-1),z%val(ipz1:ipz2-1), &
-          ! !$               & done,zw,info)
+
           do k=ipz1, ipz2-1
             kr     = z%ia(k)
             zw(kr) = zw(kr) + alpha*z%val(k)
@@ -522,11 +532,18 @@ contains
               call psb_insert_heap(kr,heap,info) 
               if (info /= psb_success_) exit
               ikr(kr) = 1
-              nzwadd  = ac%icp(kr+1)-ac%icp(kr)
-              call psb_ensure_size(nzwc+nzwadd, zwcols,  info)
-              if (info /= psb_success_) exit
-              zwcols(nzwc+1:nzwc+nzwadd) = ac%ia(ac%icp(kr):ac%icp(kr+1)-1)
-              nzwc = nzwc + nzwadd              
+              ! We have just added a new nonzero in KR. Thus, we will
+              ! need to explicitly compute the dot products on all
+              ! rows>J with nonzeros in column kr; we keep  them in 
+              ! a heap.
+              ! 
+              do j = ac%icp(kr), ac%icp(kr+1)-1
+                if ((info == psb_success_).and.(ac%ia(j)>j)) &
+                     & call psb_insert_heap(ac%ia(j),rheap,info)
+              end do
+              if (debug) write(0,*) 'update loop, adding indices: ',&
+                   &  ac%ia(ac%icp(kr):ac%icp(kr+1)-1)
+
             end if
             if (info /= psb_success_) exit
           end do
@@ -535,27 +552,12 @@ contains
             call psb_errpush(info,name,a_err='psb_insert_heap')
             return
           end if
-          call psb_msort_unique(zwcols(1:nzwc),nzwc)
         end if
-        ! 
-        ! Here IPJ will always be >0 since
-        ! J has been found in previous zwcols. 
-        ! 
-        ipj = psb_ibsrch(j,nzwc,zwcols)
-        if (ipj < 0) then 
-          info=psb_err_internal_error_
-          call psb_errpush(info,name,a_err='Cannot be ipj < 0')
-          return
-        else if (ipj == nzwc) then 
-          exit
-        else
-          j = zwcols(ipj+1) 
-        end if
-      end do
+      end do outer
       call a%csget(i,i,nzra,ia,ja,val,info)
       call rwclip(nzra,ia,ja,val,1,n,1,n)      
       p(i) = psb_spge_dot(nzra,ja,val,zw)
-      ! !$      write(psb_err_unit,*) i,i,p(i)
+
       !
       ! Sparsify current ZW and put into ZMAT
       ! 

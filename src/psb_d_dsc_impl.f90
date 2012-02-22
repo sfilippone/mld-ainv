@@ -1387,7 +1387,7 @@ subroutine psb_d_dsc_get_diag(a,d,info)
 end subroutine psb_d_dsc_get_diag
 
 
-subroutine psb_d_dsc_scal(d,a,info) 
+subroutine psb_d_dsc_scal(d,a,info,side) 
   use psb_error_mod
   use psb_const_mod
   use psb_d_dsc_mat_mod, psb_protect_name => psb_d_dsc_scal
@@ -1395,6 +1395,7 @@ subroutine psb_d_dsc_scal(d,a,info)
   class(psb_d_dsc_sparse_mat), intent(inout) :: a
   real(psb_dpk_), intent(in)      :: d(:)
   integer, intent(out)            :: info
+  character, intent(in), optional :: side
 
   Integer :: err_act,mnm, i, j, n
   character(len=20)  :: name='scal'

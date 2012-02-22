@@ -618,7 +618,6 @@ contains
     write(iout_,*) '  AINVK Approximate Inverse with ILU(N) '
     write(iout_,*) '  Fill level             :',sv%fill_in
     write(iout_,*) '  Inverse fill level     :',sv%inv_fill
-    write(iout_,*) '  Fill threshold         :',sv%thresh
 
     call psb_erractionrestore(err_act)
     return

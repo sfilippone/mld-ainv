@@ -531,11 +531,12 @@ module psb_d_dsc_mat_mod
   end interface
   
   interface 
-    subroutine psb_d_dsc_scal(d,a,info) 
+    subroutine psb_d_dsc_scal(d,a,info,side) 
       import :: psb_d_dsc_sparse_mat, psb_dpk_
       class(psb_d_dsc_sparse_mat), intent(inout) :: a
       real(psb_dpk_), intent(in)      :: d(:)
       integer, intent(out)            :: info
+      character, intent(in), optional :: side
     end subroutine psb_d_dsc_scal
   end interface
   

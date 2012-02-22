@@ -88,7 +88,7 @@ contains
     ! Arguments
     class(mld_d_aorth_solver_type), intent(inout) :: sv
 
-    sv%alg     = mld_ainv_orth1_
+    sv%alg     = mld_ainv_orth3_
     sv%fill_in = 0
     sv%thresh  = dzero
 
@@ -110,8 +110,6 @@ contains
     call psb_erractionsave(err_act)
     info = psb_success_
 
-!!$    call mld_check_def(sv%alg,&
-!!$         & 'ALG',mld_ainv_orth1_,is_legal_ml_lev)
     call mld_check_def(sv%fill_in,&
          & 'Level',0,is_legal_ml_lev)
     call mld_check_def(sv%thresh,&
@@ -404,7 +402,7 @@ contains
          & write(debug_unit,*) me,' ',trim(name),' start'
 
     call mld_ainv_orth_bld(a,sv%alg,sv%fill_in,sv%thresh,&
-         & sv%w,sv%d,sv%z,desc_a,info,b,iscale=mld_ilu_scale_maxval_)    
+         & sv%w,sv%d,sv%z,desc_a,info,b,iscale=mld_ilu_scale_arcsum_)    
     if ((info == psb_success_) .and.present(amold)) then 
       call sv%w%set_asb()
       call sv%w%trim()
