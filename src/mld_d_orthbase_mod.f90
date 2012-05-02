@@ -162,6 +162,7 @@ contains
       ifnz   = i
       call psb_init_heap(heap,info)
       if (info == psb_success_) call psb_insert_heap(i,heap,info)
+!!$      write(0,*) 'Inserting into heap ',i
       if (info /= psb_success_) then
         info=psb_err_from_subroutine_
         call psb_errpush(info,name,a_err='psb_init_heap')
@@ -201,6 +202,7 @@ contains
             zw(kr) = zw(kr) + alpha*z%val(k)
             ifnz   = min(ifnz,kr)
             if (ikr(kr) == 0) then 
+!!$              write(0,*) 'Inserting into heap ',kr
               call psb_insert_heap(kr,heap,info) 
               ikr(kr) = 1
             end if
@@ -417,18 +419,18 @@ contains
     integer, intent(out)                      :: info
 
     ! Locals
-    integer, allocatable        :: ia(:), ja(:), iz(:), ikr(:), zwcols(:)
+    integer, allocatable        :: ia(:), ja(:), iz(:), ikr(:)
     real(psb_dpk_), allocatable :: zw(:), val(:), valz(:)
     integer :: i,j,k, kc, kr, err_act, nz, nzra, nzrz, ipzi,ipzj,&
          & nzzi,nzzj, nzz, ip1, ip2, ipza,ipzz, ipzn, nzzn,ifnz, ipz1, ipz2,&
-         & nzwc, nzwadd, ipj, lastj
+         &  ipj, lastj
     type(psb_int_heap) :: heap, rheap
     type(psb_d_csc_sparse_mat) :: ac
     real(psb_dpk_)     :: alpha
     character(len=20)  :: name='mld_orth_llk'
     logical, parameter :: debug=.false.
 
-    allocate(zw(n),iz(n),valz(n),zwcols(n),ikr(n),stat=info)
+    allocate(zw(n),iz(n),valz(n),ikr(n),stat=info)
     if (info == psb_success_) call ac%cp_from_fmt(a,info)
     if (info /= psb_success_) then 
       call psb_errpush(psb_err_from_subroutine_,name,a_err='Allocate')
@@ -477,9 +479,8 @@ contains
       ikr(i) = 1
       ifnz   = i
       nzwc           = ac%icp(i+1)-ac%icp(i)
-      zwcols(1:nzwc) = ac%ia(ac%icp(i):ac%icp(i+1)-1)
-      call psb_init_heap(heap,info)
       if (info == psb_success_) call psb_insert_heap(i,heap,info)
+!!$      write(0,*) 'Inserting into heap ',i
       if (info == psb_success_) call psb_init_heap(rheap,info)
       do j = ac%icp(i), ac%icp(i+1)-1
         if (info == psb_success_) call psb_insert_heap(ac%ia(j),rheap,info)
@@ -491,10 +492,10 @@ contains
       end if
 
       ! Update loop
-      ! The idea is to keep track  of the indices of the nonzeros in zw,
+      ! The idea is to keep track of the indices of the nonzeros in zw,
       ! so as to only do the dot products on the rows which have nonzeros
       ! in their positions; to do this we keep an extra
-      ! copy of A in CSC.
+      ! copy of A in CSC, and the row indices to be considered are in rheap. 
       lastj = -1 
       outer: do 
         inner: do 
@@ -529,6 +530,7 @@ contains
             zw(kr) = zw(kr) + alpha*z%val(k)
             ifnz   = min(ifnz,kr)
             if (ikr(kr) == 0) then 
+!!$              write(0,*) 'Inserting into heap ',kr      
               call psb_insert_heap(kr,heap,info) 
               if (info /= psb_success_) exit
               ikr(kr) = 1
@@ -538,8 +540,10 @@ contains
               ! a heap.
               ! 
               do j = ac%icp(kr), ac%icp(kr+1)-1
-                if ((info == psb_success_).and.(ac%ia(j)>j)) &
+                if ((info == psb_success_)) &
                      & call psb_insert_heap(ac%ia(j),rheap,info)
+!!$                if ((info == psb_success_).and.(ac%ia(j)>j)) &
+!!$                     & call psb_insert_heap(ac%ia(j),rheap,info)
               end do
               if (debug) write(0,*) 'update loop, adding indices: ',&
                    &  ac%ia(ac%icp(kr):ac%icp(kr+1)-1)
