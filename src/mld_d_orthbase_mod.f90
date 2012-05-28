@@ -478,7 +478,7 @@ contains
       zw(i)  = done
       ikr(i) = 1
       ifnz   = i
-      nzwc           = ac%icp(i+1)-ac%icp(i)
+      call psb_init_heap(heap,info)
       if (info == psb_success_) call psb_insert_heap(i,heap,info)
 !!$      write(0,*) 'Inserting into heap ',i
       if (info == psb_success_) call psb_init_heap(rheap,info)
@@ -540,10 +540,10 @@ contains
               ! a heap.
               ! 
               do j = ac%icp(kr), ac%icp(kr+1)-1
-                if ((info == psb_success_)) &
-                     & call psb_insert_heap(ac%ia(j),rheap,info)
-!!$                if ((info == psb_success_).and.(ac%ia(j)>j)) &
+!!$                if ((info == psb_success_)) &
 !!$                     & call psb_insert_heap(ac%ia(j),rheap,info)
+                if ((info == psb_success_).and.(ac%ia(j)>j)) &
+                     & call psb_insert_heap(ac%ia(j),rheap,info)
               end do
               if (debug) write(0,*) 'update loop, adding indices: ',&
                    &  ac%ia(ac%icp(kr):ac%icp(kr+1)-1)
@@ -608,7 +608,7 @@ contains
     real(psb_dpk_), allocatable :: zw(:), val(:), valz(:), ddtmp(:)
     integer :: i,j,k, kc, kr, err_act, nz, nzra, nzrz, ipzi,ipzj,&
          & nzzi,nzzj, nzz, ip1, ip2, ipza,ipzz, ipzn, nzzn,ifnz, ljr,&
-         & nzwc, nzwadd, ipj
+         & nzwadd, ipj
     integer :: debug_unit, debug_level, me
     type(psb_int_heap) :: heap 
     real(psb_dpk_)     :: alpha

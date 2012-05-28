@@ -117,13 +117,13 @@ subroutine mld_dinvt(thres,i,nrmi,row,heap,irwt,ja,irp,val,nidx,idxs,info)
   do
 
     call psb_heap_get_first(k,heap,iret) 
-    if (iret < 0) exit
+    if (iret < 0)  exit
 
     ! 
     ! An index may have been put on the heap more than once.
+    ! Should not happen, but just in case. 
     !
-    if (k == lastk) cycle
-
+    if (k == lastk)  cycle
     lastk = k 
 
     !
@@ -183,8 +183,8 @@ subroutine mld_dinvt(thres,i,nrmi,row,heap,irwt,ja,irp,val,nidx,idxs,info)
     idxs(nidx) = k
     irwt(k)    = 0
   end do
-  irwt(i) = 0
 
+  irwt(i) = 0
 end subroutine mld_dinvt
 
 subroutine mld_dinvt_copyout(fill_in,thres,i,m,nlw,nup,jmaxup,nrmi,row, &

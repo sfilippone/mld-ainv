@@ -28,6 +28,11 @@ subroutine mld_dinvk_copyin(i,m,a,jmin,jmax,row,rowlevs,heap,ktrw,trw,info,sign,
   info = psb_success_
   call psb_erractionsave(err_act)
   call psb_init_heap(heap,info) 
+  if (info /= psb_success_) then
+    info=psb_err_from_subroutine_
+    call psb_errpush(info,name,a_err='psb_init_heap')
+    goto 9999
+  end if
 
   if (present(sign)) then 
     sign_ = sign
