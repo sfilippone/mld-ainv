@@ -81,7 +81,7 @@ contains
          & a%get_nrows(),a%get_ncols(),a%get_nzeros()
 
 
-    n_row  = psb_cd_get_local_rows(desc)
+    n_row  = desc%get_local_rows()
     allocate(pq(n_row),stat=info)
     if (info /= psb_success_) then 
       call psb_errpush(psb_err_from_subroutine_,name,a_err='Allocate')
