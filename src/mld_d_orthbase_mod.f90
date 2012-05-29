@@ -419,18 +419,18 @@ contains
     integer, intent(out)                      :: info
 
     ! Locals
-    integer, allocatable        :: ia(:), ja(:), iz(:), ikr(:)
+    integer, allocatable        :: ia(:), ja(:), iz(:), ikr(:), icr(:)
     real(psb_dpk_), allocatable :: zw(:), val(:), valz(:)
     integer :: i,j,k, kc, kr, err_act, nz, nzra, nzrz, ipzi,ipzj,&
          & nzzi,nzzj, nzz, ip1, ip2, ipza,ipzz, ipzn, nzzn,ifnz, ipz1, ipz2,&
-         &  ipj, lastj
+         &  ipj, lastj, nextj
     type(psb_int_heap) :: heap, rheap
     type(psb_d_csc_sparse_mat) :: ac
     real(psb_dpk_)     :: alpha
     character(len=20)  :: name='mld_orth_llk'
     logical, parameter :: debug=.false.
 
-    allocate(zw(n),iz(n),valz(n),ikr(n),stat=info)
+    allocate(zw(n),iz(n),valz(n),ikr(n),icr(n),stat=info)
     if (info == psb_success_) call ac%cp_from_fmt(a,info)
     if (info /= psb_success_) then 
       call psb_errpush(psb_err_from_subroutine_,name,a_err='Allocate')
@@ -443,6 +443,7 @@ contains
     !
     do i=1,n
       ikr(i) = 0
+      icr(i) = 0 
       zw(i)  = dzero
     end do
 
@@ -484,6 +485,7 @@ contains
       if (info == psb_success_) call psb_init_heap(rheap,info)
       do j = ac%icp(i), ac%icp(i+1)-1
         if (info == psb_success_) call psb_insert_heap(ac%ia(j),rheap,info)
+        icr(ac%ia(j)) = 1
       end do
       if (info /= psb_success_) then
         info=psb_err_from_subroutine_
@@ -542,8 +544,11 @@ contains
               do kc = ac%icp(kr), ac%icp(kr+1)-1
 !!$                if ((info == psb_success_)) &
 !!$                     & call psb_insert_heap(ac%ia(kc),rheap,info)
-                if ((info == psb_success_).and.(ac%ia(kc)>j)) &
-                     & call psb_insert_heap(ac%ia(kc),rheap,info)
+                nextj=ac%ia(kc)
+                if ((info == psb_success_).and.(icr(nextj)==0).and.(nextj>j)   ) then
+                  call psb_insert_heap(nextj,rheap,info)
+                  icr(nextj) = 1
+                end if
               end do
               if (debug) write(0,*) 'update loop, adding indices: ',&
                    &  ac%ia(ac%icp(kr):ac%icp(kr+1)-1)
@@ -557,6 +562,7 @@ contains
             return
           end if
         end if
+        icr(j) = 0
       end do outer
       call a%csget(i,i,nzra,ia,ja,val,info)
       call rwclip(nzra,ia,ja,val,1,n,1,n)      

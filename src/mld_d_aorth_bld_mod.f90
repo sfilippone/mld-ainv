@@ -4,7 +4,7 @@ module mld_d_aorth_bld_mod
   
 
   use mld_d_orthbase_mod
-
+  use mld_d_biconjg_mod
   interface mld_ainv_orth_bld
     module procedure mld_d_ainv_orth_bld
   end interface mld_ainv_orth_bld
@@ -122,15 +122,19 @@ contains
       goto 9999      
     end select
 
-    call mld_sparse_orthbase(alg,n_row,acsr,pq,&
-         & zmat,nzrmax,sp_thresh,info)
-    ! Now for W  (i.e. Lower) 
-    if (info == psb_success_) call acsr%transp() 
-    if (info == psb_success_) &
-         & call mld_sparse_orthbase(alg,n_row,acsr,pq,&
-         &   wmat,nzrmax,sp_thresh,info)
-    call wmat%transp()
-
+    if (.false.) then 
+      call mld_sparse_orthbase(alg,n_row,acsr,pq,&
+           & zmat,nzrmax,sp_thresh,info)
+      ! Now for W  (i.e. Lower) 
+      if (info == psb_success_) call acsr%transp() 
+      if (info == psb_success_) &
+           & call mld_sparse_orthbase(alg,n_row,acsr,pq,&
+           &   wmat,nzrmax,sp_thresh,info)
+      call wmat%transp()
+    else
+      call mld_sparse_biconjg(alg,n_row,acsr,pq,&
+           &   zmat,wmat,nzrmax,sp_thresh,info)
+    end if
     ! Done. Hopefully.... 
 
     if (info /= psb_success_) then 
