@@ -539,11 +539,11 @@ contains
               ! rows>J with nonzeros in column kr; we keep  them in 
               ! a heap.
               ! 
-              do j = ac%icp(kr), ac%icp(kr+1)-1
+              do kc = ac%icp(kr), ac%icp(kr+1)-1
 !!$                if ((info == psb_success_)) &
-!!$                     & call psb_insert_heap(ac%ia(j),rheap,info)
-                if ((info == psb_success_).and.(ac%ia(j)>j)) &
-                     & call psb_insert_heap(ac%ia(j),rheap,info)
+!!$                     & call psb_insert_heap(ac%ia(kc),rheap,info)
+                if ((info == psb_success_).and.(ac%ia(kc)>j)) &
+                     & call psb_insert_heap(ac%ia(kc),rheap,info)
               end do
               if (debug) write(0,*) 'update loop, adding indices: ',&
                    &  ac%ia(ac%icp(kr):ac%icp(kr+1)-1)
