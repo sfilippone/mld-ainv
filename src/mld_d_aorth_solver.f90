@@ -402,7 +402,7 @@ contains
          & write(debug_unit,*) me,' ',trim(name),' start'
 
     call mld_ainv_orth_bld(a,sv%alg,sv%fill_in,sv%thresh,&
-         & sv%w,sv%d,sv%z,desc_a,info,b,iscale=mld_ilu_scale_arcsum_)    
+         & sv%w,sv%d,sv%z,desc_a,info,b,iscale=mld_ilu_scale_maxval_)    
     if ((info == psb_success_) .and.present(amold)) then 
       call sv%w%set_asb()
       call sv%w%trim()

@@ -9,18 +9,6 @@ module mld_d_aorth_bld_mod
     module procedure mld_d_ainv_orth_bld
   end interface mld_ainv_orth_bld
 
-!!$  interface mld_sparse_orthbase
-!!$    subroutine mld_dsparse_orthbase(alg,n,a,p,z,nzrmax,sp_thresh,info)
-!!$      use psb_base_mod, only :psb_d_csr_sparse_mat, psb_dspmat_type, psb_dpk_
-!!$      integer, intent(in)                    :: alg,n
-!!$      type(psb_d_csr_sparse_mat), intent(in) :: a
-!!$      type(psb_dspmat_type), intent(out)     :: z
-!!$      integer, intent(in)                    :: nzrmax
-!!$      real(psb_dpk_), intent(in)             :: sp_thresh
-!!$      real(psb_dpk_), intent(out)            :: p(:)
-!!$      integer, intent(out)                   :: info
-!!$    end subroutine mld_dsparse_orthbase
-!!$  end interface mld_sparse_orthbase
 
 contains
 
@@ -113,7 +101,7 @@ contains
       end if
       call acsr%arwsum(arws)
       call acsr%aclsum(acls)
-      ad(1:n_row) = sqrt(arws(1:n_row)*acls(1:n_row))
+      ad(1:n_row) = sqrt(sqrt(arws(1:n_row)*acls(1:n_row)))
       ad(1:n_row) = done/ad(1:n_row)
       call acsr%scal(ad,info,side='L')
       call acsr%scal(ad,info,side='R')
@@ -122,7 +110,7 @@ contains
       goto 9999      
     end select
 
-    if (.false.) then 
+    if (alg /=  mld_ainv_orth3_) then 
       call mld_sparse_orthbase(alg,n_row,acsr,pq,&
            & zmat,nzrmax,sp_thresh,info)
       ! Now for W  (i.e. Lower) 
