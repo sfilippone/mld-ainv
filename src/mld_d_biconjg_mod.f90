@@ -240,7 +240,9 @@ contains
       call a%csget(i,i,nzra,ia,ja,val,info)
       call rwclip(nzra,ia,ja,val,1,n,1,n)      
       p(i) = psb_spge_dot(nzra,ja,val,zval)
-
+      if (abs(p(i)) < d_epstol) &
+         & p(i) = 1.d-3 
+          
       !
       ! Sparsify current ZVAL and put into ZMAT
       ! 
@@ -360,6 +362,8 @@ contains
       end do
       nzra = max(0,ip2 - ip1 + 1) 
       q(i) = psb_spge_dot(nzra,ac%ia(ip1:ip2),ac%val(ip1:ip2),zval)
+      if (abs(q(i)) < d_epstol) &
+           & q(i) = 1.d-3 
 
       !
       ! Sparsify current ZVAL and put into ZMAT
