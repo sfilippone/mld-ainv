@@ -7,7 +7,7 @@ library: libdir srcd
 libdir:
 	(if test ! -d lib ; then mkdir lib; fi)
 srcd:
-	(cd src; make lib)
+	cd src && $(MAKE)
 
 install:
 	(./mkdir.sh  $(INSTALL_DIR) &&\
@@ -19,7 +19,7 @@ install:
 	(./mkdir.sh  $(INSTALL_DOCSDIR) && \
 	   /bin/cp -fr docs/*pdf docs/html $(INSTALL_DOCSDIR))
 veryclean: 
-	(cd src; make veryclean)
+	cd src && $(MAKE) veryclean
 	(cd lib; /bin/rm -fr *.a *$(.mod))
 	(cd tests/pdegen; make clean)
 

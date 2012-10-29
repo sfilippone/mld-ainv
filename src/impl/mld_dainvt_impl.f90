@@ -1,4 +1,248 @@
 
+subroutine mld_d_ainvt_solver_apply(alpha,sv,x,beta,y,desc_data,trans,work,info)
+  use psb_base_mod
+  use mld_d_ainvt_solver, mld_protect_name => mld_d_ainvt_solver_apply
+  implicit none 
+  type(psb_desc_type), intent(in)      :: desc_data
+  class(mld_d_ainvt_solver_type), intent(in) :: sv
+  real(psb_dpk_),intent(inout)         :: x(:)
+  real(psb_dpk_),intent(inout)         :: y(:)
+  real(psb_dpk_),intent(in)            :: alpha,beta
+  character(len=1),intent(in)          :: trans
+  real(psb_dpk_),target, intent(inout) :: work(:)
+  integer, intent(out)                 :: info
+
+  integer    :: n_row,n_col
+  real(psb_dpk_), pointer :: ww(:), aux(:), tx(:),ty(:)
+  integer    :: ictxt,np,me,i, err_act
+  character          :: trans_
+  character(len=20)  :: name='d_ainvt_solver_apply'
+
+  call psb_erractionsave(err_act)
+
+  info = psb_success_
+
+  trans_ = psb_toupper(trans)
+  select case(trans_)
+  case('N')
+  case('T','C')
+  case default
+    call psb_errpush(psb_err_iarg_invalid_i_,name)
+    goto 9999
+  end select
+
+  n_row = psb_cd_get_local_rows(desc_data)
+  n_col = psb_cd_get_local_cols(desc_data)
+
+  if (n_col <= size(work)) then 
+    ww => work(1:n_col)
+    if ((4*n_col+n_col) <= size(work)) then 
+      aux => work(n_col+1:)
+    else
+      allocate(aux(4*n_col),stat=info)
+      if (info /= psb_success_) then 
+        info=psb_err_alloc_request_
+        call psb_errpush(info,name,i_err=(/4*n_col,0,0,0,0/),&
+             & a_err='real(psb_dpk_)')
+        goto 9999      
+      end if
+    endif
+  else
+    allocate(ww(n_col),aux(4*n_col),stat=info)
+    if (info /= psb_success_) then 
+      info=psb_err_alloc_request_
+      call psb_errpush(info,name,i_err=(/5*n_col,0,0,0,0/),&
+           & a_err='real(psb_dpk_)')
+      goto 9999      
+    end if
+  endif
+
+  select case(trans_)
+  case('N')
+    call psb_spmm(done,sv%l,x,dzero,ww,desc_data,info,&
+         & trans=trans_,work=aux,doswap=.false.)
+    ww(1:n_row) = ww(1:n_row) * sv%d(1:n_row)
+    if (info == psb_success_) &
+         & call psb_spmm(alpha,sv%u,ww,beta,y,desc_data,info,&
+         & trans=trans_,work=aux,doswap=.false.)
+
+  case('T','C')
+    call psb_spmm(done,sv%u,x,dzero,ww,desc_data,info,&
+         & trans=trans_,work=aux,doswap=.false.)
+    ww(1:n_row) = ww(1:n_row) * sv%d(1:n_row)
+    if (info == psb_success_) &
+         & call psb_spmm(alpha,sv%l,ww,beta,y,desc_data,info,&
+         & trans=trans_,work=aux,doswap=.false.)
+
+  case default
+    call psb_errpush(psb_err_internal_error_,name,&
+         & a_err='Invalid TRANS in AINVT subsolve')
+    goto 9999
+  end select
+
+
+  if (info /= psb_success_) then
+
+    call psb_errpush(psb_err_internal_error_,name,&
+         & a_err='Error in subsolve')
+    goto 9999
+  endif
+
+  if (n_col <= size(work)) then 
+    if ((4*n_col+n_col) <= size(work)) then 
+    else
+      deallocate(aux,stat=info)
+    endif
+  else
+    deallocate(ww,aux,stat=info)
+  endif
+
+  if (info /= psb_success_) then
+
+    call psb_errpush(psb_err_internal_error_,name,&
+         & a_err='Deallocate')
+    goto 9999
+  endif
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 continue
+  call psb_erractionrestore(err_act)
+  if (err_act == psb_act_abort_) then
+    call psb_error()
+    return
+  end if
+  return
+
+end subroutine mld_d_ainvt_solver_apply
+
+subroutine mld_d_ainvt_solver_apply_vect(alpha,sv,x,beta,y,desc_data,trans,work,info)
+  use psb_base_mod
+  use mld_d_ainvt_solver, mld_protect_name => mld_d_ainvt_solver_apply_vect
+  implicit none 
+  type(psb_desc_type), intent(in)      :: desc_data
+  class(mld_d_ainvt_solver_type), intent(inout) :: sv
+  type(psb_d_vect_type),intent(inout)  :: x
+  type(psb_d_vect_type),intent(inout)  :: y
+  real(psb_dpk_),intent(in)            :: alpha,beta
+  character(len=1),intent(in)          :: trans
+  real(psb_dpk_),target, intent(inout) :: work(:)
+  integer, intent(out)                 :: info
+
+  integer    :: n_row,n_col
+  real(psb_dpk_), pointer :: ww(:), aux(:)
+  type(psb_d_vect_type) :: tx,ty
+  integer    :: ictxt,np,me,i, err_act
+  character          :: trans_
+  character(len=20)  :: name='d_ainvt_solver_apply'
+
+  call psb_erractionsave(err_act)
+
+  info = psb_success_
+
+  trans_ = psb_toupper(trans)
+  select case(trans_)
+  case('N')
+  case('T','C')
+  case default
+    call psb_errpush(psb_err_iarg_invalid_i_,name)
+    goto 9999
+  end select
+
+  n_row = desc_data%get_local_rows()
+  n_col = desc_data%get_local_cols()
+
+  if (n_col <= size(work)) then 
+    ww => work(1:n_col)
+    if ((4*n_col+n_col) <= size(work)) then 
+      aux => work(n_col+1:)
+    else
+      allocate(aux(4*n_col),stat=info)
+      if (info /= psb_success_) then 
+        info=psb_err_alloc_request_
+        call psb_errpush(info,name,i_err=(/4*n_col,0,0,0,0/),&
+             & a_err='real(psb_dpk_)')
+        goto 9999      
+      end if
+    endif
+  else
+    allocate(ww(n_col),aux(4*n_col),stat=info)
+    if (info /= psb_success_) then 
+      info=psb_err_alloc_request_
+      call psb_errpush(info,name,i_err=(/5*n_col,0,0,0,0/),&
+           & a_err='real(psb_dpk_)')
+      goto 9999      
+    end if
+  endif
+
+  call tx%bld(x%get_nrows(),mold=x%v)
+  call ty%bld(x%get_nrows(),mold=x%v)
+
+  select case(trans_)
+  case('N')
+    call psb_spmm(done,sv%l,x,dzero,tx,desc_data,info,&
+         & trans=trans_,work=aux,doswap=.false.)
+    if (info == psb_success_) call ty%mlt(done,sv%dv,tx,dzero,info)
+    if (info == psb_success_) &
+         & call psb_spmm(alpha,sv%u,ty,beta,y,desc_data,info,&
+         & trans=trans_,work=aux,doswap=.false.)
+
+  case('T','C')
+    call psb_spmm(done,sv%u,x,dzero,tx,desc_data,info,&
+         & trans=trans_,work=aux,doswap=.false.)
+    if (info == psb_success_) call ty%mlt(done,sv%dv,tx,dzero,info)
+    if (info == psb_success_) &
+         & call psb_spmm(alpha,sv%l,ty,beta,y,desc_data,info,&
+         & trans=trans_,work=aux,doswap=.false.)
+
+  case default
+    call psb_errpush(psb_err_internal_error_,name,&
+         & a_err='Invalid TRANS in AINVT subsolve')
+    goto 9999
+  end select
+
+
+  if (info /= psb_success_) then
+
+    call psb_errpush(psb_err_internal_error_,name,&
+         & a_err='Error in subsolve')
+    goto 9999
+  endif
+
+
+  call tx%free(info) 
+  if (info == psb_success_) call ty%free(info)
+  if (n_col <= size(work)) then 
+    if ((4*n_col+n_col) <= size(work)) then 
+    else
+      deallocate(aux,stat=info)
+    endif
+  else
+    deallocate(ww,aux,stat=info)
+  endif
+
+  if (info /= psb_success_) then
+
+    call psb_errpush(psb_err_internal_error_,name,&
+         & a_err='Deallocate')
+    goto 9999
+  endif
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 continue
+  call psb_erractionrestore(err_act)
+  if (err_act == psb_act_abort_) then
+    call psb_error()
+    return
+  end if
+  return
+
+end subroutine mld_d_ainvt_solver_apply_vect
+
+
 subroutine mld_dinvt_copyin(i,m,a,jd,jmin,jmax,nlw,nup,jmaxup,nrmi,row,heap,&
      & irwt,ktrw,trw,info,sign)
   use psb_base_mod
@@ -67,7 +311,7 @@ subroutine mld_dinvt_copyin(i,m,a,jd,jmin,jmax,nlw,nup,jmaxup,nrmi,row,heap,&
   end do
   nz   = a%irp(i+1) - a%irp(i)
   nrmi = dnrm2(nz,a%val(a%irp(i):),ione)
-  
+
   return
 
 9999 continue
@@ -161,7 +405,7 @@ subroutine mld_dinvt(thres,i,nrmi,row,heap,irwt,ja,irp,val,nidx,idxs,info)
             ! Drop the entry.
             !
             row(j)  = dzero
-           else
+          else
             !
             ! Do the insertion.
             !
@@ -176,7 +420,7 @@ subroutine mld_dinvt(thres,i,nrmi,row,heap,irwt,ja,irp,val,nidx,idxs,info)
     !
     ! If we get here it is an index we need to keep on copyout.
     !
-   
+
     nidx       = nidx + 1
     call psb_ensure_size(nidx,idxs,info,addsz=psb_heap_resize)      
     if (info /= psb_success_) return
@@ -507,7 +751,7 @@ subroutine mld_dsparse_ainvt(n,a,z,nzrmax,sp_thresh,info)
   rowlevs(:) = 0
   l2         = 0
   zcsr%irp(1) = 1 
-  
+
   outer: do i = 1, n-1
     ! ZW = e_i
     call mld_invt_copyin(i,n,acsr,i,1,n,nlw,nup,jmaxup,nrmi,row,&
@@ -542,7 +786,7 @@ subroutine mld_dsparse_ainvt(n,a,z,nzrmax,sp_thresh,info)
   zcsr%val(ipz1) = done
   zcsr%ja(ipz1)  = n
   zcsr%irp(n+1)  = ipz1+1 
-  
+
   call z%mv_from(zcsr)
 
   call psb_erractionrestore(err_act)
