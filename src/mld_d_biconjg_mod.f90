@@ -20,7 +20,7 @@ contains
     type(psb_d_csc_sparse_mat)             :: zcsc,wcsc
     integer :: i,j,k,nrm
     integer :: err_act
-    character(len=20)  :: name='mld_sp_orthbase'
+    character(len=20)  :: name='mld_sparse_biconjg'
     integer, parameter :: variant=1
     
 
@@ -36,7 +36,14 @@ contains
       goto 9999      
     end if
 
-    call mld_dsparse_biconjg_llk(n,acsr,p,zcsc,wcsc,nzrmax,sp_thresh,info)
+    select case(alg)
+    case (mld_ainv_llk_) 
+      call mld_dsparse_biconjg_llk(n,acsr,p,zcsc,wcsc,nzrmax,sp_thresh,info)
+    case default
+      info = psb_err_internal_error_
+      call psb_errpush(info,name,a_err='Invalid alg')
+      goto 9999      
+    end select
 
     if (info /= 0) then 
       info = psb_err_from_subroutine_

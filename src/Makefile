@@ -34,9 +34,9 @@ lib: $(OBJS)
 impld: 
 	cd impl && $(MAKE) LIBNAME=$(LIBNAME)
 
-mld_d_ainv_bld_mod.o:	mld_base_ainv_mod.o
+mld_d_biconjg_mod.o mld_d_ainv_bld_mod.o: mld_base_ainv_mod.o
 mld_d_ainvt_solver.o mld_d_ainvk_solver.o: mld_d_ainv_bld_mod.o mld_base_ainv_mod.o
-mld_d_biconjg_mod.o mld_d_orthbase_mod.o: psb_d_dsc_mat_mod.o
+mld_d_orthbase_mod.o: psb_d_dsc_mat_mod.o
 mld_d_aorth_solver.o: mld_d_aorth_bld_mod.o  mld_base_ainv_mod.o	
 mld_d_aorth_bld_mod.o: mld_base_ainv_mod.o  mld_d_orthbase_mod.o mld_d_biconjg_mod.o
 

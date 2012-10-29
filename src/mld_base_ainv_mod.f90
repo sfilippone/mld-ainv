@@ -22,11 +22,14 @@ module mld_base_ainv_mod
   integer, parameter   :: mld_ainv_orth3_ = mld_ainv_orth2_+1
   integer, parameter   :: mld_ainv_orth4_ = mld_ainv_orth3_+1
   integer, parameter   :: mld_inv_thresh_ = mld_ainv_orth4_ + 1
+  integer, parameter   :: mld_ainv_llk_   = mld_ainv_orth3_
+
 
 contains
 
   subroutine drwclip(nz,ia,ja,val,imin,imax,jmin,jmax)
-    use psb_base_mod
+    use psb_base_mod, only : psb_dpk_
+
     implicit none 
     integer, intent(inout) :: nz
     integer, intent(inout) :: ia(*), ja(*)

@@ -12,7 +12,7 @@ FINCLUDES=$(FMFLAG). $(FMFLAG)$(AINVLIBDIR) $(FMFLAG)$(MLDINCDIR)  $(FMFLAG)$(PS
 
 PDOBJS=ppde.o  data_input.o 
 PSOBJS=spde.o  data_input.o 
-MLOBJS=mldpde.o data_input.o
+MLOBJS=mldpde.o data_input.o  pde3d_exp_mod.o pde3d_gauss_mod.o pde3d_base_mod.o
 EXEDIR=./runs
 
 all: mldpde
@@ -20,7 +20,7 @@ all: mldpde
 mldpde: $(MLOBJS)
 	$(F90LINK) $(MLOBJS) -o mldpde $(AINV_LIB) $(MLD_LIB) $(PSBLAS_LIB) $(LDLIBS)
 	/bin/mv mldpde $(EXEDIR)
-
+mldpde.o:  data_input.o  pde3d_exp_mod.o pde3d_gauss_mod.o pde3d_base_mod.o
 ppde: $(PDOBJS)
 	$(F90LINK) $(PDOBJS) -o ppde $(AINV_LIB) $(MLD_LIB) $(PSBLAS_LIB) $(LDLIBS) -Wl,-pthread
 	/bin/mv ppde $(EXEDIR)
