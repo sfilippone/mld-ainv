@@ -42,13 +42,10 @@ psb_d_mv_dsc_from_coo.o \
 psb_d_mv_dsc_from_fmt.o \
 psb_d_mv_dsc_to_coo.o \
 psb_d_mv_dsc_to_fmt.o \
-mld_dainvk_impl.o \
 mld_d_ainvk_solver_apply.o \
 mld_d_ainvk_solver_apply_vect.o \
-mld_dainvt_impl.o \
 mld_d_ainvt_solver_apply.o \
 mld_d_ainvt_solver_apply_vect.o \
-mld_d_aorth_impl.o \
 mld_d_aorth_solver_apply.o \
 mld_d_aorth_solver_apply_vect.o \
 mld_dinvk_copyin.o \
