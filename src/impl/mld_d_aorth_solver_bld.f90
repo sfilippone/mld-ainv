@@ -4,7 +4,7 @@ subroutine mld_d_aorth_solver_bld(a,desc_a,sv,upd,info,b,amold,vmold)
   use psb_base_mod
   use mld_d_aorth_solver, mld_protect_name => mld_d_aorth_solver_bld
   use mld_prec_mod
-  use mld_d_aorth_bld_mod
+  !use mld_d_aorth_bld_mod
   Implicit None
 
   ! Arguments
@@ -34,6 +34,7 @@ subroutine mld_d_aorth_solver_bld(a,desc_a,sv,upd,info,b,amold,vmold)
 
   call mld_ainv_orth_bld(a,sv%alg,sv%fill_in,sv%thresh,&
        & sv%w,sv%d,sv%z,desc_a,info,b,iscale=mld_ilu_scale_maxval_)    
+
   if ((info == psb_success_) .and.present(amold)) then 
     call sv%w%set_asb()
     call sv%w%trim()

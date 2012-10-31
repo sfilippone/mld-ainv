@@ -219,6 +219,23 @@ module mld_d_aorth_solver
     end subroutine mld_d_aorth_solver_dmp
   end interface
   
+  interface  mld_ainv_orth_bld
+    subroutine mld_d_ainv_orth_bld(a,alg,fillin,thresh,wmat,d,zmat,desc,info,blck,iscale)
+      import :: psb_desc_type, psb_dspmat_type,  psb_d_base_sparse_mat, &
+           & psb_d_vect_type, psb_d_base_vect_type, psb_dpk_
+      implicit none
+      type(psb_dspmat_type), intent(in), target   :: a
+      integer, intent(in)                         :: fillin,alg
+      real(psb_dpk_), intent(in)                  :: thresh
+      type(psb_dspmat_type), intent(inout)        :: wmat, zmat
+      real(psb_dpk_), allocatable                 :: d(:)
+      Type(psb_desc_type), Intent(in)             :: desc
+      integer, intent(out)                        :: info
+      type(psb_dspmat_type), intent(in), optional :: blck
+      integer, intent(in), optional               :: iscale
+    end subroutine mld_d_ainv_orth_bld
+  end interface
+
 
 contains
 
