@@ -64,6 +64,14 @@ mld_d_ainvt_solver_seti.o \
 mld_d_ainvt_solver_setr.o \
 mld_d_aorth_solver_apply.o \
 mld_d_aorth_solver_apply_vect.o \
+mld_d_aorth_solver_bld.o \
+mld_d_aorth_solver_check.o \
+mld_d_aorth_solver_descr.o \
+mld_d_aorth_solver_dmp.o \
+mld_d_aorth_solver_free.o \
+mld_d_aorth_solver_setc.o \
+mld_d_aorth_solver_seti.o \
+mld_d_aorth_solver_setr.o \
 mld_dinvk_copyin.o \
 mld_dinvk_copyout.o \
 mld_dinvk.o \
