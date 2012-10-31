@@ -45,7 +45,7 @@
 
 module mld_d_ainvt_solver
 
-  use mld_d_prec_type
+  use mld_d_base_solver_mod
   use mld_base_ainv_mod 
   use psb_base_mod, only : psb_d_vect_type
 
@@ -56,63 +56,182 @@ module mld_d_ainvt_solver
     integer                     :: fill_in, inv_fill
     real(psb_dpk_)              :: thresh, inv_thresh
   contains
-    procedure, pass(sv) :: dump    => d_ainvt_solver_dmp
-    procedure, pass(sv) :: build   => d_ainvt_solver_bld
+    procedure, pass(sv) :: dump    => mld_d_ainvt_solver_dmp
+    procedure, pass(sv) :: build   => mld_d_ainvt_solver_bld
     procedure, pass(sv) :: apply_v => mld_d_ainvt_solver_apply_vect
     procedure, pass(sv) :: apply_a => mld_d_ainvt_solver_apply
-    procedure, pass(sv) :: free    => d_ainvt_solver_free
-    procedure, pass(sv) :: seti    => d_ainvt_solver_seti
-    procedure, pass(sv) :: setc    => d_ainvt_solver_setc
-    procedure, pass(sv) :: setr    => d_ainvt_solver_setr
-    procedure, pass(sv) :: descr   => d_ainvt_solver_descr
+    procedure, pass(sv) :: free    => mld_d_ainvt_solver_free
+    procedure, pass(sv) :: seti    => mld_d_ainvt_solver_seti
+    procedure, pass(sv) :: setc    => mld_d_ainvt_solver_setc
+    procedure, pass(sv) :: setr    => mld_d_ainvt_solver_setr
+    procedure, pass(sv) :: descr   => mld_d_ainvt_solver_descr
     procedure, pass(sv) :: sizeof  => d_ainvt_solver_sizeof
     procedure, pass(sv) :: default => d_ainvt_solver_default
     procedure, pass(sv) :: get_nzeros => d_ainvt_get_nzeros
   end type mld_d_ainvt_solver_type
 
 
-  private :: d_ainvt_solver_bld,  &
-       &  d_ainvt_solver_free,   d_ainvt_solver_seti, &
-       &  d_ainvt_solver_setc,   d_ainvt_solver_setr,&
-       &  d_ainvt_solver_descr,  d_ainvt_solver_sizeof, &
-       &  d_ainvt_solver_default, d_ainvt_solver_dmp, &
+  private :: d_ainvt_solver_sizeof, &
+       &  d_ainvt_solver_default, &
        &  d_ainvt_get_nzeros
 
-  interface 
-    subroutine mld_d_ainvt_solver_apply(alpha,sv,x,beta,y,desc_data,trans,work,info)
-      import :: psb_desc_type, psb_dpk_,mld_d_ainvt_solver_type
-      type(psb_desc_type), intent(in)      :: desc_data
-      class(mld_d_ainvt_solver_type), intent(in) :: sv
-      real(psb_dpk_),intent(inout)         :: x(:)
-      real(psb_dpk_),intent(inout)         :: y(:)
-      real(psb_dpk_),intent(in)            :: alpha,beta
-      character(len=1),intent(in)          :: trans
-      real(psb_dpk_),target, intent(inout) :: work(:)
-      integer, intent(out)                 :: info
-    end subroutine mld_d_ainvt_solver_apply
-  end interface
 
+  interface  
+    subroutine mld_d_ainvt_solver_apply(alpha,sv,x,beta,y,desc_data,trans,work,info)
+      import :: psb_desc_type, psb_dspmat_type,  psb_d_base_sparse_mat, &
+       & psb_d_vect_type, psb_d_base_vect_type, psb_dpk_, mld_d_ainvt_solver_type
+      type(psb_desc_type), intent(in)           :: desc_data
+      class(mld_d_ainvt_solver_type), intent(in) :: sv
+      real(psb_dpk_),intent(inout)              :: x(:)
+      real(psb_dpk_),intent(inout)              :: y(:)
+      real(psb_dpk_),intent(in)                 :: alpha,beta
+      character(len=1),intent(in)               :: trans
+      real(psb_dpk_),target, intent(inout)      :: work(:)
+      integer, intent(out)                      :: info
+    end subroutine mld_d_ainvt_solver_apply
+  end interface 
+  
+      
   interface 
     subroutine mld_d_ainvt_solver_apply_vect(alpha,sv,x,beta,y,desc_data,trans,work,info)
-      import :: psb_desc_type, psb_dpk_,mld_d_ainvt_solver_type, psb_d_vect_type
-      type(psb_desc_type), intent(in)      :: desc_data
+      import :: psb_desc_type, psb_dspmat_type,  psb_d_base_sparse_mat, &
+           & psb_d_vect_type, psb_d_base_vect_type, psb_dpk_, mld_d_ainvt_solver_type
+      
+      type(psb_desc_type), intent(in)              :: desc_data
       class(mld_d_ainvt_solver_type), intent(inout) :: sv
-      type(psb_d_vect_type),intent(inout)  :: x
-      type(psb_d_vect_type),intent(inout)  :: y
-      real(psb_dpk_),intent(in)            :: alpha,beta
-      character(len=1),intent(in)          :: trans
-      real(psb_dpk_),target, intent(inout) :: work(:)
-      integer, intent(out)                 :: info
+      type(psb_d_vect_type),intent(inout)          :: x
+      type(psb_d_vect_type),intent(inout)          :: y
+      real(psb_dpk_),intent(in)                    :: alpha,beta
+      character(len=1),intent(in)                  :: trans
+      real(psb_dpk_),target, intent(inout)         :: work(:)
+      integer, intent(out)                         :: info
     end subroutine mld_d_ainvt_solver_apply_vect
   end interface
   
+  interface 
+    subroutine mld_d_ainvt_solver_bld(a,desc_a,sv,upd,info,b,amold,vmold)
+      import :: psb_desc_type, psb_dspmat_type,  psb_d_base_sparse_mat, &
+       & psb_d_vect_type, psb_d_base_vect_type, psb_dpk_, mld_d_ainvt_solver_type
+      
+      Implicit None
+      
+      ! Arguments
+      type(psb_dspmat_type), intent(in), target           :: a
+      Type(psb_desc_type), Intent(in)                     :: desc_a 
+      class(mld_d_ainvt_solver_type), intent(inout)        :: sv
+      character, intent(in)                               :: upd
+      integer, intent(out)                                :: info
+      type(psb_dspmat_type), intent(in), target, optional :: b
+      class(psb_d_base_sparse_mat), intent(in), optional  :: amold
+      class(psb_d_base_vect_type), intent(in), optional   :: vmold
+    end subroutine mld_d_ainvt_solver_bld
+  end interface
+  
+  interface 
+    subroutine mld_d_ainvt_solver_check(sv,info)
+      import :: psb_desc_type, psb_dspmat_type,  psb_d_base_sparse_mat, &
+           & psb_d_vect_type, psb_d_base_vect_type, psb_dpk_, mld_d_ainvt_solver_type
 
+      Implicit None
+      
+      ! Arguments
+      class(mld_d_ainvt_solver_type), intent(inout) :: sv
+      integer, intent(out)                   :: info
+    end subroutine mld_d_ainvt_solver_check
+  end interface
+  
+  interface 
+    subroutine mld_d_ainvt_solver_seti(sv,what,val,info)
+      import :: psb_desc_type, psb_dspmat_type,  psb_d_base_sparse_mat, &
+           & psb_d_vect_type, psb_d_base_vect_type, psb_dpk_, mld_d_ainvt_solver_type
+      
+      Implicit None
+      
+      ! Arguments
+      class(mld_d_ainvt_solver_type), intent(inout) :: sv 
+      integer, intent(in)                          :: what 
+      integer, intent(in)                          :: val
+      integer, intent(out)                         :: info
+    end subroutine mld_d_ainvt_solver_seti
+  end interface
+  
+  interface 
+    subroutine mld_d_ainvt_solver_setc(sv,what,val,info)
+      import :: psb_desc_type, psb_dspmat_type,  psb_d_base_sparse_mat, &
+           & psb_d_vect_type, psb_d_base_vect_type, psb_dpk_, mld_d_ainvt_solver_type
+      Implicit None
+      
+      ! Arguments
+      class(mld_d_ainvt_solver_type), intent(inout) :: sv
+      integer, intent(in)                          :: what 
+      character(len=*), intent(in)                 :: val
+      integer, intent(out)                         :: info
+    end subroutine mld_d_ainvt_solver_setc
+  end interface 
+  
+  interface 
+    subroutine mld_d_ainvt_solver_setr(sv,what,val,info)
+      import :: psb_desc_type, psb_dspmat_type,  psb_d_base_sparse_mat, &
+           & psb_d_vect_type, psb_d_base_vect_type, psb_dpk_, mld_d_ainvt_solver_type
+            
+      Implicit None
+      
+      ! Arguments
+      class(mld_d_ainvt_solver_type), intent(inout) :: sv 
+      integer, intent(in)                          :: what 
+      real(psb_dpk_), intent(in)                   :: val
+      integer, intent(out)                         :: info
+    end subroutine mld_d_ainvt_solver_setr
+  end interface 
+  
+  interface
+    subroutine mld_d_ainvt_solver_free(sv,info)
+      import :: psb_desc_type, psb_dspmat_type,  psb_d_base_sparse_mat, &
+           & psb_d_vect_type, psb_d_base_vect_type, psb_dpk_, mld_d_ainvt_solver_type
+      Implicit None
+      
+      ! Arguments
+      class(mld_d_ainvt_solver_type), intent(inout) :: sv
+      integer, intent(out)                         :: info
+    end subroutine mld_d_ainvt_solver_free
+  end interface
+  
+  interface
+    subroutine mld_d_ainvt_solver_descr(sv,info,iout,coarse)
+      import :: psb_desc_type, psb_dspmat_type,  psb_d_base_sparse_mat, &
+           & psb_d_vect_type, psb_d_base_vect_type, psb_dpk_, mld_d_ainvt_solver_type
+      
+      Implicit None
+      
+      ! Arguments
+      class(mld_d_ainvt_solver_type), intent(in) :: sv
+      integer, intent(out)                      :: info
+      integer, intent(in), optional             :: iout
+      logical, intent(in), optional             :: coarse
+
+    end subroutine mld_d_ainvt_solver_descr
+  end interface 
+  
+  interface 
+    subroutine mld_d_ainvt_solver_dmp(sv,ictxt,level,info,prefix,head,solver)
+      import :: psb_desc_type, psb_dspmat_type,  psb_d_base_sparse_mat, &
+           & psb_d_vect_type, psb_d_base_vect_type, psb_dpk_, mld_d_ainvt_solver_type
+      
+      implicit none 
+      class(mld_d_ainvt_solver_type), intent(in) :: sv
+      integer, intent(in)              :: ictxt,level
+      integer, intent(out)             :: info
+      character(len=*), intent(in), optional :: prefix, head
+      logical, optional, intent(in)    :: solver
+    end subroutine mld_d_ainvt_solver_dmp
+  end interface
+  
 contains
 
   subroutine d_ainvt_solver_default(sv)
 
-    use psb_base_mod
-
+    !use psb_base_mod
+    
     Implicit None
 
     ! Arguments
@@ -126,310 +245,6 @@ contains
     return
   end subroutine d_ainvt_solver_default
 
-  subroutine d_ainvt_solver_check(sv,info)
-
-    use psb_base_mod
-
-    Implicit None
-
-    ! Arguments
-    class(mld_d_ainvt_solver_type), intent(inout) :: sv
-    integer, intent(out)                   :: info
-    Integer           :: err_act
-    character(len=20) :: name='d_ainvt_solver_check'
-
-    call psb_erractionsave(err_act)
-    info = psb_success_
-
-    call mld_check_def(sv%fill_in,&
-         & 'Level',0,is_legal_ml_lev)
-    call mld_check_def(sv%inv_fill,&
-         & 'Level',0,is_legal_ml_lev)
-    call mld_check_def(sv%thresh,&
-         & 'Eps',dzero,is_legal_d_fact_thrs)
-    call mld_check_def(sv%inv_thresh,&
-         & 'Eps',dzero,is_legal_d_fact_thrs)
-    
-    if (info /= psb_success_) goto 9999
-    
-    call psb_erractionrestore(err_act)
-    return
-
-9999 continue
-    call psb_erractionrestore(err_act)
-    if (err_act == psb_act_abort_) then
-      call psb_error()
-      return
-    end if
-    return
-  end subroutine d_ainvt_solver_check
-
-  subroutine d_ainvt_solver_bld(a,desc_a,sv,upd,info,b,amold,vmold)
-
-    use psb_base_mod
-    use mld_d_ainv_bld_mod
-    Implicit None
-
-    ! Arguments
-    type(psb_dspmat_type), intent(in), target  :: a
-    Type(psb_desc_type), Intent(in)            :: desc_a
-    class(mld_d_ainvt_solver_type), intent(inout) :: sv
-    character, intent(in)                      :: upd
-    integer, intent(out)                       :: info
-    type(psb_dspmat_type), intent(in), target, optional :: b
-    class(psb_d_base_sparse_mat), intent(in), optional  :: amold
-    class(psb_d_base_vect_type), intent(in), optional   :: vmold
-
-    ! Local variables
-    integer :: n_row,n_col, nrow_a, nztota
-    real(psb_dpk_), pointer :: ww(:), aux(:), tx(:),ty(:)
-    integer :: ictxt,np,me,i, err_act, debug_unit, debug_level
-    character(len=20)  :: name='d_ainvt_solver_bld', ch_err
-
-    info=psb_success_
-    call psb_erractionsave(err_act)
-    debug_unit  = psb_get_debug_unit()
-    debug_level = psb_get_debug_level()
-    ictxt       = psb_cd_get_context(desc_a)
-    call psb_info(ictxt, me, np)
-    if (debug_level >= psb_debug_outer_) &
-         & write(debug_unit,*) me,' ',trim(name),' start'
-
-
-    call mld_ainv_invt_bld(a,sv%fill_in,sv%inv_fill,&
-         & sv%thresh,sv%inv_thresh,&
-         & sv%l,sv%d,sv%u,desc_a,info,b)    
-
-    if ((info == psb_success_) .and.present(amold)) then 
-      call sv%l%cscnv(info,mold=amold)
-      if (info == psb_success_) &
-           & call sv%u%cscnv(info,mold=amold)
-    end if
-
-    if (info == psb_success_) then 
-      call sv%dv%bld(sv%d,mold=vmold)
-    end if
-
-    if (info /= psb_success_) then 
-      call psb_errpush(psb_err_internal_error_,name) 
-      goto 9999
-    end if
-
-    if (debug_level >= psb_debug_outer_) &
-         & write(debug_unit,*) me,' ',trim(name),' end'
-
-    call psb_erractionrestore(err_act)
-    return
-
-9999 continue
-    call psb_erractionrestore(err_act)
-    if (err_act == psb_act_abort_) then
-      call psb_error()
-      return
-    end if
-    return
-  end subroutine d_ainvt_solver_bld
-
-
-  subroutine d_ainvt_solver_seti(sv,what,val,info)
-
-    use psb_base_mod
-
-    Implicit None
-
-    ! Arguments
-    class(mld_d_ainvt_solver_type), intent(inout) :: sv 
-    integer, intent(in)                    :: what 
-    integer, intent(in)                    :: val
-    integer, intent(out)                   :: info
-    Integer :: err_act
-    character(len=20)  :: name='d_ainvt_solver_seti'
-
-    info = psb_success_
-    call psb_erractionsave(err_act)
-
-    select case(what) 
-    case(mld_sub_fillin_)
-      sv%fill_in   = val
-    case(mld_inv_fillin_)
-      sv%inv_fill  = val
-    case default
-!!$      write(0,*) name,': Error: invalid WHAT'
-!!$      info = -2
-    end select
-
-    call psb_erractionrestore(err_act)
-    return
-
-9999 continue
-    call psb_erractionrestore(err_act)
-    if (err_act == psb_act_abort_) then
-      call psb_error()
-      return
-    end if
-    return
-  end subroutine d_ainvt_solver_seti
-
-  subroutine d_ainvt_solver_setc(sv,what,val,info)
-
-    use psb_base_mod
-
-    Implicit None
-
-    ! Arguments
-    class(mld_d_ainvt_solver_type), intent(inout) :: sv
-    integer, intent(in)                    :: what 
-    character(len=*), intent(in)           :: val
-    integer, intent(out)                   :: info
-    Integer :: err_act, ival
-    character(len=20)  :: name='d_ainvt_solver_setc'
-
-    info = psb_success_
-    call psb_erractionsave(err_act)
-    
-    call mld_stringval(val,ival,info)
-
-    if (info == psb_success_) call sv%set(what,ival,info)
-    if (info /= psb_success_) then
-      info = psb_err_from_subroutine_
-      call psb_errpush(info, name)
-      goto 9999
-    end if
-
-    call psb_erractionrestore(err_act)
-    return
-
-9999 continue
-    call psb_erractionrestore(err_act)
-    if (err_act == psb_act_abort_) then
-      call psb_error()
-      return
-    end if
-    return
-  end subroutine d_ainvt_solver_setc
-  
-  subroutine d_ainvt_solver_setr(sv,what,val,info)
-
-    use psb_base_mod
-
-    Implicit None
-
-    ! Arguments
-    class(mld_d_ainvt_solver_type), intent(inout) :: sv 
-    integer, intent(in)                    :: what 
-    real(psb_dpk_), intent(in)             :: val
-    integer, intent(out)                   :: info
-    Integer :: err_act
-    character(len=20)  :: name='d_ainvt_solver_setr'
-
-    call psb_erractionsave(err_act)
-    info = psb_success_
-
-    select case(what)
-    case(mld_sub_iluthrs_) 
-      sv%thresh = val
-    case(mld_inv_thresh_) 
-      sv%inv_thresh = val
-    case default
-!!$      write(0,*) name,': Error: invalid WHAT'
-!!$      info = -2
-!!$      goto 9999
-    end select
-
-    call psb_erractionrestore(err_act)
-    return
-
-9999 continue
-    call psb_erractionrestore(err_act)
-    if (err_act == psb_act_abort_) then
-      call psb_error()
-      return
-    end if
-    return
-  end subroutine d_ainvt_solver_setr
-
-  subroutine d_ainvt_solver_free(sv,info)
-
-    use psb_base_mod
-
-    Implicit None
-
-    ! Arguments
-    class(mld_d_ainvt_solver_type), intent(inout) :: sv
-    integer, intent(out)                       :: info
-    Integer :: err_act
-    character(len=20)  :: name='d_ainvt_solver_free'
-
-    call psb_erractionsave(err_act)
-    info = psb_success_
-    
-    if (allocated(sv%d)) then 
-      deallocate(sv%d,stat=info)
-      if (info /= psb_success_) then 
-        info = psb_err_alloc_dealloc_
-        call psb_errpush(info,name)
-        goto 9999 
-      end if
-    end if
-    call sv%l%free()
-    call sv%u%free()
-    call sv%dv%free(info)
-
-    call psb_erractionrestore(err_act)
-    return
-
-9999 continue
-    call psb_erractionrestore(err_act)
-    if (err_act == psb_act_abort_) then
-      call psb_error()
-      return
-    end if
-    return
-  end subroutine d_ainvt_solver_free
-
-  subroutine d_ainvt_solver_descr(sv,info,iout,coarse)
-
-    use psb_base_mod
-
-    Implicit None
-
-    ! Arguments
-    class(mld_d_ainvt_solver_type), intent(in) :: sv
-    integer, intent(out)                     :: info
-    integer, intent(in), optional            :: iout
-    logical, intent(in), optional       :: coarse
-
-    ! Local variables
-    integer      :: err_act
-    integer      :: ictxt, me, np
-    character(len=20), parameter :: name='mld_d_ainvt_solver_descr'
-    integer :: iout_
-
-    call psb_erractionsave(err_act)
-    info = psb_success_
-    if (present(iout)) then 
-      iout_ = iout 
-    else
-      iout_ = 6
-    endif
-    
-    write(iout_,*) '  AINVT Approximate Inverse with ILU(T,P) '
-    write(iout_,*) '  Fill level             :',sv%fill_in
-    write(iout_,*) '  Fill threshold         :',sv%thresh
-    write(iout_,*) '  Inverse fill level     :',sv%inv_fill
-    write(iout_,*) '  Inverse fill threshold :',sv%inv_thresh
-
-    call psb_erractionrestore(err_act)
-    return
-
-9999 continue
-    call psb_erractionrestore(err_act)
-    if (err_act == psb_act_abort_) then
-      call psb_error()
-      return
-    end if
-    return
-  end subroutine d_ainvt_solver_descr
 
   function d_ainvt_get_nzeros(sv) result(val)
     use psb_base_mod, only : psb_long_int_k_
@@ -462,56 +277,6 @@ contains
 
     return
   end function d_ainvt_solver_sizeof
-
-  subroutine d_ainvt_solver_dmp(sv,ictxt,level,info,prefix,head,solver)
-    use psb_base_mod
-    implicit none 
-    class(mld_d_ainvt_solver_type), intent(in) :: sv
-    integer, intent(in)              :: ictxt,level
-    integer, intent(out)             :: info
-    character(len=*), intent(in), optional :: prefix, head
-    logical, optional, intent(in)    :: solver
-    integer :: i, j, il1, iln, lname, lev
-    integer :: icontxt,iam, np
-    character(len=80)  :: prefix_
-    character(len=120) :: fname ! len should be at least 20 more than
-    logical :: solver_
-    !  len of prefix_ 
-
-    info = 0
-
-    if (present(prefix)) then 
-      prefix_ = trim(prefix(1:min(len(prefix),len(prefix_))))
-    else
-      prefix_ = "dump_ainvt_d"
-    end if
-
-    call psb_info(ictxt,iam,np)
-
-    if (present(solver)) then 
-      solver_ = solver
-    else
-      solver_ = .false. 
-    end if
-    lname = len_trim(prefix_)
-    fname = trim(prefix_)
-    write(fname(lname+1:lname+5),'(a,i3.3)') '_p',iam
-    lname = lname + 5
-
-    if (solver_) then 
-      write(fname(lname+1:),'(a,i3.3,a)')'_l',level,'_lower.mtx'
-      if (sv%l%is_asb()) &
-           & call sv%l%print(fname,head=head)
-      write(fname(lname+1:),'(a,i3.3,a)')'_l',level,'_diag.mtx'
-      if (allocated(sv%d)) &
-           & call psb_geprt(fname,sv%d,head=head)
-      write(fname(lname+1:),'(a,i3.3,a)')'_l',level,'_upper.mtx'
-      if (sv%u%is_asb()) &
-           & call sv%u%print(fname,head=head)
-
-    end if
-
-  end subroutine d_ainvt_solver_dmp
 
 
 end module mld_d_ainvt_solver
