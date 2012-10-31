@@ -2,7 +2,7 @@ module mld_d_biconjg_mod
 
   interface mld_sparse_biconjg
     module procedure mld_dsparse_biconjg
-  end interface mld_sparse_biconjg
+  end interface
 
 contains
 

@@ -1,16 +1,16 @@
-subroutine mld_d_ainvk_solver_check(sv,info)
+subroutine mld_d_invk_solver_check(sv,info)
   
 
   use psb_base_mod
-  use mld_d_ainvk_solver, mld_protect_name => mld_d_ainvk_solver_check
+  use mld_d_invk_solver, mld_protect_name => mld_d_invk_solver_check
 
   Implicit None
 
   ! Arguments
-  class(mld_d_ainvk_solver_type), intent(inout) :: sv
+  class(mld_d_invk_solver_type), intent(inout) :: sv
   integer, intent(out)                   :: info
   Integer           :: err_act
-  character(len=20) :: name='d_ainvk_solver_check'
+  character(len=20) :: name='d_invk_solver_check'
 
   call psb_erractionsave(err_act)
   info = psb_success_
@@ -34,4 +34,4 @@ subroutine mld_d_ainvk_solver_check(sv,info)
     return
   end if
   return
-end subroutine mld_d_ainvk_solver_check
+end subroutine mld_d_invk_solver_check

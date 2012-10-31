@@ -1,9 +1,9 @@
-subroutine mld_d_ainvk_solver_dmp(sv,ictxt,level,info,prefix,head,solver)
+subroutine mld_d_invk_solver_dmp(sv,ictxt,level,info,prefix,head,solver)
   
   use psb_base_mod
-  use mld_d_ainvk_solver, mld_protect_name => mld_d_ainvk_solver_dmp
+  use mld_d_invk_solver, mld_protect_name => mld_d_invk_solver_dmp
   implicit none 
-  class(mld_d_ainvk_solver_type), intent(in) :: sv
+  class(mld_d_invk_solver_type), intent(in) :: sv
   integer, intent(in)              :: ictxt,level
   integer, intent(out)             :: info
   character(len=*), intent(in), optional :: prefix, head
@@ -20,7 +20,7 @@ subroutine mld_d_ainvk_solver_dmp(sv,ictxt,level,info,prefix,head,solver)
   if (present(prefix)) then 
     prefix_ = trim(prefix(1:min(len(prefix),len(prefix_))))
   else
-    prefix_ = "dump_ainvk_d"
+    prefix_ = "dump_invk_d"
   end if
 
   call psb_info(ictxt,iam,np)
@@ -48,4 +48,4 @@ subroutine mld_d_ainvk_solver_dmp(sv,ictxt,level,info,prefix,head,solver)
 
   end if
 
-end subroutine mld_d_ainvk_solver_dmp
+end subroutine mld_d_invk_solver_dmp

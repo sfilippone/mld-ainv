@@ -1,7 +1,7 @@
-subroutine mld_dsparse_ainvt(n,a,z,nzrmax,sp_thresh,info)
+subroutine mld_dsparse_invt(n,a,z,nzrmax,sp_thresh,info)
   
   use psb_base_mod
-  use mld_d_ainv_bld_mod, mld_protect_name => mld_dsparse_ainvt
+  use mld_d_ainv_bld_mod, mld_protect_name => mld_dsparse_invt
 
   implicit none 
   integer, intent(in)                  :: n
@@ -21,7 +21,7 @@ subroutine mld_dsparse_ainvt(n,a,z,nzrmax,sp_thresh,info)
   integer                  :: ktrw, nidx, nlw,nup,jmaxup
   type(psb_int_heap)       :: heap
   real(psb_dpk_)     :: alpha, nrmi
-  character(len=20)  :: name='mld_sp_ainvt'
+  character(len=20)  :: name='mld_sp_invt'
 
 
   if(psb_get_errstatus() /= psb_success_) return 
@@ -103,4 +103,4 @@ subroutine mld_dsparse_ainvt(n,a,z,nzrmax,sp_thresh,info)
   end if
   return
 
-end subroutine mld_dsparse_ainvt
+end subroutine mld_dsparse_invt

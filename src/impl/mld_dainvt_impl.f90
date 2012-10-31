@@ -1,10 +1,10 @@
 
-subroutine mld_d_ainvt_solver_apply(alpha,sv,x,beta,y,desc_data,trans,work,info)
+subroutine mld_d_invt_solver_apply(alpha,sv,x,beta,y,desc_data,trans,work,info)
   use psb_base_mod
-  use mld_d_ainvt_solver, mld_protect_name => mld_d_ainvt_solver_apply
+  use mld_d_invt_solver, mld_protect_name => mld_d_invt_solver_apply
   implicit none 
   type(psb_desc_type), intent(in)      :: desc_data
-  class(mld_d_ainvt_solver_type), intent(in) :: sv
+  class(mld_d_invt_solver_type), intent(in) :: sv
   real(psb_dpk_),intent(inout)         :: x(:)
   real(psb_dpk_),intent(inout)         :: y(:)
   real(psb_dpk_),intent(in)            :: alpha,beta
@@ -16,7 +16,7 @@ subroutine mld_d_ainvt_solver_apply(alpha,sv,x,beta,y,desc_data,trans,work,info)
   real(psb_dpk_), pointer :: ww(:), aux(:), tx(:),ty(:)
   integer    :: ictxt,np,me,i, err_act
   character          :: trans_
-  character(len=20)  :: name='d_ainvt_solver_apply'
+  character(len=20)  :: name='d_invt_solver_apply'
 
   call psb_erractionsave(err_act)
 
@@ -76,7 +76,7 @@ subroutine mld_d_ainvt_solver_apply(alpha,sv,x,beta,y,desc_data,trans,work,info)
 
   case default
     call psb_errpush(psb_err_internal_error_,name,&
-         & a_err='Invalid TRANS in AINVT subsolve')
+         & a_err='Invalid TRANS in invt subsolve')
     goto 9999
   end select
 
@@ -115,14 +115,14 @@ subroutine mld_d_ainvt_solver_apply(alpha,sv,x,beta,y,desc_data,trans,work,info)
   end if
   return
 
-end subroutine mld_d_ainvt_solver_apply
+end subroutine mld_d_invt_solver_apply
 
-subroutine mld_d_ainvt_solver_apply_vect(alpha,sv,x,beta,y,desc_data,trans,work,info)
+subroutine mld_d_invt_solver_apply_vect(alpha,sv,x,beta,y,desc_data,trans,work,info)
   use psb_base_mod
-  use mld_d_ainvt_solver, mld_protect_name => mld_d_ainvt_solver_apply_vect
+  use mld_d_invt_solver, mld_protect_name => mld_d_invt_solver_apply_vect
   implicit none 
   type(psb_desc_type), intent(in)      :: desc_data
-  class(mld_d_ainvt_solver_type), intent(inout) :: sv
+  class(mld_d_invt_solver_type), intent(inout) :: sv
   type(psb_d_vect_type),intent(inout)  :: x
   type(psb_d_vect_type),intent(inout)  :: y
   real(psb_dpk_),intent(in)            :: alpha,beta
@@ -135,7 +135,7 @@ subroutine mld_d_ainvt_solver_apply_vect(alpha,sv,x,beta,y,desc_data,trans,work,
   type(psb_d_vect_type) :: tx,ty
   integer    :: ictxt,np,me,i, err_act
   character          :: trans_
-  character(len=20)  :: name='d_ainvt_solver_apply'
+  character(len=20)  :: name='d_invt_solver_apply'
 
   call psb_erractionsave(err_act)
 
@@ -198,7 +198,7 @@ subroutine mld_d_ainvt_solver_apply_vect(alpha,sv,x,beta,y,desc_data,trans,work,
 
   case default
     call psb_errpush(psb_err_internal_error_,name,&
-         & a_err='Invalid TRANS in AINVT subsolve')
+         & a_err='Invalid TRANS in invt subsolve')
     goto 9999
   end select
 
@@ -240,7 +240,7 @@ subroutine mld_d_ainvt_solver_apply_vect(alpha,sv,x,beta,y,desc_data,trans,work,
   end if
   return
 
-end subroutine mld_d_ainvt_solver_apply_vect
+end subroutine mld_d_invt_solver_apply_vect
 
 
 subroutine mld_dinvt_copyin(i,m,a,jd,jmin,jmax,nlw,nup,jmaxup,nrmi,row,heap,&
@@ -513,7 +513,7 @@ subroutine mld_dinvt_copyout(fill_in,thres,i,m,nlw,nup,jmaxup,nrmi,row, &
   end do
 
   if (nz > 1) then 
-    write(psb_err_unit,*) 'Warning: lower triangle from ainvt???? '
+    write(psb_err_unit,*) 'Warning: lower triangle from invt???? '
   end if
 
 
@@ -696,9 +696,9 @@ end subroutine mld_dinvt_copyout
 
 
 
-subroutine mld_dsparse_ainvt(n,a,z,nzrmax,sp_thresh,info)
+subroutine mld_dsparse_invt(n,a,z,nzrmax,sp_thresh,info)
   use psb_base_mod
-  use mld_d_ainv_bld_mod, mld_protect_name => mld_dsparse_ainvt
+  use mld_d_ainv_bld_mod, mld_protect_name => mld_dsparse_invt
 
   implicit none 
   integer, intent(in)                  :: n
@@ -718,7 +718,7 @@ subroutine mld_dsparse_ainvt(n,a,z,nzrmax,sp_thresh,info)
   integer                  :: ktrw, nidx, nlw,nup,jmaxup
   type(psb_int_heap)       :: heap
   real(psb_dpk_)     :: alpha, nrmi
-  character(len=20)  :: name='mld_sp_ainvt'
+  character(len=20)  :: name='mld_sp_invt'
 
 
   if(psb_get_errstatus() /= psb_success_) return 
@@ -800,5 +800,5 @@ subroutine mld_dsparse_ainvt(n,a,z,nzrmax,sp_thresh,info)
   end if
   return
 
-end subroutine mld_dsparse_ainvt
+end subroutine mld_dsparse_invt
 

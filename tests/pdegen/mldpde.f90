@@ -57,8 +57,8 @@ program mldpde3d
   use psb_krylov_mod
   use psb_util_mod
   use pde3d_exp_mod
-  use mld_d_ainvt_solver
-  use mld_d_ainvk_solver
+  use mld_d_invt_solver
+  use mld_d_invk_solver
   use mld_d_aorth_solver
   implicit none
 
@@ -75,8 +75,8 @@ program mldpde3d
   ! sparse matrix and preconditioner
   type(psb_dspmat_type) :: a
   type(mld_dprec_type)  :: prec
-  type(mld_d_ainvt_solver_type) :: ainvtsv
-  type(mld_d_ainvk_solver_type) :: ainvksv
+  type(mld_d_invt_solver_type) :: invtsv
+  type(mld_d_invk_solver_type) :: invksv
   type(mld_d_aorth_solver_type) :: ainvort
   type ainvparms 
     character(len=12) :: alg
@@ -196,10 +196,10 @@ program mldpde3d
   end if
   if (psb_toupper(ptype) == 'AINV') then 
     select case (psb_toupper(parms%alg)) 
-    case ('AINVK') 
-      call mld_inner_precset(prec,ainvksv,info) 
-    case ('AINVT') 
-      call mld_inner_precset(prec,ainvtsv,info) 
+    case ('INVK') 
+      call mld_inner_precset(prec,invksv,info) 
+    case ('INVT') 
+      call mld_inner_precset(prec,invtsv,info) 
     case ('AORTH') 
       call mld_inner_precset(prec,ainvort,info) 
     end select

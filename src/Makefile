@@ -25,7 +25,7 @@ LIBNAME=libainv_prec.a
 
 libcopy: lib impld
 	/bin/cp -p $(HERE)/$(LIBNAME) $(LIBDIR)
-	/bin/cp -p $(LIBMOD) $(LOCAL_MODS) *$(.mod) $(LIBDIR)
+	/bin/cp -p $(LIBMOD) *$(.mod) $(LIBDIR)
 
 lib: $(OBJS) 
 	$(AR) $(HERE)/$(LIBNAME) $(OBJS)
@@ -44,6 +44,6 @@ veryclean: clean
 	/bin/rm -f $(LIBNAME)
 
 clean: iclean
-	/bin/rm -f $(OBJS) $(LOCAL_MODS)
+	/bin/rm -f $(OBJS) $(LOCAL_MODS) *$(.mod)
 iclean:
 	cd impl && $(MAKE) clean

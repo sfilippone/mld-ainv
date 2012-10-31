@@ -1,10 +1,10 @@
-subroutine mld_d_ainvk_solver_apply_vect(alpha,sv,x,beta,y,desc_data,trans,work,info)
+subroutine mld_d_invk_solver_apply_vect(alpha,sv,x,beta,y,desc_data,trans,work,info)
   
   use psb_base_mod
-  use mld_d_ainvk_solver, mld_protect_name => mld_d_ainvk_solver_apply_vect
+  use mld_d_invk_solver, mld_protect_name => mld_d_invk_solver_apply_vect
   implicit none 
   type(psb_desc_type), intent(in)      :: desc_data
-  class(mld_d_ainvk_solver_type), intent(inout) :: sv
+  class(mld_d_invk_solver_type), intent(inout) :: sv
   type(psb_d_vect_type), intent(inout) :: x
   type(psb_d_vect_type), intent(inout) :: y
   real(psb_dpk_),intent(in)            :: alpha,beta
@@ -17,7 +17,7 @@ subroutine mld_d_ainvk_solver_apply_vect(alpha,sv,x,beta,y,desc_data,trans,work,
   type(psb_d_vect_type)   :: tx,ty
   integer    :: ictxt,np,me,i, err_act
   character          :: trans_
-  character(len=20)  :: name='d_ainvk_solver_apply'
+  character(len=20)  :: name='d_invk_solver_apply'
 
   call psb_erractionsave(err_act)
 
@@ -80,7 +80,7 @@ subroutine mld_d_ainvk_solver_apply_vect(alpha,sv,x,beta,y,desc_data,trans,work,
 
   case default
     call psb_errpush(psb_err_internal_error_,name,&
-         & a_err='Invalid TRANS in AINVK subsolve')
+         & a_err='Invalid TRANS in invk subsolve')
     goto 9999
   end select
 
@@ -122,4 +122,4 @@ subroutine mld_d_ainvk_solver_apply_vect(alpha,sv,x,beta,y,desc_data,trans,work,
   end if
   return
 
-end subroutine mld_d_ainvk_solver_apply_vect
+end subroutine mld_d_invk_solver_apply_vect

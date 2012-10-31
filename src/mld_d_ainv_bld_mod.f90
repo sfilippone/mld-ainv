@@ -6,7 +6,7 @@ module mld_d_ainv_bld_mod
   
   interface mld_ainv_invk_bld
     module procedure mld_d_ainv_invk_bld
-  end interface mld_ainv_invk_bld
+  end interface
 
 
   interface  mld_invk_copyin
@@ -70,8 +70,8 @@ module mld_d_ainv_bld_mod
     end subroutine mld_dinvk_copyout
   end interface
   
-  interface mld_sparse_ainvk
-    subroutine mld_dsparse_ainvk(n,a,z,fill_in,sp_thresh,info,inlevs)
+  interface mld_sparse_invk
+    subroutine mld_dsparse_invk(n,a,z,fill_in,sp_thresh,info,inlevs)
       use psb_base_mod, only : psb_dspmat_type, psb_dpk_, psb_int_heap
       integer, intent(in)                  :: n
       type(psb_dspmat_type), intent(in)    :: a
@@ -81,12 +81,12 @@ module mld_d_ainv_bld_mod
       integer, intent(out)                 :: info
       integer, intent(in), optional        :: inlevs(:)
 
-    end subroutine mld_dsparse_ainvk
+    end subroutine mld_dsparse_invk
   end interface
 
   interface mld_ainv_invt_bld
     module procedure mld_d_ainv_invt_bld
-  end interface mld_ainv_invt_bld
+  end interface
   
 
   interface mld_invt_copyin
@@ -145,8 +145,8 @@ module mld_d_ainv_bld_mod
     end subroutine mld_dinvt_copyout
   end interface
 
-  interface  mld_sparse_ainvt
-    subroutine mld_dsparse_ainvt(n,a,z,nzrmax,sp_thresh,info)
+  interface  mld_sparse_invt
+    subroutine mld_dsparse_invt(n,a,z,nzrmax,sp_thresh,info)
       use psb_base_mod, only : psb_dspmat_type, psb_dpk_, psb_int_heap
       implicit none 
       integer, intent(in)                  :: n
@@ -155,7 +155,7 @@ module mld_d_ainv_bld_mod
       integer, intent(in)                  :: nzrmax
       real(psb_dpk_), intent(in)           :: sp_thresh
       integer, intent(out)                 :: info
-    end subroutine mld_dsparse_ainvt
+    end subroutine mld_dsparse_invt
   end interface
 
 
@@ -254,17 +254,17 @@ contains
     ! Compute the approx U^-1  and L^-1
     !
     nzrmax    = invfill
-    call mld_sparse_ainvt(n_row,umat,atmp,nzrmax,invthresh,info)
+    call mld_sparse_invt(n_row,umat,atmp,nzrmax,invthresh,info)
     if (info == psb_success_) call psb_move_alloc(atmp,umat,info)
     if (info == psb_success_) call lmat%transp()
-    if (info == psb_success_) call mld_sparse_ainvt(n_row,lmat,atmp,nzrmax,invthresh,info)
+    if (info == psb_success_) call mld_sparse_invt(n_row,lmat,atmp,nzrmax,invthresh,info)
     if (info == psb_success_) call psb_move_alloc(atmp,lmat,info)
     if (info == psb_success_) call lmat%transp()
     ! Done. Hopefully.... 
 
     if (info /= psb_success_) then 
       info = psb_err_internal_error_
-      call psb_errpush(info,name,a_err='ainvt')
+      call psb_errpush(info,name,a_err='invt')
       goto 9999
     end if
 
@@ -374,17 +374,17 @@ contains
     !
     ! Compute the aprox U^-1  and L^-1
     !
-    call mld_sparse_ainvk(n_row,umat,atmp,fill2,sp_thresh,info)
+    call mld_sparse_invk(n_row,umat,atmp,fill2,sp_thresh,info)
     if (info == psb_success_) call psb_move_alloc(atmp,umat,info)
     if (info == psb_success_) call lmat%transp()
-    if (info == psb_success_) call mld_sparse_ainvk(n_row,lmat,atmp,fill2,sp_thresh,info)
+    if (info == psb_success_) call mld_sparse_invk(n_row,lmat,atmp,fill2,sp_thresh,info)
     if (info == psb_success_) call psb_move_alloc(atmp,lmat,info)
     if (info == psb_success_) call lmat%transp()
     ! Done. Hopefully.... 
 
     if (info /= psb_success_) then 
       info = psb_err_internal_error_
-      call psb_errpush(info,name,a_err='ainvt')
+      call psb_errpush(info,name,a_err='invt')
       goto 9999
     end if
 

@@ -1,7 +1,7 @@
-subroutine mld_dsparse_ainvk(n,a,z,fill_in,sp_thresh,info,inlevs)
+subroutine mld_dsparse_invk(n,a,z,fill_in,sp_thresh,info,inlevs)
   
   use psb_base_mod
-  use mld_d_ainv_bld_mod, mld_protect_name => mld_dsparse_ainvk
+  use mld_d_ainv_bld_mod, mld_protect_name => mld_dsparse_invk
 
   integer, intent(in)                  :: n
   type(psb_dspmat_type), intent(in)    :: a
@@ -22,7 +22,7 @@ subroutine mld_dsparse_ainvk(n,a,z,fill_in,sp_thresh,info,inlevs)
   type(psb_int_heap)       :: heap
 
   real(psb_dpk_)     :: alpha
-  character(len=20)  :: name='mld_sp_ainvk'
+  character(len=20)  :: name='mld_sp_invk'
 
 
   if(psb_get_errstatus() /= psb_success_) return 
@@ -110,4 +110,4 @@ subroutine mld_dsparse_ainvk(n,a,z,fill_in,sp_thresh,info,inlevs)
   return
 
 
-end subroutine mld_dsparse_ainvk
+end subroutine mld_dsparse_invk

@@ -2,9 +2,9 @@ subroutine mld_d_aorth_solver_bld(a,desc_a,sv,upd,info,b,amold,vmold)
   
 
   use psb_base_mod
-  use mld_d_aorth_solver, mld_protect_name => mld_d_aorth_solver_bld
   use mld_prec_mod
-  !use mld_d_aorth_bld_mod
+  use mld_d_aorth_solver, mld_protect_name => mld_d_aorth_solver_bld
+
   Implicit None
 
   ! Arguments

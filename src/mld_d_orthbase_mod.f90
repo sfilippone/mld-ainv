@@ -2,7 +2,7 @@ module mld_d_orthbase_mod
 
   interface mld_sparse_orthbase
     module procedure mld_dsparse_orthbase
-  end interface mld_sparse_orthbase
+  end interface
 
 contains
 

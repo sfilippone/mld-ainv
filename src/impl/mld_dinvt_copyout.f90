@@ -81,7 +81,7 @@ subroutine mld_dinvt_copyout(fill_in,thres,i,m,nlw,nup,jmaxup,nrmi,row, &
   end do
 
   if (nz > 1) then 
-    write(psb_err_unit,*) 'Warning: lower triangle from ainvt???? '
+    write(psb_err_unit,*) 'Warning: lower triangle from invt???? '
   end if
 
 
