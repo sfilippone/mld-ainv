@@ -3,7 +3,7 @@ subroutine mld_dinvk_inv(fill_in,i,row,rowlevs,heap,uia1,uia2,uaspk,uplevs,&
   
 
   use psb_base_mod
-  use mld_d_ainv_bld_mod, mld_protect_name => mld_dinvk_inv
+  use mld_d_invk_solver, mld_protect_name => mld_dinvk_inv
 
   implicit none 
 

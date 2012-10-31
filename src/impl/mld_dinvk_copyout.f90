@@ -3,7 +3,7 @@ subroutine mld_dinvk_copyout(fill_in,i,m,row,rowlevs,nidx,idxs,&
      &  l2,uia1,uia2,uaspk,info)
 
   use psb_base_mod
-  use mld_d_ainv_bld_mod, mld_protect_name => mld_dinvk_copyout
+  use mld_d_invk_solver, mld_protect_name => mld_dinvk_copyout
 
   implicit none 
 

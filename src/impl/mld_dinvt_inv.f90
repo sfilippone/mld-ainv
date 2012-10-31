@@ -2,7 +2,7 @@ subroutine mld_dinvt_inv(thres,i,nrmi,row,heap,irwt,ja,irp,val,nidx,idxs,info)
   
 
   use psb_base_mod
-  use mld_d_ainv_bld_mod, mld_protect_name => mld_dinvt_inv
+  use mld_d_invt_solver, mld_protect_name => mld_dinvt_inv
 
   implicit none 
 

@@ -1,7 +1,7 @@
 subroutine mld_dsparse_invt(n,a,z,nzrmax,sp_thresh,info)
   
   use psb_base_mod
-  use mld_d_ainv_bld_mod, mld_protect_name => mld_dsparse_invt
+  use mld_d_invt_solver, mld_protect_name => mld_dsparse_invt
 
   implicit none 
   integer, intent(in)                  :: n

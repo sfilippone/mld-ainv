@@ -1,7 +1,7 @@
 subroutine mld_dsparse_invk(n,a,z,fill_in,sp_thresh,info,inlevs)
   
   use psb_base_mod
-  use mld_d_ainv_bld_mod, mld_protect_name => mld_dsparse_invk
+  use mld_d_invk_solver, mld_protect_name => mld_dsparse_invk
 
   integer, intent(in)                  :: n
   type(psb_dspmat_type), intent(in)    :: a

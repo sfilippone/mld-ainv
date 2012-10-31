@@ -2,7 +2,7 @@ subroutine mld_dinvt_copyin(i,m,a,jd,jmin,jmax,nlw,nup,jmaxup,nrmi,row,heap,&
   
      & irwt,ktrw,trw,info,sign)
   use psb_base_mod
-  use mld_d_ainv_bld_mod, mld_protect_name => mld_dinvt_copyin
+  use mld_d_invt_solver, mld_protect_name => mld_dinvt_copyin
   implicit none 
   type(psb_d_csr_sparse_mat), intent(in)    :: a
   type(psb_d_coo_sparse_mat), intent(inout) :: trw

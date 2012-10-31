@@ -2,7 +2,7 @@ subroutine mld_dinvk_copyin(i,m,a,jmin,jmax,row,rowlevs,heap,ktrw,trw,info,sign,
   
 
   use psb_base_mod
-  use mld_d_ainv_bld_mod, mld_protect_name => mld_dinvk_copyin
+  use mld_d_invk_solver, mld_protect_name => mld_dinvk_copyin
 
   implicit none
 

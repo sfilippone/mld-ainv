@@ -76,9 +76,11 @@ mld_d_ainv_orth_bld.o \
 mld_dinvk_copyin.o \
 mld_dinvk_copyout.o \
 mld_dinvk_inv.o \
+mld_d_invk_bld.o \
 mld_dinvt_copyin.o \
 mld_dinvt_copyout.o \
 mld_dinvt_inv.o \
+mld_d_invt_bld.o \
 mld_dsparse_invk.o \
 mld_dsparse_invt.o
 
