@@ -26,7 +26,7 @@ subroutine mld_d_invk_solver_descr(sv,info,iout,coarse)
     iout_ = 6
   endif
 
-  write(iout_,*) '  invk Approximate Inverse with ILU(N) '
+  write(iout_,*) '  INVK Approximate Inverse with ILU(N) '
   write(iout_,*) '  Fill level             :',sv%fill_in
   write(iout_,*) '  Inverse fill level     :',sv%inv_fill
 

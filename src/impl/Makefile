@@ -75,10 +75,10 @@ mld_d_aorth_solver_setr.o \
 mld_d_ainv_orth_bld.o \
 mld_dinvk_copyin.o \
 mld_dinvk_copyout.o \
-mld_dinvk.o \
+mld_dinvk_inv.o \
 mld_dinvt_copyin.o \
 mld_dinvt_copyout.o \
-mld_dinvt.o \
+mld_dinvt_inv.o \
 mld_dsparse_invk.o \
 mld_dsparse_invt.o
 

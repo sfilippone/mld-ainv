@@ -26,7 +26,7 @@ subroutine mld_d_invt_solver_descr(sv,info,iout,coarse)
     iout_ = 6
   endif
 
-  write(iout_,*) '  invt Approximate Inverse with ILU(T,P) '
+  write(iout_,*) '  INVT Approximate Inverse with ILU(T,P) '
   write(iout_,*) '  Fill level             :',sv%fill_in
   write(iout_,*) '  Fill threshold         :',sv%thresh
   write(iout_,*) '  Inverse fill level     :',sv%inv_fill
