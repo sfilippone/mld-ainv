@@ -9,8 +9,8 @@ HERE=.
 FINCLUDES=$(FMFLAG). $(FMFLAG)$(LIBDIR) $(FMFLAG)$(MLDINCDIR)  $(FMFLAG)$(PSBINCDIR) 
 
 
-MODOBJS=mld_d_ainvt_solver.o mld_d_ainv_bld_mod.o mld_base_ainv_mod.o \
-	mld_d_ainvk_solver.o mld_d_aorth_solver.o \
+MODOBJS=mld_d_invt_solver.o mld_d_ainv_bld_mod.o mld_base_ainv_mod.o \
+	mld_d_invk_solver.o mld_d_aorth_solver.o \
 	psb_d_dsc_mat_mod.o mld_d_orthbase_mod.o mld_d_biconjg_mod.o
 
 #F90OBJS=mld_dainvt_impl.o mld_dainvk_impl.o  psb_d_dsc_impl.o mld_d_aorth_bld_mod.o 
@@ -35,7 +35,7 @@ impld:
 	cd impl && $(MAKE) LIBNAME=$(LIBNAME)
 
 mld_d_biconjg_mod.o mld_d_ainv_bld_mod.o: mld_base_ainv_mod.o
-mld_d_ainvt_solver.o mld_d_ainvk_solver.o: mld_d_ainv_bld_mod.o mld_base_ainv_mod.o
+mld_d_invt_solver.o mld_d_invk_solver.o: mld_d_ainv_bld_mod.o mld_base_ainv_mod.o
 mld_d_orthbase_mod.o: psb_d_dsc_mat_mod.o
 mld_d_aorth_solver.o: mld_base_ainv_mod.o	
 #mld_d_aorth_bld_mod.o: mld_base_ainv_mod.o  mld_d_orthbase_mod.o mld_d_biconjg_mod.o

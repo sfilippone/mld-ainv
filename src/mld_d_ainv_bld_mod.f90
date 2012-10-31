@@ -31,8 +31,9 @@ module mld_d_ainv_bld_mod
     end subroutine mld_dinvk_copyin
   end interface
 
-  interface mld_invk
-    subroutine mld_dinvk(fill_in,i,row,rowlevs,heap,uia1,uia2,uaspk,uplevs,nidx,idxs,info)
+  interface mld_invk_inv
+    subroutine mld_dinvk_inv(fill_in,i,row,rowlevs,heap,uia1,uia2,uaspk,uplevs,&
+         & nidx,idxs,info)
 
       use psb_base_mod, only : psb_dspmat_type, psb_dpk_, psb_int_heap
       implicit none 
@@ -48,7 +49,7 @@ module mld_d_ainv_bld_mod
       real(psb_dpk_), intent(inout)        :: row(:)
 
 
-    end subroutine mld_dinvk
+    end subroutine mld_dinvk_inv
   end interface
 
   interface mld_invk_copyout
@@ -107,8 +108,9 @@ module mld_d_ainv_bld_mod
     end subroutine mld_dinvt_copyin
   end interface
 
-  interface mld_invt
-    subroutine mld_dinvt(thres,i,nrmi,row,heap,irwt,uia1,uia2,uaspk,nidx,idxs,info)
+  interface mld_invt_inv
+    subroutine mld_dinvt_inv(thres,i,nrmi,row,heap,irwt,uia1,uia2,uaspk,&
+         & nidx,idxs,info)
       use psb_base_mod, only : psb_dspmat_type, psb_dpk_, psb_int_heap
       implicit none 
       ! Arguments
@@ -122,7 +124,7 @@ module mld_d_ainv_bld_mod
       real(psb_dpk_), intent(in)          :: uaspk(:)
       real(psb_dpk_), intent(inout)       :: row(:)
 
-    end subroutine mld_dinvt
+    end subroutine mld_dinvt_inv
   end interface
 
   interface mld_invt_copyout

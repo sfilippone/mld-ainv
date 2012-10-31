@@ -42,26 +42,26 @@ psb_d_mv_dsc_from_coo.o \
 psb_d_mv_dsc_from_fmt.o \
 psb_d_mv_dsc_to_coo.o \
 psb_d_mv_dsc_to_fmt.o \
-mld_d_ainvk_solver_apply.o \
-mld_d_ainvk_solver_apply_vect.o \
-mld_d_ainvk_solver_bld.o \
-mld_d_ainvk_solver_check.o \
-mld_d_ainvk_solver_descr.o \
-mld_d_ainvk_solver_dmp.o \
-mld_d_ainvk_solver_free.o \
-mld_d_ainvk_solver_setc.o \
-mld_d_ainvk_solver_seti.o \
-mld_d_ainvk_solver_setr.o \
-mld_d_ainvt_solver_apply.o \
-mld_d_ainvt_solver_apply_vect.o \
-mld_d_ainvt_solver_bld.o \
-mld_d_ainvt_solver_check.o \
-mld_d_ainvt_solver_descr.o \
-mld_d_ainvt_solver_dmp.o \
-mld_d_ainvt_solver_free.o \
-mld_d_ainvt_solver_setc.o \
-mld_d_ainvt_solver_seti.o \
-mld_d_ainvt_solver_setr.o \
+mld_d_invk_solver_apply.o \
+mld_d_invk_solver_apply_vect.o \
+mld_d_invk_solver_bld.o \
+mld_d_invk_solver_check.o \
+mld_d_invk_solver_descr.o \
+mld_d_invk_solver_dmp.o \
+mld_d_invk_solver_free.o \
+mld_d_invk_solver_setc.o \
+mld_d_invk_solver_seti.o \
+mld_d_invk_solver_setr.o \
+mld_d_invt_solver_apply.o \
+mld_d_invt_solver_apply_vect.o \
+mld_d_invt_solver_bld.o \
+mld_d_invt_solver_check.o \
+mld_d_invt_solver_descr.o \
+mld_d_invt_solver_dmp.o \
+mld_d_invt_solver_free.o \
+mld_d_invt_solver_setc.o \
+mld_d_invt_solver_seti.o \
+mld_d_invt_solver_setr.o \
 mld_d_aorth_solver_apply.o \
 mld_d_aorth_solver_apply_vect.o \
 mld_d_aorth_solver_bld.o \
@@ -79,10 +79,10 @@ mld_dinvk.o \
 mld_dinvt_copyin.o \
 mld_dinvt_copyout.o \
 mld_dinvt.o \
-mld_dsparse_ainvk.o \
-mld_dsparse_ainvt.o
+mld_dsparse_invk.o \
+mld_dsparse_invt.o
 
-#mld_dainvt_impl.o mld_dainvk_impl.o mld_d_aorth_impl.o \
+#mld_dinvt_impl.o mld_dinvk_impl.o mld_d_aorth_impl.o \
 # psb_d_dsc_impl.o
 
 
