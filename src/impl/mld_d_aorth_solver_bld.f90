@@ -32,7 +32,7 @@ subroutine mld_d_aorth_solver_bld(a,desc_a,sv,upd,info,b,amold,vmold)
   if (debug_level >= psb_debug_outer_) &
        & write(debug_unit,*) me,' ',trim(name),' start'
 
-  call mld_ainv_orth_bld(a,sv%alg,sv%fill_in,sv%thresh,&
+  call mld_aorth_bld(a,sv%alg,sv%fill_in,sv%thresh,&
        & sv%w,sv%d,sv%z,desc_a,info,b,iscale=mld_ilu_scale_maxval_)    
 
   if ((info == psb_success_) .and.present(amold)) then 

@@ -1,8 +1,8 @@
-subroutine mld_d_ainv_orth_bld(a,alg,fillin,thresh,wmat,d,zmat,desc,info,blck,iscale)
+subroutine mld_d_aorth_bld(a,alg,fillin,thresh,wmat,d,zmat,desc,info,blck,iscale)
 
   use psb_base_mod
   use mld_prec_mod
-  use mld_d_aorth_solver, mld_protect_name => mld_d_ainv_orth_bld
+  use mld_d_aorth_solver, mld_protect_name => mld_d_aorth_bld
   use mld_d_orthbase_mod
   use mld_d_biconjg_mod
 
@@ -158,5 +158,5 @@ subroutine mld_d_ainv_orth_bld(a,alg,fillin,thresh,wmat,d,zmat,desc,info,blck,is
     return
   end if
   return
-end subroutine mld_d_ainv_orth_bld
+end subroutine mld_d_aorth_bld
 
