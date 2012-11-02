@@ -247,7 +247,7 @@ module mld_d_invk_solver
   end interface
   
   interface  mld_invk_copyin
-    subroutine mld_dinvk_copyin(i,m,a,jmin,jmax,row,rowlevs,heap,&
+    subroutine mld_d_invk_copyin(i,m,a,jmin,jmax,row,rowlevs,heap,&
          & ktrw,trw,info,sign,inlevs)
 
       use psb_base_mod, only : psb_d_csr_sparse_mat, psb_d_coo_sparse_mat,&
@@ -265,11 +265,11 @@ module mld_d_invk_solver
       real(psb_dpk_), optional, intent(in) :: sign
       integer, intent(in), optional        :: inlevs(:)
 
-    end subroutine mld_dinvk_copyin
+    end subroutine mld_d_invk_copyin
   end interface
 
   interface mld_invk_inv
-    subroutine mld_dinvk_inv(fill_in,i,row,rowlevs,heap,uia1,uia2,uaspk,uplevs,&
+    subroutine mld_d_invk_inv(fill_in,i,row,rowlevs,heap,uia1,uia2,uaspk,uplevs,&
          & nidx,idxs,info)
 
       use psb_base_mod, only : psb_dspmat_type, psb_dpk_, psb_int_heap
@@ -286,11 +286,11 @@ module mld_d_invk_solver
       real(psb_dpk_), intent(inout)        :: row(:)
 
 
-    end subroutine mld_dinvk_inv
+    end subroutine mld_d_invk_inv
   end interface
 
   interface mld_invk_copyout
-    subroutine mld_dinvk_copyout(fill_in,i,m,row,rowlevs,nidx,idxs,&
+    subroutine mld_d_invk_copyout(fill_in,i,m,row,rowlevs,nidx,idxs,&
          &  l2,uia1,uia2,uaspk,info)
 
       use psb_base_mod, only : psb_dspmat_type, psb_dpk_, psb_int_heap
@@ -305,7 +305,7 @@ module mld_d_invk_solver
       real(psb_dpk_), allocatable, intent(inout) :: uaspk(:)
       real(psb_dpk_), intent(inout)              :: row(:)
 
-    end subroutine mld_dinvk_copyout
+    end subroutine mld_d_invk_copyout
   end interface
   
   interface mld_sparse_invk

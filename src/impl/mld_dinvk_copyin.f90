@@ -1,8 +1,8 @@
-subroutine mld_dinvk_copyin(i,m,a,jmin,jmax,row,rowlevs,heap,ktrw,trw,info,sign,inlevs)
+subroutine mld_d_invk_copyin(i,m,a,jmin,jmax,row,rowlevs,heap,ktrw,trw,info,sign,inlevs)
   
 
   use psb_base_mod
-  use mld_d_invk_solver, mld_protect_name => mld_dinvk_copyin
+  use mld_d_invk_solver, mld_protect_name => mld_d_invk_copyin
 
   implicit none
 
@@ -75,4 +75,4 @@ subroutine mld_dinvk_copyin(i,m,a,jmin,jmax,row,rowlevs,heap,ktrw,trw,info,sign,
   end if
   return
 
-end subroutine mld_dinvk_copyin
+end subroutine mld_d_invk_copyin

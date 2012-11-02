@@ -1,8 +1,7 @@
-subroutine mld_dinvt_inv(thres,i,nrmi,row,heap,irwt,ja,irp,val,nidx,idxs,info)
-  
-
+subroutine mld_d_invt_inv(thres,i,nrmi,row,heap,irwt,ja,irp,val,nidx,idxs,info)
+ 
   use psb_base_mod
-  use mld_d_invt_solver, mld_protect_name => mld_dinvt_inv
+  use mld_d_invt_solver, mld_protect_name => mld_d_invt_inv
 
   implicit none 
 
@@ -104,4 +103,4 @@ subroutine mld_dinvt_inv(thres,i,nrmi,row,heap,irwt,ja,irp,val,nidx,idxs,info)
   end do
 
   irwt(i) = 0
-end subroutine mld_dinvt_inv
+end subroutine mld_d_invt_inv

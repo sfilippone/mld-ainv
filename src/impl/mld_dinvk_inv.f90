@@ -1,9 +1,8 @@
-subroutine mld_dinvk_inv(fill_in,i,row,rowlevs,heap,uia1,uia2,uaspk,uplevs,&
+subroutine mld_d_invk_inv(fill_in,i,row,rowlevs,heap,uia1,uia2,uaspk,uplevs,&
      & nidx,idxs,info)
   
-
   use psb_base_mod
-  use mld_d_invk_solver, mld_protect_name => mld_dinvk_inv
+  use mld_d_invk_solver, mld_protect_name => mld_d_invk_inv
 
   implicit none 
 
@@ -90,4 +89,4 @@ subroutine mld_dinvk_inv(fill_in,i,row,rowlevs,heap,uia1,uia2,uaspk,uplevs,&
     end if
   end do
 
-end subroutine mld_dinvk_inv
+end subroutine mld_d_invk_inv

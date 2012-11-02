@@ -1,9 +1,8 @@
-subroutine mld_dinvt_copyout(fill_in,thres,i,m,nlw,nup,jmaxup,nrmi,row, &
-  
+subroutine mld_d_invt_copyout(fill_in,thres,i,m,nlw,nup,jmaxup,nrmi,row, &
      & nidx,idxs,l2,ja,irp,val,info)
 
   use psb_base_mod
-  use mld_d_invt_solver, mld_protect_name => mld_dinvt_copyout
+  use mld_d_invt_solver, mld_protect_name => mld_d_invt_copyout
 
   implicit none 
 
@@ -260,4 +259,4 @@ subroutine mld_dinvt_copyout(fill_in,thres,i,m,nlw,nup,jmaxup,nrmi,row, &
     return
   end if
 
-end subroutine mld_dinvt_copyout
+end subroutine mld_d_invt_copyout
