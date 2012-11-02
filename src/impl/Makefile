@@ -73,13 +73,13 @@ mld_d_aorth_solver_setc.o \
 mld_d_aorth_solver_seti.o \
 mld_d_aorth_solver_setr.o \
 mld_d_aorth_bld.o \
-mld_dinvk_copyin.o \
-mld_dinvk_copyout.o \
-mld_dinvk_inv.o \
+mld_d_invk_copyin.o \
+mld_d_invk_copyout.o \
+mld_d_invk_inv.o \
 mld_d_invk_bld.o \
-mld_dinvt_copyin.o \
-mld_dinvt_copyout.o \
-mld_dinvt_inv.o \
+mld_d_invt_copyin.o \
+mld_d_invt_copyout.o \
+mld_d_invt_inv.o \
 mld_d_invt_bld.o \
 mld_dsparse_invk.o \
 mld_dsparse_invt.o
