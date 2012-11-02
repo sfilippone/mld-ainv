@@ -1,18 +1,18 @@
-subroutine mld_d_aorth_solver_setr(sv,what,val,info)
+subroutine mld_d_ainv_solver_setr(sv,what,val,info)
   
 
   use psb_base_mod
-  use mld_d_aorth_solver, mld_protect_name => mld_d_aorth_solver_setr
+  use mld_d_ainv_solver, mld_protect_name => mld_d_ainv_solver_setr
 
   Implicit None
 
   ! Arguments
-  class(mld_d_aorth_solver_type), intent(inout) :: sv 
+  class(mld_d_ainv_solver_type), intent(inout) :: sv 
   integer, intent(in)                    :: what 
   real(psb_dpk_), intent(in)             :: val
   integer, intent(out)                   :: info
   Integer :: err_act
-  character(len=20)  :: name='mld_d_aorth_solver_setr'
+  character(len=20)  :: name='mld_d_ainv_solver_setr'
 
   call psb_erractionsave(err_act)
   info = psb_success_
@@ -36,4 +36,4 @@ subroutine mld_d_aorth_solver_setr(sv,what,val,info)
     return
   end if
   return
-end subroutine mld_d_aorth_solver_setr
+end subroutine mld_d_ainv_solver_setr

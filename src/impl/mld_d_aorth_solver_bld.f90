@@ -1,16 +1,16 @@
-subroutine mld_d_aorth_solver_bld(a,desc_a,sv,upd,info,b,amold,vmold)
+subroutine mld_d_ainv_solver_bld(a,desc_a,sv,upd,info,b,amold,vmold)
   
 
   use psb_base_mod
   use mld_prec_mod
-  use mld_d_aorth_solver, mld_protect_name => mld_d_aorth_solver_bld
+  use mld_d_ainv_solver, mld_protect_name => mld_d_ainv_solver_bld
 
   Implicit None
 
   ! Arguments
   type(psb_dspmat_type), intent(in), target  :: a
   Type(psb_desc_type), Intent(in)            :: desc_a
-  class(mld_d_aorth_solver_type), intent(inout) :: sv
+  class(mld_d_ainv_solver_type), intent(inout) :: sv
   character, intent(in)                      :: upd
   integer, intent(out)                       :: info
   type(psb_dspmat_type), intent(in), target, optional :: b
@@ -21,7 +21,7 @@ subroutine mld_d_aorth_solver_bld(a,desc_a,sv,upd,info,b,amold,vmold)
   integer :: n_row,n_col, nrow_a, nztota
   real(psb_dpk_), pointer :: ww(:), aux(:), tx(:),ty(:)
   integer :: ictxt,np,me,i, err_act, debug_unit, debug_level
-  character(len=20)  :: name='mld_d_aorth_solver_bld', ch_err
+  character(len=20)  :: name='mld_d_ainv_solver_bld', ch_err
 
   info=psb_success_
   call psb_erractionsave(err_act)
@@ -32,7 +32,7 @@ subroutine mld_d_aorth_solver_bld(a,desc_a,sv,upd,info,b,amold,vmold)
   if (debug_level >= psb_debug_outer_) &
        & write(debug_unit,*) me,' ',trim(name),' start'
 
-  call mld_aorth_bld(a,sv%alg,sv%fill_in,sv%thresh,&
+  call mld_ainv_bld(a,sv%alg,sv%fill_in,sv%thresh,&
        & sv%w,sv%d,sv%z,desc_a,info,b,iscale=mld_ilu_scale_maxval_)    
 
   if ((info == psb_success_) .and.present(amold)) then 
@@ -66,4 +66,4 @@ subroutine mld_d_aorth_solver_bld(a,desc_a,sv,upd,info,b,amold,vmold)
     return
   end if
   return
-end subroutine mld_d_aorth_solver_bld
+end subroutine mld_d_ainv_solver_bld

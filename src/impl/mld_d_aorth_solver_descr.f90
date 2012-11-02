@@ -1,13 +1,13 @@
-subroutine mld_d_aorth_solver_descr(sv,info,iout,coarse)
+subroutine mld_d_ainv_solver_descr(sv,info,iout,coarse)
   
 
   use psb_base_mod
-  use mld_d_aorth_solver, mld_protect_name => mld_d_aorth_solver_descr
+  use mld_d_ainv_solver, mld_protect_name => mld_d_ainv_solver_descr
 
   Implicit None
 
   ! Arguments
-  class(mld_d_aorth_solver_type), intent(in) :: sv
+  class(mld_d_ainv_solver_type), intent(in) :: sv
   integer, intent(out)                     :: info
   integer, intent(in), optional            :: iout
   logical, intent(in), optional       :: coarse
@@ -15,7 +15,7 @@ subroutine mld_d_aorth_solver_descr(sv,info,iout,coarse)
   ! Local variables
   integer      :: err_act
   integer      :: ictxt, me, np
-  character(len=20), parameter :: name='mld_d_aorth_solver_descr'
+  character(len=20), parameter :: name='mld_d_ainv_solver_descr'
   integer :: iout_
 
   call psb_erractionsave(err_act)
@@ -26,7 +26,7 @@ subroutine mld_d_aorth_solver_descr(sv,info,iout,coarse)
     iout_ = 6
   endif
 
-  write(iout_,*) '  AORTH Approximate Inverse with sparse orthogonalization '
+  write(iout_,*) '  AINV: Approximate Inverse with sparse boconjugation '
   write(iout_,*) '  Algoritm variant       :',sv%alg    
   write(iout_,*) '  Fill level             :',sv%fill_in
   write(iout_,*) '  Fill threshold         :',sv%thresh
@@ -41,4 +41,4 @@ subroutine mld_d_aorth_solver_descr(sv,info,iout,coarse)
     return
   end if
   return
-end subroutine mld_d_aorth_solver_descr
+end subroutine mld_d_ainv_solver_descr

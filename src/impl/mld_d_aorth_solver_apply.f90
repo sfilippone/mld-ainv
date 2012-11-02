@@ -1,10 +1,10 @@
-subroutine mld_d_aorth_solver_apply(alpha,sv,x,beta,y,desc_data,trans,work,info)
+subroutine mld_d_ainv_solver_apply(alpha,sv,x,beta,y,desc_data,trans,work,info)
   
   use psb_base_mod
-  use mld_d_aorth_solver, mld_protect_name => mld_d_aorth_solver_apply
+  use mld_d_ainv_solver, mld_protect_name => mld_d_ainv_solver_apply
   implicit none 
   type(psb_desc_type), intent(in)      :: desc_data
-  class(mld_d_aorth_solver_type), intent(in) :: sv
+  class(mld_d_ainv_solver_type), intent(in) :: sv
   real(psb_dpk_),intent(inout)         :: x(:)
   real(psb_dpk_),intent(inout)         :: y(:)
   real(psb_dpk_),intent(in)            :: alpha,beta
@@ -16,7 +16,7 @@ subroutine mld_d_aorth_solver_apply(alpha,sv,x,beta,y,desc_data,trans,work,info)
   real(psb_dpk_), pointer :: ww(:), aux(:), tx(:),ty(:)
   integer    :: ictxt,np,me,i, err_act
   character          :: trans_
-  character(len=20)  :: name='d_aorth_solver_apply'
+  character(len=20)  :: name='d_ainv_solver_apply'
 
   call psb_erractionsave(err_act)
 
@@ -76,7 +76,7 @@ subroutine mld_d_aorth_solver_apply(alpha,sv,x,beta,y,desc_data,trans,work,info)
 
   case default
     call psb_errpush(psb_err_internal_error_,name,&
-         & a_err='Invalid TRANS in AORTH subsolve')
+         & a_err='Invalid TRANS in ainv subsolve')
     goto 9999
   end select
 
@@ -115,4 +115,4 @@ subroutine mld_d_aorth_solver_apply(alpha,sv,x,beta,y,desc_data,trans,work,info)
   end if
   return
 
-end subroutine mld_d_aorth_solver_apply
+end subroutine mld_d_ainv_solver_apply

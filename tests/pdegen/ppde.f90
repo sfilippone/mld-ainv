@@ -38,7 +38,7 @@ program ppde
   use data_input
   use mld_d_invt_solver
   use mld_d_invk_solver
-  use mld_d_aorth_solver
+  use mld_d_ainv_solver
   implicit none
 
   ! input parameters
@@ -55,7 +55,7 @@ program ppde
   type(mld_dprec_type)  :: prec
   type(mld_d_invt_solver_type) :: invtsv
   type(mld_d_invk_solver_type) :: invksv
-  type(mld_d_aorth_solver_type) :: ainvort
+  type(mld_d_ainv_solver_type) :: ainvort
   ! descriptor
   type(psb_desc_type)   :: desc_a
   ! dense matrices
@@ -182,7 +182,7 @@ program ppde
     call mld_inner_precset(prec,invksv,info) 
   case ('invt') 
     call mld_inner_precset(prec,invtsv,info) 
-  case ('AORTH') 
+  case ('ainv') 
     call mld_inner_precset(prec,ainvort,info) 
   end select
   call mld_precset(prec,mld_sub_fillin_,   prectype%fill1,   info)

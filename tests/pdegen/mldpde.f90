@@ -59,7 +59,7 @@ program mldpde3d
   use pde3d_exp_mod
   use mld_d_invt_solver
   use mld_d_invk_solver
-  use mld_d_aorth_solver
+  use mld_d_ainv_solver
   implicit none
 
   ! input parameters
@@ -77,7 +77,7 @@ program mldpde3d
   type(mld_dprec_type)  :: prec
   type(mld_d_invt_solver_type) :: invtsv
   type(mld_d_invk_solver_type) :: invksv
-  type(mld_d_aorth_solver_type) :: ainvort
+  type(mld_d_ainv_solver_type) :: ainvsv
   type ainvparms 
     character(len=12) :: alg
     integer           :: fill, inv_fill, orth_alg
@@ -200,8 +200,8 @@ program mldpde3d
       call mld_inner_precset(prec,invksv,info) 
     case ('INVT') 
       call mld_inner_precset(prec,invtsv,info) 
-    case ('AORTH') 
-      call mld_inner_precset(prec,ainvort,info) 
+    case ('AINV') 
+      call mld_inner_precset(prec,ainvsv,info) 
     end select
     call mld_precset(prec,mld_ainv_alg_,  parms%orth_alg,  info)
     call mld_precset(prec,mld_sub_fillin_,  parms%fill,    info)
