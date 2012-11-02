@@ -62,17 +62,17 @@ mld_d_invt_solver_free.o \
 mld_d_invt_solver_setc.o \
 mld_d_invt_solver_seti.o \
 mld_d_invt_solver_setr.o \
-mld_d_aorth_solver_apply.o \
-mld_d_aorth_solver_apply_vect.o \
-mld_d_aorth_solver_bld.o \
-mld_d_aorth_solver_check.o \
-mld_d_aorth_solver_descr.o \
-mld_d_aorth_solver_dmp.o \
-mld_d_aorth_solver_free.o \
-mld_d_aorth_solver_setc.o \
-mld_d_aorth_solver_seti.o \
-mld_d_aorth_solver_setr.o \
-mld_d_aorth_bld.o \
+mld_d_ainv_solver_apply.o \
+mld_d_ainv_solver_apply_vect.o \
+mld_d_ainv_solver_bld.o \
+mld_d_ainv_solver_check.o \
+mld_d_ainv_solver_descr.o \
+mld_d_ainv_solver_dmp.o \
+mld_d_ainv_solver_free.o \
+mld_d_ainv_solver_setc.o \
+mld_d_ainv_solver_seti.o \
+mld_d_ainv_solver_setr.o \
+mld_d_ainv_bld.o \
 mld_d_invk_copyin.o \
 mld_d_invk_copyout.o \
 mld_d_invk_inv.o \
@@ -84,7 +84,7 @@ mld_d_invt_bld.o \
 mld_dsparse_invk.o \
 mld_dsparse_invt.o
 
-#mld_dinvt_impl.o mld_dinvk_impl.o mld_d_aorth_impl.o \
+#mld_dinvt_impl.o mld_dinvk_impl.o mld_d_ainv_impl.o \
 # psb_d_dsc_impl.o
 
 

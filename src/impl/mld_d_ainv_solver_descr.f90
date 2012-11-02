@@ -26,7 +26,7 @@ subroutine mld_d_ainv_solver_descr(sv,info,iout,coarse)
     iout_ = 6
   endif
 
-  write(iout_,*) '  AINV: Approximate Inverse with sparse boconjugation '
+  write(iout_,*) '  AINV: Approximate Inverse with sparse biconjugation '
   write(iout_,*) '  Algoritm variant       :',sv%alg    
   write(iout_,*) '  Fill level             :',sv%fill_in
   write(iout_,*) '  Fill threshold         :',sv%thresh
