@@ -100,7 +100,11 @@ subroutine mld_d_ainv_bld(a,alg,fillin,thresh,wmat,d,zmat,desc,info,blck,iscale)
     goto 9999      
   end select
 
-  if (alg /=  mld_ainv_orth3_) then 
+  !
+  ! Here for the actual workhorses. 
+  !
+  select case(alg)
+  case(mld_ainv_orth1_,mld_ainv_orth2_,mld_ainv_orth3_,mld_ainv_orth4_)
     call mld_sparse_orthbase(alg,n_row,acsr,pq,&
          & zmat,nzrmax,sp_thresh,info)
     ! Now for W  (i.e. Lower) 
@@ -109,10 +113,14 @@ subroutine mld_d_ainv_bld(a,alg,fillin,thresh,wmat,d,zmat,desc,info,blck,iscale)
          & call mld_sparse_orthbase(alg,n_row,acsr,pq,&
          &   wmat,nzrmax,sp_thresh,info)
     call wmat%transp()
-  else
+  case(mld_ainv_llk_,mld_ainv_s_llk_)
     call mld_sparse_biconjg(alg,n_row,acsr,pq,&
          &   zmat,wmat,nzrmax,sp_thresh,info)
-  end if
+  case default
+    info = psb_err_internal_error_
+    call psb_errpush(info,name,a_err='ainv_bld: bad alg')
+    goto 9999
+  end select
   ! Done. Hopefully.... 
 
   if (info /= psb_success_) then 
@@ -120,6 +128,10 @@ subroutine mld_d_ainv_bld(a,alg,fillin,thresh,wmat,d,zmat,desc,info,blck,iscale)
     call psb_errpush(info,name,a_err='orthbase')
     goto 9999
   end if
+
+  !
+  ! Is this right??? 
+  !
   do i=1, n_row
     if (abs(pq(i)) < d_epstol) then
       pq(i) = done

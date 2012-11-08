@@ -8,9 +8,9 @@ NONE                     Renum
 -001                     ITRACE
 02                       IRST    restart for RGMRES  and BiCGSTABL
 AINV                     AINV variant: AINVK, AINVT, AORTH
-05                       Direct fill
-05                       Inverse fill
+04                       Direct fill
+04                       Inverse fill
 1.d-2		         Threshold
 1.d-2                    Inverse threshold
-14                       AORTH variant: 12 or 13
+18                      AORTH variant: 13,14,15,16, 17, 18
 
