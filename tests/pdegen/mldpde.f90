@@ -99,6 +99,7 @@ program mldpde3d
   integer, allocatable :: perm(:)
 
   ! other variables
+  logical            :: pdump=.false.
   integer            :: info, i
   character(len=20)  :: name,ch_err
   character(len=40)  :: fname
@@ -225,6 +226,12 @@ program mldpde3d
   tprec = psb_wtime()-t1
 
   call psb_amx(ictxt,tprec)
+
+
+  if (pdump) then 
+    call prec%dump(info,prefix='mlainv-t',head='AINV prec',&
+         & solver=.true., smoother=.false.)
+  end if
 
   if (iam == psb_root_) write(psb_out_unit,'("Preconditioner time : ",es12.5)')tprec
   if (iam == psb_root_) write(psb_out_unit,'(" ")')
