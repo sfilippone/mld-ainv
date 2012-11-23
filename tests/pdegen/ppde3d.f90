@@ -1,8 +1,15 @@
+!!$ 
+!!$ 
+!!$                           MLD2P4  version 2.0
+!!$  MultiLevel Domain Decomposition Parallel Preconditioners Package
+!!$             based on PSBLAS (Parallel Sparse BLAS version 3.0)
 !!$  
-!!$              Parallel Sparse BLAS  version 2.3.1
-!!$    (C) Copyright 2006, 2007, 2008, 2009, 2010
-!!$                       Salvatore Filippone    University of Rome Tor Vergata
-!!$                       Alfredo Buttari        CNRS-IRIT, Toulouse
+!!$  (C) Copyright 2008,2009,2010,2012
+!!$
+!!$                      Salvatore Filippone  University of Rome Tor Vergata
+!!$                      Alfredo Buttari      CNRS-IRIT, Toulouse
+!!$                      Pasqua D'Ambra       ICAR-CNR, Naples
+!!$                      Daniela di Serafino  Second University of Naples
 !!$ 
 !!$  Redistribution and use in source and binary forms, with or without
 !!$  modification, are permitted provided that the following conditions
@@ -12,14 +19,14 @@
 !!$    2. Redistributions in binary form must reproduce the above copyright
 !!$       notice, this list of conditions, and the following disclaimer in the
 !!$       documentation and/or other materials provided with the distribution.
-!!$    3. The name of the PSBLAS group or the names of its contributors may
+!!$    3. The name of the MLD2P4 group or the names of its contributors may
 !!$       not be used to endorse or promote products derived from this
 !!$       software without specific written permission.
 !!$ 
 !!$  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !!$  ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
 !!$  TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
-!!$  PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE PSBLAS GROUP OR ITS CONTRIBUTORS
+!!$  PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE MLD2P4 GROUP OR ITS CONTRIBUTORS
 !!$  BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
 !!$  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
 !!$  SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
@@ -29,12 +36,15 @@
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
 !!$  
-! File: ppde.f90
 !
-! Program: ppde
+! File: ppde3d.f90
+!
+! Program: ppde3d
 ! This sample program solves a linear system obtained by discretizing a
 ! PDE with Dirichlet BCs. 
 ! 
+!
+! The PDE is a general second order equation in 3d
 !
 !   a1 dd(u)  a2 dd(u)    a3 dd(u)    b1 d(u)   b2 d(u)  b3 d(u)  
 ! -   ------ -  ------ -  ------ +  -----  +  ------  +  ------ + c u = f
@@ -45,11 +55,13 @@
 !
 !  on the unit cube  0<=x,y,z<=1.
 !
+!
+! Note that if b1=b2=b3=c=0., the PDE is the  Laplace equation.
+!
 ! In this sample program the index space of the discretized
 ! computational domain is first numbered sequentially in a standard way, 
 ! then the corresponding vector is distributed according to a BLOCK
 ! data distribution.
-!
 !
 program ppde3d
   use psb_base_mod
