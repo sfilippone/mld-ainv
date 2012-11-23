@@ -10,28 +10,16 @@ AINV_LIB=-L$(AINVLIBDIR) -lainv_prec
 PSBLAS_LIB= -L$(PSBLIBDIR)  -lpsb_util  -lpsb_base
 FINCLUDES=$(FMFLAG). $(FMFLAG)$(AINVLIBDIR) $(FMFLAG)$(MLDINCDIR)  $(FMFLAG)$(PSBINCDIR) $(FIFLAG).
 
-PDOBJS=ppde.o  data_input.o 
-PSOBJS=spde.o  data_input.o 
-MLOBJS=mldpde.o data_input.o  pde3d_exp_mod.o pde3d_gauss_mod.o pde3d_base_mod.o
+D3DOBJS=ppde3d.o data_input.o  pde3d_exp_mod.o pde3d_gauss_mod.o pde3d_base_mod.o
 EXEDIR=./runs
 
-all: mldpde
+all: ppde3d
 # ppde spde
-mldpde: $(MLOBJS)
-	$(F90LINK) $(MLOBJS) -o mldpde $(AINV_LIB) $(MLD_LIB) $(PSBLAS_LIB) $(LDLIBS)
-	/bin/mv mldpde $(EXEDIR)
-mldpde.o:  data_input.o  pde3d_exp_mod.o pde3d_gauss_mod.o pde3d_base_mod.o
-ppde: $(PDOBJS)
-	$(F90LINK) $(PDOBJS) -o ppde $(AINV_LIB) $(MLD_LIB) $(PSBLAS_LIB) $(LDLIBS) -Wl,-pthread
-	/bin/mv ppde $(EXEDIR)
+ppde3d: $(D3DOBJS)
+	$(F90LINK) $(D3DOBJS) -o ppde3d $(AINV_LIB) $(MLD_LIB) $(PSBLAS_LIB) $(LDLIBS)
+	/bin/mv ppde3d $(EXEDIR)
 
-
-spde: $(PSOBJS)
-	$(F90LINK) $(PSOBJS) -o spde $(MLD_LIB) $(PSBLAS_LIB) $(LDLIBS)
-	/bin/mv spde $(EXEDIR)
-
-ppde.o spde.o: data_input.o 
-
+ppde3d.o:  data_input.o  pde3d_exp_mod.o pde3d_gauss_mod.o pde3d_base_mod.o
 
 clean: 
 	/bin/rm -f $(PDOBJS) $(EXEDIR)/ppde $(PSOBJS) $(EXEDIR)/spde 

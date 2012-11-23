@@ -51,7 +51,7 @@
 ! data distribution.
 !
 !
-program mldpde3d
+program ppde3d
   use psb_base_mod
   use mld_prec_mod
   use psb_krylov_mod
@@ -116,7 +116,7 @@ program mldpde3d
     stop
   endif
   if(psb_get_errstatus() /= 0) goto 9999
-  name='mldpde3d'
+  name='ppde3d'
   call psb_set_errverbosity(2)
   !
   ! Hello world
@@ -137,7 +137,6 @@ program mldpde3d
   t1 = psb_wtime()
   call psb_gen_pde3d(ictxt,idim,a,bv,xv,desc_a,afmt,&
        & a1,a2,a3,b1,b2,b3,c,g,info)  
-!!$  call create_matrix(idim,a,bv,xv,desc_a,ictxt,afmt,info)  
   call psb_barrier(ictxt)
   t2 = psb_wtime() - t1
   if(info /= psb_success_) then
@@ -162,7 +161,6 @@ program mldpde3d
         goto 9999
       end if
       if (allocated(perm)) then
-!!$    write(0,*) size(perm),':',nr,':',perm(:),b(:)
       else
         write(0,*) allocated(perm)
         goto 9999
@@ -170,7 +168,6 @@ program mldpde3d
       call psb_gelp('N',perm(1:nr),b(1:nr),info)
     end if
   end if
-!!$  write(0,*) size(perm),':',nr,':',perm(:),b(:)
   info = psb_get_errstatus()
   if (info /= 0) call psb_error(ictxt)
   t1 = psb_wtime()
@@ -380,4 +377,4 @@ contains
     write(iout,*)'               >= 1 do tracing every itrace'
     write(iout,*)'               iterations ' 
   end subroutine pr_usage
-end program mldpde3d
+end program ppde3d
