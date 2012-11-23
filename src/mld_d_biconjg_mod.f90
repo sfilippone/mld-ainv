@@ -419,7 +419,7 @@ contains
     real(psb_dpk_), allocatable :: zval(:),val(:), q(:),  ww(:) 
     integer :: i,j,k, kc, kr, err_act, nz, nzra, nzrz, ipzi,ipzj, nzww,&
          & nzzi,nzzj, nzz, ip1, ip2, ipza,ipzz, ipzn, nzzn, ipz1, ipz2,&
-         &  ipj, lastj, nextj, nzw
+         &  ipj, lastj, nextj, nzw, nzrw
     type(psb_int_heap) :: heap, rheap
     type(psb_d_csc_sparse_mat) :: ac
     real(psb_dpk_)     :: alpha
@@ -599,6 +599,7 @@ contains
       z%icp(i+1) = ipz1 + nzrz
       nzz        = nzz + nzrz
       nzww = 0
+
       call psb_d_spmspv(done,ac,nzrz,ia,val,dzero,nzww,iww,ww,info)
       p(i) = psb_spdot_srtd(nzww,iww,ww,nzrz,ia,val)
       if (abs(p(i)) < d_epstol) &
@@ -712,28 +713,42 @@ contains
       !
       ! Sparsify current ZVAL and put into ZMAT
       ! 
-      call sparsify(i,nzrmax,sp_thresh,n,zval,nzrz,ia,val,info,iheap=heap,ikr=izkr)
+      call sparsify(i,nzrmax,sp_thresh,n,zval,nzrw,ia,val,info,iheap=heap,ikr=izkr)
       if (info /= psb_success_) then 
         info = psb_err_internal_error_
         call psb_errpush(info,name,a_err='sparsify')
         return
       end if
-      call psb_ensure_size(nzw+nzrz, w%ia,  info)
-      call psb_ensure_size(nzw+nzrz, w%val, info)
+      call psb_ensure_size(nzw+nzrw, w%ia,  info)
+      call psb_ensure_size(nzw+nzrw, w%val, info)
       ipz1 = w%icp(i)
-      do j=1, nzrz
+      do j=1, nzrw
         w%ia(ipz1  + j -1) = ia(j)
         w%val(ipz1 + j -1) = val(j)
       end do
-      w%icp(i+1) = ipz1 + nzrz
-      nzw        = nzw + nzrz
+      w%icp(i+1) = ipz1 + nzrw
+      nzw        = nzw + nzrw
 
+      !
+      ! Ok, now compute w_i^T A z_i
+      !
+      
       nzww = 0
-      call psb_d_spmspv(done,ac,nzrz,ia,val,dzero,nzww,iww,ww,info)
-      q(i) = psb_spdot_srtd(nzww,iww,ww,nzrz,ia,val)
-      if (abs(p(i)) < d_epstol) &
-         & p(i) = 1.d-3 
-
+      nzrz = z%icp(i+1)-z%icp(i)
+      ipz1 = z%icp(i)
+      call psb_d_spmspv(done,ac,&
+           & nzrz,z%ia(ipz1:ipz1+nzrz-1),z%val(ipz1:ipz1+nzrz-1),&
+           & dzero,nzww,iww,ww,info)
+      q(i) = psb_spdot_srtd(nzww,iww,ww,nzrw,ia,val)
+      if (abs(q(i)) < d_epstol) &
+           & q(i) = 1.d-3 
+      p(i) = q(i)
+      
+!!$      call psb_d_spmspv(done,ac,nzrz,ia,val,dzero,nzww,iww,ww,info)
+!!$      q(i) = psb_spdot_srtd(nzww,iww,ww,nzrz,ia,val)
+!!$      if (abs(p(i)) < d_epstol) &
+!!$         & p(i) = 1.d-3 
+!!$
 
       
 
