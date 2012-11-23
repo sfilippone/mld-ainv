@@ -29,7 +29,7 @@ ppde2d: $(D2DOBJS)
 ppde2d.o:  data_input.o  pde2d_exp_mod.o pde2d_gauss_mod.o pde2d_base_mod.o
 
 clean: 
-	/bin/rm -f $(PDOBJS) $(EXEDIR)/ppde $(PSOBJS) $(EXEDIR)/spde 
+	/bin/rm -f $(D2DOBJS) $(D3DOBJS) *.$(.mod)
 
 verycleanlib: 
 	(cd ../..; make veryclean)
