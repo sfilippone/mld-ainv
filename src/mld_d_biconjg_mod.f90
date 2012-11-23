@@ -422,7 +422,7 @@ contains
          &  ipj, lastj, nextj, nzw, nzrw
     type(psb_int_heap) :: heap, rheap
     type(psb_d_csc_sparse_mat) :: ac
-    real(psb_dpk_)     :: alpha
+    real(psb_dpk_)     :: alpha, tmpq
     character(len=20)  :: name='mld_orth_llk'
     logical, parameter :: debug=.false.
 
@@ -574,11 +574,11 @@ contains
         izcr(j) = 0
       end do outer
 
-!!$      call a%csget(i,i,nzra,ia,ja,val,info)
-!!$      call rwclip(nzra,ia,ja,val,1,n,1,n)      
-!!$      p(i) = psb_spge_dot(nzra,ja,val,zval)
-!!$      if (abs(p(i)) < d_epstol) &
-!!$         & p(i) = 1.d-3 
+      call a%csget(i,i,nzra,ia,ja,val,info)
+      call rwclip(nzra,ia,ja,val,1,n,1,n)      
+      p(i) = psb_spge_dot(nzra,ja,val,zval)
+      if (abs(p(i)) < d_epstol) &
+         & p(i) = 1.d-3 
           
       !
       ! Sparsify current ZVAL and put into ZMAT
@@ -600,10 +600,10 @@ contains
       nzz        = nzz + nzrz
       nzww = 0
 
-      call psb_d_spmspv(done,ac,nzrz,ia,val,dzero,nzww,iww,ww,info)
-      p(i) = psb_spdot_srtd(nzww,iww,ww,nzrz,ia,val)
-      if (abs(p(i)) < d_epstol) &
-         & p(i) = 1.d-3 
+!!$      call psb_d_spmspv(done,ac,nzrz,ia,val,dzero,nzww,iww,ww,info)
+!!$      p(i) = psb_spdot_srtd(nzww,iww,ww,nzrz,ia,val)
+!!$      if (abs(p(i)) < d_epstol) &
+!!$         & p(i) = 1.d-3 
       
 
       
@@ -707,9 +707,9 @@ contains
       end do
       nzra = max(0,ip2 - ip1 + 1) 
       
-!!$      q(i) = psb_spge_dot(nzra,ac%ia(ip1:ip2),ac%val(ip1:ip2),zval)
-!!$      if (abs(q(i)) < d_epstol) &
-!!$           & q(i) = 1.d-3 
+      q(i) = psb_spge_dot(nzra,ac%ia(ip1:ip2),ac%val(ip1:ip2),zval)
+      if (abs(q(i)) < d_epstol) &
+           & q(i) = 1.d-3 
       !
       ! Sparsify current ZVAL and put into ZMAT
       ! 
@@ -729,20 +729,20 @@ contains
       w%icp(i+1) = ipz1 + nzrw
       nzw        = nzw + nzrw
 
-      !
-      ! Ok, now compute w_i^T A z_i
-      !
-      
+!!$      !
+!!$      ! Ok, now compute w_i^T A z_i
+!!$      !      
       nzww = 0
       nzrz = z%icp(i+1)-z%icp(i)
       ipz1 = z%icp(i)
       call psb_d_spmspv(done,ac,&
            & nzrz,z%ia(ipz1:ipz1+nzrz-1),z%val(ipz1:ipz1+nzrz-1),&
            & dzero,nzww,iww,ww,info)
-      q(i) = psb_spdot_srtd(nzww,iww,ww,nzrw,ia,val)
-      if (abs(q(i)) < d_epstol) &
-           & q(i) = 1.d-3 
-      p(i) = q(i)
+      tmpq = psb_spdot_srtd(nzww,iww,ww,nzrw,ia,val)
+      write(0,*) 'I-th Q',i,tmpq,q(i)
+!!$      if (abs(q(i)) < d_epstol) &
+!!$           & q(i) = 1.d-3 
+!!$      p(i) = q(i)
       
 
     end do
