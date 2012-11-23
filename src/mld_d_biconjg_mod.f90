@@ -744,13 +744,6 @@ contains
            & q(i) = 1.d-3 
       p(i) = q(i)
       
-!!$      call psb_d_spmspv(done,ac,nzrz,ia,val,dzero,nzww,iww,ww,info)
-!!$      q(i) = psb_spdot_srtd(nzww,iww,ww,nzrz,ia,val)
-!!$      if (abs(p(i)) < d_epstol) &
-!!$         & p(i) = 1.d-3 
-!!$
-
-      
 
     end do
 
