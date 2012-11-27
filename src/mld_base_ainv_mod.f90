@@ -24,6 +24,7 @@ module mld_base_ainv_mod
   integer, parameter   :: mld_ainv_orth4_ = mld_ainv_orth3_ + 1 
   integer, parameter   :: mld_ainv_llk_   = mld_ainv_orth4_ + 1
   integer, parameter   :: mld_ainv_s_llk_ = mld_ainv_llk_ + 1
+  integer, parameter   :: mld_ainv_s_ft_llk_ = mld_ainv_s_llk_ + 1
 
 
 contains

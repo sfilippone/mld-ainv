@@ -41,6 +41,8 @@ contains
       call mld_dsparse_biconjg_llk(n,acsr,p,zcsc,wcsc,nzrmax,sp_thresh,info)
     case (mld_ainv_s_llk_) 
       call mld_dsparse_biconjg_s_llk(n,acsr,p,zcsc,wcsc,nzrmax,sp_thresh,info)
+    case (mld_ainv_s_ft_llk_) 
+      call mld_dsparse_biconjg_s_ft_llk(n,acsr,p,zcsc,wcsc,nzrmax,sp_thresh,info)
     case default
       info = psb_err_internal_error_
       call psb_errpush(info,name,a_err='Invalid alg')
@@ -773,8 +775,7 @@ contains
 
     ! Locals
     integer, allocatable        :: ia(:), ja(:), izkr(:), izcr(:),iww(:) 
-    real(psb_dpk_), allocatable :: zval(:),val(:), q(:),  ww(:)
-    real(psb_dpk_), allocatable :: zfull(:,:), wfull(:,:)
+    real(psb_dpk_), allocatable :: zval(:),val(:), q(:),  ww(:) 
     integer :: i,j,k, kc, kr, err_act, nz, nzra, nzrz, ipzi,ipzj, nzww,&
          & nzzi,nzzj, nzz, ip1, ip2, ipza,ipzz, ipzn, nzzn, ipz1, ipz2,&
          &  ipj, lastj, nextj, nzw, nzrw
@@ -784,8 +785,7 @@ contains
     character(len=20)  :: name='mld_orth_llk'
     logical, parameter :: debug=.false.
 
-    allocate(zval(n),ia(n),val(n),izkr(n),izcr(n),q(n),iww(n),ww(n),&
-         & zfull(n,n),wfull(n,n),stat=info)
+    allocate(zval(n),ia(n),val(n),izkr(n),izcr(n),q(n),iww(n),ww(n),stat=info)
     if (info == psb_success_) call ac%cp_from_fmt(a,info)
     if (info /= psb_success_) then 
       call psb_errpush(psb_err_from_subroutine_,name,a_err='Allocate')
@@ -879,16 +879,14 @@ contains
           end if
         end do inner
         if (debug) write(0,*) 'update loop, using row: ',j
-        ip1 = a%irp(j)
-        ip2 = a%irp(j+1) - 1
-        do 
-          if (ip2 < ip1 ) exit
-          if (a%ja(ip2) <= n) exit
-          ip2 = ip2 -1 
-        end do
+        ip1 = w%icp(j)
+        ip2 = w%icp(j+1) - 1
         nzra = max(0,ip2 - ip1 + 1) 
-        p(i) = psb_spge_dot(nzra,a%ja(ip1:ip2),a%val(ip1:ip2),zval)
-        ! !$          write(psb_err_unit,*) j,i,p(i)
+        nzww = 0
+        call psb_d_spvspm(done,a,nzra,w%ia(ip1:ip2),w%val(ip1:ip2),&
+             & dzero,nzww,iww,ww,info)
+        
+        p(i) =  psb_spge_dot(nzww,iww,ww,zval)
 
         ipz1 = z%icp(j) 
         ipz2 = z%icp(j+1) 
@@ -900,7 +898,6 @@ contains
             kr     = z%ia(k)
             zval(kr) = zval(kr) + alpha*z%val(k)
             if (izkr(kr) == 0) then 
-!!$              write(0,*) 'Inserting into heap ',kr      
               call psb_insert_heap(kr,heap,info) 
               if (info /= psb_success_) exit
               izkr(kr) = 1
@@ -910,8 +907,6 @@ contains
               ! a heap.
               ! 
               do kc = ac%icp(kr), ac%icp(kr+1)-1
-!!$                if ((info == psb_success_)) &
-!!$                     & call psb_insert_heap(ac%ia(kc),rheap,info)
                 nextj=ac%ia(kc)
                 if ((info == psb_success_).and.(izcr(nextj)==0).and.(nextj>j)   ) then
                   call psb_insert_heap(nextj,rheap,info)
@@ -933,11 +928,14 @@ contains
         izcr(j) = 0
       end do outer
 
-      call a%csget(i,i,nzra,ia,ja,val,info)
-      call rwclip(nzra,ia,ja,val,1,n,1,n)      
-      p(i) = psb_spge_dot(nzra,ja,val,zval)
-      if (abs(p(i)) < d_epstol) &
-         & p(i) = 1.d-3 
+      if (.false.) then 
+        ! We can't do the proper thing until we have bot Z_i and W_i. 
+        call a%csget(i,i,nzra,ia,ja,val,info)
+        call rwclip(nzra,ia,ja,val,1,n,1,n)      
+        p(i) = psb_spge_dot(nzra,ja,val,zval)
+        if (abs(p(i)) < d_epstol) &
+             & p(i) = 1.d-3 
+      end if
           
       !
       ! Sparsify current ZVAL and put into ZMAT
@@ -957,8 +955,8 @@ contains
       end do
       z%icp(i+1) = ipz1 + nzrz
       nzz        = nzz + nzrz
-      nzww = 0
 
+!!$      nzww = 0
 !!$      call psb_d_spmspv(done,ac,nzrz,ia,val,dzero,nzww,iww,ww,info)
 !!$      p(i) = psb_spdot_srtd(nzww,iww,ww,nzrz,ia,val)
 !!$      if (abs(p(i)) < d_epstol) &
@@ -1004,17 +1002,28 @@ contains
           end if
         end do innerw
         if (debug) write(0,*) 'update loop, using row: ',j
-        ip1 = ac%icp(j)
-        ip2 = ac%icp(j+1) - 1
-        do 
-          if (ip2 < ip1 ) exit
-          if (ac%ia(ip2) <= n) exit
-          ip2 = ip2 -1 
-        end do
-        nzra = max(0,ip2 - ip1 + 1) 
-        q(i) = psb_spge_dot(nzra,ac%ia(ip1:ip2),ac%val(ip1:ip2),zval)
-        ! !$          write(psb_err_unit,*) j,i,p(i)
-
+        if (.false.) then 
+          ip1 = ac%icp(j)
+          ip2 = ac%icp(j+1) - 1
+          do 
+            if (ip2 < ip1 ) exit
+            if (ac%ia(ip2) <= n) exit
+            ip2 = ip2 -1 
+          end do
+          nzra = max(0,ip2 - ip1 + 1) 
+          q(i) = psb_spge_dot(nzra,ac%ia(ip1:ip2),ac%val(ip1:ip2),zval)
+          ! !$          write(psb_err_unit,*) j,i,p(i)
+        else
+          ip1 = z%icp(j)
+          ip2 = z%icp(j+1) - 1
+          nzra = max(0,ip2 - ip1 + 1) 
+          nzww = 0
+          call psb_d_spmspv(done,ac,nzra,z%ia(ip1:ip2),z%val(ip1:ip2),&
+               & dzero,nzww,iww,ww,info)
+          
+          q(i) =  psb_spge_dot(nzww,iww,ww,zval)
+        end if
+        
         ipz1 = w%icp(j) 
         ipz2 = w%icp(j+1) 
         nzrz = ipz2-ipz1
@@ -1057,18 +1066,19 @@ contains
         end if
         izcr(j) = 0
       end do outerw
-      ip1 = ac%icp(i)
-      ip2 = ac%icp(i+1) - 1
-      do 
-        if (ip2 < ip1 ) exit
-        if (ac%ia(ip2) <= n) exit
-        ip2 = ip2 -1 
-      end do
-      nzra = max(0,ip2 - ip1 + 1) 
-      
-      q(i) = psb_spge_dot(nzra,ac%ia(ip1:ip2),ac%val(ip1:ip2),zval)
-      if (abs(q(i)) < d_epstol) &
-           & q(i) = 1.d-3 
+
+!!$      ip1 = ac%icp(i)
+!!$      ip2 = ac%icp(i+1) - 1
+!!$      do 
+!!$        if (ip2 < ip1 ) exit
+!!$        if (ac%ia(ip2) <= n) exit
+!!$        ip2 = ip2 -1 
+!!$      end do
+!!$      nzra = max(0,ip2 - ip1 + 1) 
+!!$      
+!!$      q(i) = psb_spge_dot(nzra,ac%ia(ip1:ip2),ac%val(ip1:ip2),zval)
+!!$      if (abs(q(i)) < d_epstol) &
+!!$           & q(i) = 1.d-3 
       !
       ! Sparsify current ZVAL and put into ZMAT
       ! 
@@ -1098,19 +1108,20 @@ contains
            & nzrz,z%ia(ipz1:ipz1+nzrz-1),z%val(ipz1:ipz1+nzrz-1),&
            & dzero,nzww,iww,ww,info)
       tmpq  = psb_spdot_srtd(nzww,iww,ww,nzrw,ia,val)
-      tmpq2 = psb_spdot_srtd(nzra,ac%ia(ip1:ip2),ac%val(ip1:ip2),nzrw,ia,val)
-      write(0,*) 'I-th Q',i,tmpq,tmpq2,q(i),p(i)
-!!$      if (abs(q(i)) < d_epstol) &
-!!$           & q(i) = 1.d-3 
-!!$      p(i) = q(i)
+      q(i) = tmpq
+      if (abs(q(i)) < d_epstol) &
+           & q(i) = 1.d-3 
+      p(i) = q(i)
       
-
     end do
 
   end subroutine mld_dsparse_biconjg_s_ft_llk
 
 
   subroutine psb_d_spmspv(alpha,a,nx,ix,vx,beta,ny,iy,vy, info) 
+    !
+    !  y = A x  sparse-sparse mode, A in CSC
+    !
     use psb_base_mod
     implicit none 
     integer, intent(in)           :: nx, ix(:) 
@@ -1181,6 +1192,82 @@ contains
       vy(1:ny) = vv(1:ny) 
     end do
   end subroutine psb_d_spmspv
+  
+
+  subroutine psb_d_spvspm(alpha,a,nx,ix,vx,beta,ny,iy,vy, info) 
+    !
+    !  y = x A  sparse-sparse mode, A in CSR
+    !
+    use psb_base_mod
+    implicit none 
+    integer, intent(in)           :: nx, ix(:) 
+    real(psb_dpk_), intent(in)    :: alpha, beta, vx(:)
+    integer, intent(inout)        :: ny, iy(:) 
+    real(psb_dpk_), intent(inout) :: vy(:)
+    type(psb_d_csr_sparse_mat), intent(in)  :: a
+    integer, intent(out)          :: info 
+
+    integer :: i,j,k,m,n, nv, na, iszy
+    integer, allocatable        :: iv(:)
+    real(psb_dpk_), allocatable :: vv(:)
+
+    info = 0
+    if (beta == -done) then 
+      do i=1, ny
+        vy(i) = -vy(i) 
+      end do
+    else if (beta == dzero) then 
+      do i=1, ny
+        vy(i) = dzero
+      end do
+    else if (beta /= done) then 
+      do i=1, ny
+        vy(i) = vy(i) * beta
+      end do
+    end if
+    if (alpha == dzero)  return
+    iszy = min(size(iy),size(vy))
+    m = a%get_nrows()
+    n = a%get_ncols()
+
+    if ((ny > m) .or. (nx > n)) then 
+      write(0,*) 'Wrong input spmspv rows: ',m,ny,&
+           & ' cols: ',n,nx
+      info = -4 
+      return 
+    end if
+
+    allocate(iv(m), vv(m), stat=info) 
+    if (info /= 0) then 
+      write(0,*) 'Allocation error in spmspv'
+      info = -999
+      return
+    endif
+
+    do i = 1, nx
+      j  = ix(i) 
+      ! Access column J of A
+      k  = a%irp(j)
+      na = a%irp(j+1) - a%irp(j)
+      call psb_nspaxpby(nv,iv,vv,&
+           & (alpha*vx(i)), na, a%ja(k:k+na-1), a%val(k:k+na-1),&
+           & done, ny, iy, vy, info)
+
+      if (info /= 0) then 
+        write(0,*) 'Internal error in spmspv from nspaxpby'
+        info = -998 
+        return
+      endif
+      if (nv > iszy) then 
+        write(0,*) 'Error in spmspv: out of memory for output' 
+        info = -997
+        return
+      endif
+      ny = nv
+      iy(1:ny) = iv(1:ny) 
+      vy(1:ny) = vv(1:ny) 
+    end do
+  end subroutine psb_d_spvspm
   
   subroutine cp_sp2dn(nz,ia,val,v)
     use psb_base_mod, only : psb_dpk_, dzero
