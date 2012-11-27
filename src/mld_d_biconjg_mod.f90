@@ -738,14 +738,19 @@ contains
       call psb_d_spmspv(done,ac,&
            & nzrz,z%ia(ipz1:ipz1+nzrz-1),z%val(ipz1:ipz1+nzrz-1),&
            & dzero,nzww,iww,ww,info)
+!!$      write(0,*) ' z_i',i,nzrz,z%ia(ipz1:ipz1+nzrz-1),z%val(ipz1:ipz1+nzrz-1)
+!!$      write(0,*) ' Az_i',i,nzww,iww(1:nzww),ww(1:nzww)
+!!$      write(0,*) ' w_i',i,nzrw,ia(1:nzrw),val(1:nzrw)
       tmpq  = psb_spdot_srtd(nzww,iww,ww,nzrw,ia,val)
-      tmpq2 = psb_spdot_srtd(nzra,ac%ia(ip1:ip2),ac%val(ip1:ip2),nzrw,ia,val)
-      write(0,*) 'I-th Q',i,tmpq,tmpq2,q(i),p(i)
-!!$      if (abs(q(i)) < d_epstol) &
-!!$           & q(i) = 1.d-3 
-!!$      p(i) = q(i)
+!!$      tmpq2 = psb_spdot_srtd(nzra,ac%ia(ip1:ip2),ac%val(ip1:ip2),nzrw,ia,val)
+!!$      write(0,*) 'I-th Q',i,tmpq,tmpq2,q(i),p(i)
+!!$      write(0,*) 
+!!$      write(0,*) 
+      q(i) = tmpq
+      if (abs(q(i)) < d_epstol) &
+           & q(i) = 1.d-3 
+      p(i) = q(i)
       
-
     end do
 
   end subroutine mld_dsparse_biconjg_s_llk
@@ -1158,7 +1163,7 @@ contains
       k  = a%icp(j)
       na = a%icp(j+1) - a%icp(j)
       call psb_nspaxpby(nv,iv,vv,&
-           & alpha, na, a%ia(k:k+na-1), a%val(k:k+na-1),&
+           & (alpha*vx(i)), na, a%ia(k:k+na-1), a%val(k:k+na-1),&
            & done, ny, iy, vy, info)
 
       if (info /= 0) then 

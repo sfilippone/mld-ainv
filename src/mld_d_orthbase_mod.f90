@@ -218,7 +218,7 @@ contains
       call a%csget(i,i,nzra,ia,ja,val,info)
       call rwclip(nzra,ia,ja,val,1,n,1,n)      
       p(i) = psb_spge_dot(nzra,ja,val,zw)
-      ! !$      write(psb_err_unit,*) i,i,p(i)
+      !  ! write(psb_err_unit,*) i,i,p(i)
       !
       ! Sparsify current ZW and put into ZMAT
       ! 
@@ -320,11 +320,12 @@ contains
         write(psb_err_unit,*) 'Breakdown!! ',nzzi,i
         p(i) = 1.d-3
       end if
-!!$      write(psb_err_unit,*) i,' Main loop: ',nzzi,p(i)
+! !$      write(psb_err_unit,*) i,' Main loop: ',nzzi,p(i)
       if (debug_level >= psb_debug_outer_) &
            & write(debug_unit,*) me,' ',trim(name),' p(i)',p(i)
+      ! !$write(debug_unit,*) me,' ',trim(name),' p(i)',i,p(i)
       
-!!$      do j=i+1,lcr(ljr)
+! !$      do j=i+1,lcr(ljr)
       j = i
       do 
         j = j +1 
@@ -567,7 +568,7 @@ contains
       call a%csget(i,i,nzra,ia,ja,val,info)
       call rwclip(nzra,ia,ja,val,1,n,1,n)      
       p(i) = psb_spge_dot(nzra,ja,val,zw)
-
+!!$      write(0,*) ' ',trim(name),' p(i)',i,p(i)
       !
       ! Sparsify current ZW and put into ZMAT
       ! 
@@ -681,7 +682,7 @@ contains
 
       if (debug_level >= psb_debug_outer_) &
            & write(debug_unit,*) me,' ',trim(name),' p(i)',p(i)
-
+      ! !$ write(debug_unit,*) me,' ',trim(name),' p(i)',i,p(i)
       nzzi = zmat%cols(i)%nz
       do j=i+1,n 
         ! New kernel psb_aspxpbspy 
