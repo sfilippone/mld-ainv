@@ -1,5 +1,5 @@
 module pde2d_exp_mod
-  use psb_base_mod
+  use psb_base_mod, only : psb_dpk_
   real(psb_dpk_), save, private :: epsilon=1.d0/80
 contains
   subroutine set_parm(dat)
