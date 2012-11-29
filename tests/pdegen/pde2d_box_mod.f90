@@ -2,10 +2,10 @@ module pde2d_base_mod
   use psb_base_mod, only : psb_dpk_
   real(psb_dpk_), save, private :: epsilon=1.d0/80
 contains
-  subroutine set_parm(dat)
+  subroutine pde_set_parm(dat)
     real(psb_dpk_), intent(in) :: dat
     epsilon = dat
-  end subroutine set_parm
+  end subroutine pde_set_parm
   !
   ! functions parametrizing the differential equation 
   !  

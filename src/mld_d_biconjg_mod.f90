@@ -166,7 +166,7 @@ contains
       izkr(i) = 1
       call psb_init_heap(heap,info)
       if (info == psb_success_) call psb_insert_heap(i,heap,info)
-!!$      write(0,*) 'Inserting into heap ',i
+
       if (info == psb_success_) call psb_init_heap(rheap,info)
       do j = ac%icp(i), ac%icp(i+1)-1
         if (info == psb_success_) call psb_insert_heap(ac%ia(j),rheap,info)
@@ -216,7 +216,7 @@ contains
             kr     = z%ia(k)
             zval(kr) = zval(kr) + alpha*z%val(k)
             if (izkr(kr) == 0) then 
-!!$              write(0,*) 'Inserting into heap ',kr      
+
               call psb_insert_heap(kr,heap,info) 
               if (info /= psb_success_) exit
               izkr(kr) = 1
@@ -226,8 +226,6 @@ contains
               ! a heap.
               ! 
               do kc = ac%icp(kr), ac%icp(kr+1)-1
-!!$                if ((info == psb_success_)) &
-!!$                     & call psb_insert_heap(ac%ia(kc),rheap,info)
                 nextj=ac%ia(kc)
                 if ((info == psb_success_).and.(izcr(nextj)==0).and.(nextj>j)   ) then
                   call psb_insert_heap(nextj,rheap,info)
@@ -282,7 +280,7 @@ contains
       izkr(i) = 1
       call psb_init_heap(heap,info)
       if (info == psb_success_) call psb_insert_heap(i,heap,info)
-!!$      write(0,*) 'Inserting into heap ',i
+
       if (info == psb_success_) call psb_init_heap(rheap,info)
       do j = a%irp(i), a%irp(i+1)-1
         if (info == psb_success_) call psb_insert_heap(a%ja(j),rheap,info)
