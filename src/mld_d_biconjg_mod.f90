@@ -206,13 +206,10 @@ contains
         p(i) = psb_spge_dot(nzra,a%ja(ip1:ip2),a%val(ip1:ip2),zval)
         ! !$          write(psb_err_unit,*) j,i,p(i)
 
-        ipz1 = z%icp(j) 
-        ipz2 = z%icp(j+1) 
-        nzrz = ipz2-ipz1
         alpha = (-p(i)/p(j))
-        if (abs(alpha) > sp_thresh) then 
 
-          do k=ipz1, ipz2-1
+        if (abs(alpha) > sp_thresh) then 
+          do k=z%icp(j), z%icp(j+1)-1
             kr     = z%ia(k)
             zval(kr) = zval(kr) + alpha*z%val(k)
             if (izkr(kr) == 0) then 
@@ -320,17 +317,13 @@ contains
         q(i) = psb_spge_dot(nzra,ac%ia(ip1:ip2),ac%val(ip1:ip2),zval)
         ! !$          write(psb_err_unit,*) j,i,p(i)
 
-        ipz1 = w%icp(j) 
-        ipz2 = w%icp(j+1) 
-        nzrz = ipz2-ipz1
         alpha = (-q(i)/q(j))
         if (abs(alpha) > sp_thresh) then 
 
-          do k=ipz1, ipz2-1
+          do k=w%icp(j), w%icp(j+1)-1
             kr     = w%ia(k)
             zval(kr) = zval(kr) + alpha*w%val(k)
             if (izkr(kr) == 0) then 
-!!$              write(0,*) 'Inserting into heap ',kr      
               call psb_insert_heap(kr,heap,info) 
               if (info /= psb_success_) exit
               izkr(kr) = 1
@@ -340,8 +333,6 @@ contains
               ! a heap.
               ! 
               do kc = a%irp(kr), a%irp(kr+1)-1
-!!$                if ((info == psb_success_)) &
-!!$                     & call psb_insert_heap(ac%ia(kc),rheap,info)
                 nextj=a%ja(kc)
                 if ((info == psb_success_).and.(izcr(nextj)==0).and.(nextj>j)   ) then
                   call psb_insert_heap(nextj,rheap,info)
