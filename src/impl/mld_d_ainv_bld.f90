@@ -37,7 +37,6 @@ subroutine mld_d_ainv_bld(a,alg,fillin,thresh,wmat,d,zmat,desc,info,blck,iscale)
   use psb_base_mod
   use mld_prec_mod
   use mld_d_ainv_solver, mld_protect_name => mld_d_ainv_bld
-!  use mld_d_orthbase_mod
   use mld_d_biconjg_mod
 
   implicit none
@@ -136,7 +135,8 @@ subroutine mld_d_ainv_bld(a,alg,fillin,thresh,wmat,d,zmat,desc,info,blck,iscale)
   end select
 
   !
-  ! Here for the actual workhorses. 
+  ! Here for the actual workhorses.
+  ! Only biconjg is surviving for now....
   !
   select case(alg)
 !!$  case(mld_ainv_orth1_,mld_ainv_orth2_,mld_ainv_orth3_,mld_ainv_orth4_)
