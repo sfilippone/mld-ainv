@@ -55,7 +55,7 @@ subroutine mld_d_invt_copyout(fill_in,thres,i,m,nlw,nup,jmaxup,nrmi,row, &
   real(psb_dpk_)               :: witem, wmin
   integer                      :: widx
   integer                      :: k,isz,err_act,int_err(5),idxp, nz
-  type(psb_double_idx_heap)    :: heap
+  type(psb_dreak_idx_heap)     :: heap
   character(len=20), parameter :: name='invt_copyout'
   character(len=20)            :: ch_err
   logical                      :: fndmaxup
