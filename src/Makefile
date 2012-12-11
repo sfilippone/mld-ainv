@@ -31,11 +31,11 @@ lib: $(OBJS)
 	$(AR) $(HERE)/$(LIBNAME) $(OBJS)
 	$(RANLIB) $(HERE)/$(LIBNAME)
 
-impld: 
+impld: lib
 	cd impl && $(MAKE) LIBNAME=$(LIBNAME)
 
 mld_d_biconjg_mod.o: mld_base_ainv_mod.o
-mld_d_invt_solver.o mld_d_invk_solver.o: mld_base_ainv_mod.o
+mld_d_ainv_solver.o mld_d_invt_solver.o mld_d_invk_solver.o: mld_base_ainv_mod.o
 mld_d_orthbase_mod.o: psb_d_dsc_mat_mod.o
 mld_d_aorth_solver.o: mld_base_ainv_mod.o	
 #mld_d_aorth_bld_mod.o: mld_base_ainv_mod.o  mld_d_orthbase_mod.o mld_d_biconjg_mod.o
