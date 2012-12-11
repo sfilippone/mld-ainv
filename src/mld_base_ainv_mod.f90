@@ -110,7 +110,7 @@ contains
     integer            :: widx
     real(psb_dpk_), allocatable :: xw(:)
     integer, allocatable        :: xwid(:), indx(:)
-    type(psb_double_idx_heap)   :: heap
+    type(psb_dreal_idx_heap)    :: heap
 
 
     info = psb_success_
