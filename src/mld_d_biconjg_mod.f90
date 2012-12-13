@@ -203,8 +203,10 @@ contains
 
       if (info == psb_success_) call psb_init_heap(rheap,info)
       do j = ac%icp(i), ac%icp(i+1)-1
-        if (info == psb_success_) call psb_insert_heap(ac%ia(j),rheap,info)
-        izcr(ac%ia(j)) = 1
+        if (ac%ia(j) < i) then 
+          if (info == psb_success_) call psb_insert_heap(ac%ia(j),rheap,info)
+          izcr(ac%ia(j)) = 1
+        end if
       end do
       if (info /= psb_success_) then
         info=psb_err_from_subroutine_
@@ -228,7 +230,10 @@ contains
             exit inner
           end if
         end do inner
-        if (debug) write(0,*) 'update loop, using row: ',j
+        
+        izcr(j) = 0
+        if (j>=i) cycle outer
+        if (debug) write(0,*) 'update loop, using row: ',j,i
         ip1 = a%irp(j)
         ip2 = a%irp(j+1) - 1
         do 
@@ -253,12 +258,13 @@ contains
               izkr(kr) = 1
               ! We have just added a new nonzero in KR. Thus, we will
               ! need to explicitly compute the dot products on all
-              ! rows>J with nonzeros in column kr; we keep  them in 
+              ! rows j<k<i with nonzeros in column kr; we keep  them in 
               ! a heap.
               ! 
               do kc = ac%icp(kr), ac%icp(kr+1)-1
                 nextj=ac%ia(kc)
-                if ((info == psb_success_).and.(izcr(nextj)==0).and.(nextj>j)   ) then
+                if ((info == psb_success_).and.(izcr(nextj)==0)&
+                     & .and.(nextj>j).and.(nextj<i)) then
                   call psb_insert_heap(nextj,rheap,info)
                   izcr(nextj) = 1
                 end if
@@ -275,7 +281,6 @@ contains
             return
           end if
         end if
-        izcr(j) = 0
       end do outer
       call a%csget(i,i,nzra,ia,ja,val,info)
       call rwclip(nzra,ia,ja,val,1,n,1,n)      
@@ -314,8 +319,10 @@ contains
 
       if (info == psb_success_) call psb_init_heap(rheap,info)
       do j = a%irp(i), a%irp(i+1)-1
-        if (info == psb_success_) call psb_insert_heap(a%ja(j),rheap,info)
-        izcr(a%ja(j)) = 1
+        if (a%ja(j) < i) then 
+          if (info == psb_success_) call psb_insert_heap(a%ja(j),rheap,info)
+          izcr(a%ja(j)) = 1
+        end if
       end do
       if (info /= psb_success_) then
         info=psb_err_from_subroutine_
@@ -339,6 +346,8 @@ contains
             exit innerw
           end if
         end do innerw
+        izcr(j) = 0
+        if (j>=i) cycle outerw
         if (debug) write(0,*) 'update loop, using row: ',j
         ip1 = ac%icp(j)
         ip2 = ac%icp(j+1) - 1
@@ -363,12 +372,13 @@ contains
               izkr(kr) = 1
               ! We have just added a new nonzero in KR. Thus, we will
               ! need to explicitly compute the dot products on all
-              ! rows>J with nonzeros in column kr; we keep  them in 
+              ! rows j<k<i with nonzeros in column kr; we keep  them in 
               ! a heap.
               ! 
               do kc = a%irp(kr), a%irp(kr+1)-1
                 nextj=a%ja(kc)
-                if ((info == psb_success_).and.(izcr(nextj)==0).and.(nextj>j)   ) then
+                if ((info == psb_success_).and.(izcr(nextj)==0)&
+                     & .and.(nextj>j).and.(nextj<i)) then
                   call psb_insert_heap(nextj,rheap,info)
                   izcr(nextj) = 1
                 end if
@@ -385,7 +395,6 @@ contains
             return
           end if
         end if
-        izcr(j) = 0
       end do outerw
       ip1 = ac%icp(i)
       ip2 = ac%icp(i+1) - 1
@@ -516,11 +525,12 @@ contains
       izkr(i) = 1
       call psb_init_heap(heap,info)
       if (info == psb_success_) call psb_insert_heap(i,heap,info)
-!!$      write(0,*) 'Inserting into heap ',i
       if (info == psb_success_) call psb_init_heap(rheap,info)
       do j = ac%icp(i), ac%icp(i+1)-1
-        if (info == psb_success_) call psb_insert_heap(ac%ia(j),rheap,info)
-        izcr(ac%ia(j)) = 1
+        if (ac%ia(j) <i) then 
+          if (info == psb_success_) call psb_insert_heap(ac%ia(j),rheap,info)
+          izcr(ac%ia(j)) = 1
+        end if
       end do
       if (info /= psb_success_) then
         info=psb_err_from_subroutine_
@@ -544,6 +554,8 @@ contains
             exit inner
           end if
         end do inner
+        izcr(j) = 0
+        if (j>=i) cycle outer
         if (debug) write(0,*) 'update loop, using row: ',j
         ip1 = a%irp(j)
         ip2 = a%irp(j+1) - 1
@@ -566,20 +578,18 @@ contains
             kr     = z%ia(k)
             zval(kr) = zval(kr) + alpha*z%val(k)
             if (izkr(kr) == 0) then 
-!!$              write(0,*) 'Inserting into heap ',kr      
               call psb_insert_heap(kr,heap,info) 
               if (info /= psb_success_) exit
               izkr(kr) = 1
               ! We have just added a new nonzero in KR. Thus, we will
               ! need to explicitly compute the dot products on all
-              ! rows>J with nonzeros in column kr; we keep  them in 
+              ! rows j<k<i with nonzeros in column kr; we keep  them in 
               ! a heap.
               ! 
               do kc = ac%icp(kr), ac%icp(kr+1)-1
-!!$                if ((info == psb_success_)) &
-!!$                     & call psb_insert_heap(ac%ia(kc),rheap,info)
                 nextj=ac%ia(kc)
-                if ((info == psb_success_).and.(izcr(nextj)==0).and.(nextj>j)   ) then
+                if ((info == psb_success_).and.(izcr(nextj)==0)&
+                     & .and.(nextj>j).and.(nextj<i)) then
                   call psb_insert_heap(nextj,rheap,info)
                   izcr(nextj) = 1
                 end if
@@ -596,15 +606,14 @@ contains
             return
           end if
         end if
-        izcr(j) = 0
       end do outer
 
-      call a%csget(i,i,nzra,ia,ja,val,info)
-      call rwclip(nzra,ia,ja,val,1,n,1,n)      
-      p(i) = psb_spge_dot(nzra,ja,val,zval)
-      if (abs(p(i)) < d_epstol) &
-         & p(i) = 1.d-3 
-          
+!!$      call a%csget(i,i,nzra,ia,ja,val,info)
+!!$      call rwclip(nzra,ia,ja,val,1,n,1,n)      
+!!$      p(i) = psb_spge_dot(nzra,ja,val,zval)
+!!$      if (abs(p(i)) < d_epstol) &
+!!$         & p(i) = 1.d-3 
+!!$          
       !
       ! Sparsify current ZVAL and put into ZMAT
       ! 
@@ -641,11 +650,12 @@ contains
       izkr(i) = 1
       call psb_init_heap(heap,info)
       if (info == psb_success_) call psb_insert_heap(i,heap,info)
-!!$      write(0,*) 'Inserting into heap ',i
       if (info == psb_success_) call psb_init_heap(rheap,info)
       do j = a%irp(i), a%irp(i+1)-1
-        if (info == psb_success_) call psb_insert_heap(a%ja(j),rheap,info)
-        izcr(a%ja(j)) = 1
+        if (a%ja(j)<i) then
+          if (info == psb_success_) call psb_insert_heap(a%ja(j),rheap,info)
+          izcr(a%ja(j)) = 1
+        end if
       end do
       if (info /= psb_success_) then
         info=psb_err_from_subroutine_
@@ -669,6 +679,8 @@ contains
             exit innerw
           end if
         end do innerw
+        izcr(j) = 0
+        if (j>=i) cycle outerw
         if (debug) write(0,*) 'update loop, using row: ',j
         ip1 = ac%icp(j)
         ip2 = ac%icp(j+1) - 1
@@ -691,20 +703,18 @@ contains
             kr     = w%ia(k)
             zval(kr) = zval(kr) + alpha*w%val(k)
             if (izkr(kr) == 0) then 
-!!$              write(0,*) 'Inserting into heap ',kr      
               call psb_insert_heap(kr,heap,info) 
               if (info /= psb_success_) exit
               izkr(kr) = 1
               ! We have just added a new nonzero in KR. Thus, we will
               ! need to explicitly compute the dot products on all
-              ! rows>J with nonzeros in column kr; we keep  them in 
+              ! rows j<k<i with nonzeros in column kr; we keep  them in 
               ! a heap.
               ! 
               do kc = a%irp(kr), a%irp(kr+1)-1
-!!$                if ((info == psb_success_)) &
-!!$                     & call psb_insert_heap(ac%ia(kc),rheap,info)
                 nextj=a%ja(kc)
-                if ((info == psb_success_).and.(izcr(nextj)==0).and.(nextj>j)   ) then
+                if ((info == psb_success_).and.(izcr(nextj)==0)&
+                     & .and.(nextj>j).and.(nextj<i) ) then
                   call psb_insert_heap(nextj,rheap,info)
                   izcr(nextj) = 1
                 end if
@@ -721,7 +731,6 @@ contains
             return
           end if
         end if
-        izcr(j) = 0
       end do outerw
       ip1 = ac%icp(i)
       ip2 = ac%icp(i+1) - 1
@@ -763,14 +772,7 @@ contains
       call psb_d_spmspv(done,ac,&
            & nzrz,z%ia(ipz1:ipz1+nzrz-1),z%val(ipz1:ipz1+nzrz-1),&
            & dzero,nzww,iww,ww,info)
-!!$      write(0,*) ' z_i',i,nzrz,z%ia(ipz1:ipz1+nzrz-1),z%val(ipz1:ipz1+nzrz-1)
-!!$      write(0,*) ' Az_i',i,nzww,iww(1:nzww),ww(1:nzww)
-!!$      write(0,*) ' w_i',i,nzrw,ia(1:nzrw),val(1:nzrw)
       tmpq  = psb_spdot_srtd(nzww,iww,ww,nzrw,ia,val)
-!!$      tmpq2 = psb_spdot_srtd(nzra,ac%ia(ip1:ip2),ac%val(ip1:ip2),nzrw,ia,val)
-!!$      write(0,*) 'I-th Q',i,tmpq,tmpq2,q(i),p(i)
-!!$      write(0,*) 
-!!$      write(0,*) 
       q(i) = tmpq
       if (abs(q(i)) < d_epstol) &
            & q(i) = 1.d-3 
@@ -873,11 +875,12 @@ contains
       izkr(i) = 1
       call psb_init_heap(heap,info)
       if (info == psb_success_) call psb_insert_heap(i,heap,info)
-!!$      write(0,*) 'Inserting into heap ',i
       if (info == psb_success_) call psb_init_heap(rheap,info)
       do j = ac%icp(i), ac%icp(i+1)-1
-        if (info == psb_success_) call psb_insert_heap(ac%ia(j),rheap,info)
-        izcr(ac%ia(j)) = 1
+        if (ac%ia(j)<i) then 
+          if (info == psb_success_) call psb_insert_heap(ac%ia(j),rheap,info)
+          izcr(ac%ia(j)) = 1
+        end if
       end do
       if (info /= psb_success_) then
         info=psb_err_from_subroutine_
@@ -901,6 +904,8 @@ contains
             exit inner
           end if
         end do inner
+        izcr(j) = 0
+        if (j>=i) exit outer
         if (debug) write(0,*) 'update loop, using row: ',j
         ip1 = w%icp(j)
         ip2 = w%icp(j+1) - 1
@@ -915,6 +920,7 @@ contains
         ipz2 = z%icp(j+1) 
         nzrz = ipz2-ipz1
         alpha = (-p(i)/p(j))
+!!$        write(0,*) ' p(i)/p(j) ',i,j,alpha,p(i),p(j)
         if (abs(alpha) > sp_thresh) then 
 
           do k=ipz1, ipz2-1
@@ -926,12 +932,13 @@ contains
               izkr(kr) = 1
               ! We have just added a new nonzero in KR. Thus, we will
               ! need to explicitly compute the dot products on all
-              ! rows>J with nonzeros in column kr; we keep  them in 
+              ! rows j<k<i with nonzeros in column kr; we keep  them in 
               ! a heap.
               ! 
               do kc = ac%icp(kr), ac%icp(kr+1)-1
                 nextj=ac%ia(kc)
-                if ((info == psb_success_).and.(izcr(nextj)==0).and.(nextj>j)   ) then
+                if ((info == psb_success_).and.(izcr(nextj)==0)&
+                     & .and.(nextj>j).and.(nextj<i)) then
                   call psb_insert_heap(nextj,rheap,info)
                   izcr(nextj) = 1
                 end if
@@ -948,7 +955,7 @@ contains
             return
           end if
         end if
-        izcr(j) = 0
+!!$        izcr(j) = 0
       end do outer
 
       if (.false.) then 
@@ -979,12 +986,6 @@ contains
       z%icp(i+1) = ipz1 + nzrz
       nzz        = nzz + nzrz
 
-!!$      nzww = 0
-!!$      call psb_d_spmspv(done,ac,nzrz,ia,val,dzero,nzww,iww,ww,info)
-!!$      p(i) = psb_spdot_srtd(nzww,iww,ww,nzrz,ia,val)
-!!$      if (abs(p(i)) < d_epstol) &
-!!$         & p(i) = 1.d-3 
-      
 
       
 
@@ -999,8 +1000,10 @@ contains
 !!$      write(0,*) 'Inserting into heap ',i
       if (info == psb_success_) call psb_init_heap(rheap,info)
       do j = a%irp(i), a%irp(i+1)-1
-        if (info == psb_success_) call psb_insert_heap(a%ja(j),rheap,info)
-        izcr(a%ja(j)) = 1
+        if (a%ja(j)<i) then 
+          if (info == psb_success_) call psb_insert_heap(a%ja(j),rheap,info)
+          izcr(a%ja(j)) = 1
+        end if
       end do
       if (info /= psb_success_) then
         info=psb_err_from_subroutine_
@@ -1024,6 +1027,8 @@ contains
             exit innerw
           end if
         end do innerw
+        izcr(j) = 0
+        if (j>=i) exit outerw
         if (debug) write(0,*) 'update loop, using row: ',j
         if (.false.) then 
           ip1 = ac%icp(j)
@@ -1051,26 +1056,25 @@ contains
         ipz2 = w%icp(j+1) 
         nzrz = ipz2-ipz1
         alpha = (-q(i)/q(j))
+!!$        write(0,*) ' q(i)/q(j) ',i,j,alpha,q(i),q(j)
         if (abs(alpha) > sp_thresh) then 
 
           do k=ipz1, ipz2-1
             kr     = w%ia(k)
             zval(kr) = zval(kr) + alpha*w%val(k)
             if (izkr(kr) == 0) then 
-!!$              write(0,*) 'Inserting into heap ',kr      
               call psb_insert_heap(kr,heap,info) 
               if (info /= psb_success_) exit
               izkr(kr) = 1
               ! We have just added a new nonzero in KR. Thus, we will
               ! need to explicitly compute the dot products on all
-              ! rows>J with nonzeros in column kr; we keep  them in 
+              ! rows j<k<i with nonzeros in column kr; we keep  them in 
               ! a heap.
               ! 
               do kc = a%irp(kr), a%irp(kr+1)-1
-!!$                if ((info == psb_success_)) &
-!!$                     & call psb_insert_heap(ac%ia(kc),rheap,info)
                 nextj=a%ja(kc)
-                if ((info == psb_success_).and.(izcr(nextj)==0).and.(nextj>j)   ) then
+                if ((info == psb_success_).and.(izcr(nextj)==0)&
+                     & .and.(nextj>j).and.(nextj<i)) then
                   call psb_insert_heap(nextj,rheap,info)
                   izcr(nextj) = 1
                 end if
@@ -1087,7 +1091,7 @@ contains
             return
           end if
         end if
-        izcr(j) = 0
+!!$        izcr(j) = 0
       end do outerw
 
 !!$      ip1 = ac%icp(i)
@@ -1159,6 +1163,7 @@ contains
     real(psb_dpk_), allocatable :: vv(:)
 
     info = 0
+!!$    write(0,*) 'd_spmspv ',alpha,beta
     if (beta == -done) then 
       do i=1, ny
         vy(i) = -vy(i) 
@@ -1235,6 +1240,7 @@ contains
     real(psb_dpk_), allocatable :: vv(:)
 
     info = 0
+!!$    write(0,*) 'd_spvspm ',alpha,beta
     if (beta == -done) then 
       do i=1, ny
         vy(i) = -vy(i) 
