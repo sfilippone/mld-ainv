@@ -38,6 +38,7 @@ subroutine mld_d_ainv_bld(a,alg,fillin,thresh,wmat,d,zmat,desc,info,blck,iscale)
   use mld_prec_mod
   use mld_d_ainv_solver, mld_protect_name => mld_d_ainv_bld
   use mld_d_biconjg_mod
+  use mld_d_orthbase_mod
 
   implicit none
 
@@ -139,15 +140,15 @@ subroutine mld_d_ainv_bld(a,alg,fillin,thresh,wmat,d,zmat,desc,info,blck,iscale)
   ! Only biconjg is surviving for now....
   !
   select case(alg)
-!!$  case(mld_ainv_orth1_,mld_ainv_orth2_,mld_ainv_orth3_,mld_ainv_orth4_)
-!!$    call mld_sparse_orthbase(alg,n_row,acsr,pq,&
-!!$         & zmat,nzrmax,sp_thresh,info)
-!!$    ! Now for W  (i.e. Lower) 
-!!$    if (info == psb_success_) call acsr%transp() 
-!!$    if (info == psb_success_) &
-!!$         & call mld_sparse_orthbase(alg,n_row,acsr,pq,&
-!!$         &   wmat,nzrmax,sp_thresh,info)
-!!$    call wmat%transp()
+  case(mld_ainv_orth1_,mld_ainv_orth2_,mld_ainv_orth3_,mld_ainv_orth4_)
+    call mld_sparse_orthbase(alg,n_row,acsr,pq,&
+         & zmat,nzrmax,sp_thresh,info)
+    ! Now for W  (i.e. Lower) 
+    if (info == psb_success_) call acsr%transp() 
+    if (info == psb_success_) &
+         & call mld_sparse_orthbase(alg,n_row,acsr,pq,&
+         &   wmat,nzrmax,sp_thresh,info)
+    call wmat%transp()
   case(mld_ainv_llk_,mld_ainv_s_llk_,mld_ainv_s_ft_llk_)
     call mld_sparse_biconjg(alg,n_row,acsr,pq,&
          &   zmat,wmat,nzrmax,sp_thresh,info)

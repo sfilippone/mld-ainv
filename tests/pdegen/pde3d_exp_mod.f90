@@ -1,6 +1,6 @@
 module pde3d_exp_mod
   use psb_base_mod, only : psb_dpk_
-  real(psb_dpk_), save, private :: epsilon=1.d0/80
+  real(psb_dpk_), save, private :: epsilon=1.d0/160
 contains
   subroutine pde_set_parm(dat)
     real(psb_dpk_), intent(in) :: dat
