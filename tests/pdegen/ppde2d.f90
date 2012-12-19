@@ -67,6 +67,7 @@ program ppde2d
   use mld_prec_mod
   use psb_krylov_mod
   use psb_util_mod
+!  use pde2d_base_mod
   use pde2d_exp_mod
   use mld_d_invt_solver
   use mld_d_invk_solver
@@ -240,8 +241,9 @@ program ppde2d
 
 
   if (pdump) then 
-    call prec%dump(info,prefix='mlainv-t',head='AINV prec',&
+    call prec%dump(info,prefix='mlainv-',head='AINV prec',&
          & solver=.true., smoother=.false.)
+    call a%print('amat.mtx',head='ELL mat')
   end if
 
   if (iam == psb_root_) write(psb_out_unit,'("Preconditioner time : ",es12.5)')tprec

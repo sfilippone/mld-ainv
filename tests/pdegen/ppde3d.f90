@@ -96,6 +96,7 @@ program ppde3d
     real(psb_dpk_)    :: thresh, inv_thresh
   end type ainvparms
   type(ainvparms)     :: parms
+  real(psb_dpk_)      :: nu
   ! descriptor
   type(psb_desc_type)   :: desc_a, desc_b
   ! dense matrices
@@ -140,11 +141,13 @@ program ppde3d
   !
   !  get parameters
   !
-  call get_parms(ictxt,kmethd,ptype,afmt,renum,idim,istopc,itmax,itrace,irst,parms)
+  call get_parms(ictxt,kmethd,ptype,afmt,renum,&
+       & idim,istopc,itmax,itrace,irst,nu,parms)
 
   !
   !  allocate and fill in the coefficient matrix, rhs and initial guess 
   !
+  call pde_set_parm(nu)
   call psb_barrier(ictxt)
   t1 = psb_wtime()
   call psb_gen_pde3d(ictxt,idim,a,bv,xv,desc_a,afmt,&
@@ -238,8 +241,9 @@ program ppde3d
 
 
   if (pdump) then 
-    call prec%dump(info,prefix='mlainv-t',head='AINV prec',&
+    call prec%dump(info,prefix='mlainv-',head='AINV prec',&
          & solver=.true., smoother=.false.)
+    call a%print('amat3d.mtx')
   end if
 
   if (iam == psb_root_) write(psb_out_unit,'("Preconditioner time : ",es12.5)')tprec
@@ -315,10 +319,12 @@ contains
   !
   ! get iteration parameters from standard input
   !
-  subroutine  get_parms(ictxt,kmethd,ptype,afmt,renum,idim,istopc,itmax,itrace,irst,parms)
+  subroutine  get_parms(ictxt,kmethd,ptype,afmt,renum,&
+       & idim,istopc,itmax,itrace,irst,nu,parms)
     integer      :: ictxt
     character(len=*) :: kmethd, ptype, afmt,renum
     integer      :: idim, istopc,itmax,itrace,irst
+    real(psb_dpk_)  :: nu
     type(ainvparms) :: parms
     integer      :: np, iam
     integer      :: intbuf(10), ip
@@ -331,6 +337,7 @@ contains
       read(psb_inp_unit,*) afmt
       read(psb_inp_unit,*) renum
       read(psb_inp_unit,*) idim
+      read(psb_inp_unit,*) nu
       read(psb_inp_unit,*) istopc
       read(psb_inp_unit,*) itmax
       read(psb_inp_unit,*) itrace
@@ -355,6 +362,7 @@ contains
     call psb_bcast(ictxt,renum)
     call psb_bcast(ictxt,ptype)
     call psb_bcast(ictxt,idim)
+    call psb_bcast(ictxt,nu)
     call psb_bcast(ictxt,istopc)
     call psb_bcast(ictxt,itmax)
     call psb_bcast(ictxt,itrace)

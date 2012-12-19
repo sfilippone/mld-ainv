@@ -13,13 +13,13 @@ contains
     use psb_base_mod, only : psb_dpk_
     real(psb_dpk_) :: b1
     real(psb_dpk_), intent(in) :: x,y
-    b1 = 1.d0/1.414d0
+    b1 = 0.d0/1.414d0
   end function b1
   function b2(x,y)
     use psb_base_mod, only : psb_dpk_
     real(psb_dpk_) ::  b2
     real(psb_dpk_), intent(in) :: x,y
-    b2 = 1.d0/1.414d0
+    b2 = 0.d0/1.414d0
   end function b2
   function c(x,y)
     use psb_base_mod, only : psb_dpk_

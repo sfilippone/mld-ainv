@@ -13,19 +13,19 @@ contains
     use psb_base_mod, only : psb_dpk_
     real(psb_dpk_) :: b1
     real(psb_dpk_), intent(in) :: x,y,z
-    b1=1.d0/sqrt(3.d0)-exp(-(x+y+z))
+    b1=0.d0/sqrt(3.d0)
   end function b1
   function b2(x,y,z)
     use psb_base_mod, only : psb_dpk_
     real(psb_dpk_) ::  b2
     real(psb_dpk_), intent(in) :: x,y,z
-    b2=1.d0/sqrt(3.d0)-exp(-(x+y+z))
+    b2=0.d0/sqrt(3.d0)
   end function b2
   function b3(x,y,z)
     use psb_base_mod, only : psb_dpk_
     real(psb_dpk_) ::  b3
     real(psb_dpk_), intent(in) :: x,y,z      
-    b3=1.d0/sqrt(3.d0)-exp(-(x+y+z))
+    b3=0.d0/sqrt(3.d0)
   end function b3
   function c(x,y,z)
     use psb_base_mod, only : psb_dpk_

@@ -1136,6 +1136,22 @@ contains
            & dzero,nzww,iww,ww,info)
       tmpq  = psb_spdot_srtd(nzww,iww,ww,nzrw,ia,val)
       q(i) = tmpq
+      if (tmpq <0) then 
+!!$        write(0,*) 'On negative dot prod at ',i
+!!$        write(0,*) 'On negative dot prod a ',ia(1:nzrw),val(1:nzrw)
+!!$        write(0,*) 'On negative dot prod w ',iww(1:nzww),ww(1:nzww)
+!!$        ip1 = ac%icp(i)
+!!$        ip2 = ac%icp(i+1) - 1
+!!$        do 
+!!$          if (ip2 < ip1 ) exit
+!!$          if (ac%ia(ip2) <= n) exit
+!!$          ip2 = ip2 -1 
+!!$        end do
+!!$        nzra = max(0,ip2 - ip1 + 1) 
+!!$        write(0,*) 'On negative dot prod a ',ac%ia(ip1:ip2),ac%val(ip1:ip2)
+        
+      end if
+!!$      write(0,*) i,p(i),q(i)
       if (abs(q(i)) < d_epstol) &
            & q(i) = 1.d-3 
       p(i) = q(i)
