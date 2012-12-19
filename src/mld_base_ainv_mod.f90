@@ -273,7 +273,7 @@ contains
           exit
         end if
       end do
-      nw = max(nw, 1) 
+      nw = max(nw, 1)
 
     else
 
@@ -282,7 +282,7 @@ contains
       xw(1:nw) = valz(2:nz)
 
       call psb_qsort(xw(1:nw),indx(1:nw),dir=psb_asort_down_)
-      nw = min(nw,nzrmax)
+      nw = min(nw,nzrmax-1)
       do 
         if (nw <= 1) exit
         if (abs(xw(nw)) < sp_thresh) then 
@@ -309,6 +309,7 @@ contains
       iz(i)   = xwid(i)
     end do
     nz = nw
+    if (nz>nzrmax) write(0,*) 'in sp_drop: ',nw,nzrmax,nz
     deallocate(xw,xwid,indx,stat=info) 
     if (info /= psb_success_) then 
       write(psb_err_unit,*) ' Memory deallocation failure in sp_drop',info
