@@ -222,7 +222,7 @@ contains
 
 
     info = psb_success_
-    if (nz <= nzrmax) return 
+!!$    if (nz <= nzrmax) return 
 !!$    write(0,*) 'sp_drop start',nz
 !!$    write(0,*) 'sp_drop start',nz,size(iz),size(valz)
 
@@ -265,6 +265,7 @@ contains
         xwid(i) = iz(indx(i))
       end do
       nw = min(nz,nzrmax)
+!!$      write(0,*) nw,sp_thresh,' Values before drop:',xw(1:nw)
       do 
         if (nw <= 1) exit
         if (abs(xw(nw)) < sp_thresh) then 
@@ -274,6 +275,7 @@ contains
         end if
       end do
       nw = max(nw, 1)
+!!$      write(0,*) nw,sp_thresh,' Values after drop:',xw(1:nw)
 
     else
 
@@ -283,6 +285,7 @@ contains
 
       call psb_qsort(xw(1:nw),indx(1:nw),dir=psb_asort_down_)
       nw = min(nw,nzrmax-1)
+!!$      write(0,*) nw,sp_thresh,' Values before drop:',xw(1:nw)
       do 
         if (nw <= 1) exit
         if (abs(xw(nw)) < sp_thresh) then 
@@ -291,6 +294,7 @@ contains
           exit
         end if
       end do
+!!$      write(0,*) nw,sp_thresh,' Values after drop:',xw(1:nw)
 
       do i=1, nw
         xwid(i) = iz(1+indx(i))

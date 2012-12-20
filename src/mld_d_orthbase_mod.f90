@@ -392,6 +392,7 @@ contains
                & ' done nspaxpby',nzrz,size(iz),size(valz)
         
           ! Drop tolerance for new column 
+!!$          write(0,*) 'Dropping from a column with: ',j,nzrz,sp_thresh
           if (info == psb_success_) call sp_drop(j,nzrmax,sp_thresh,nzrz,iz,valz,info)
           if (debug_level >= psb_debug_outer_) &
                & write(debug_unit,*) me,' ',trim(name),&
@@ -756,6 +757,8 @@ contains
                & ' done nspaxpby',nzrz,size(iz),size(valz)
 
           ! Drop tolerance for new column 
+!!$          write(0,*) 'Dropping from a column with: ',j,nzrz,sp_thresh
+          
           if (info == psb_success_) call sp_drop(j,nzrmax,sp_thresh,nzrz,iz,valz,info)
           if (debug_level >= psb_debug_outer_) &
                & write(debug_unit,*) me,' ',trim(name),&

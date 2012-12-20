@@ -287,6 +287,8 @@ contains
       p(i) = psb_spge_dot(nzra,ja,val,zval)
       if (abs(p(i)) < d_epstol) &
          & p(i) = 1.d-3 
+
+!!$      write(0,*) 'Dropping from a column with: ',i,psb_howmany_heap(heap),sp_thresh
           
       !
       ! Sparsify current ZVAL and put into ZMAT
@@ -408,6 +410,7 @@ contains
       if (abs(q(i)) < d_epstol) &
            & q(i) = 1.d-3 
 
+!!$      write(0,*) 'Dropping from a column with: ',i,psb_howmany_heap(heap),sp_thresh
       !
       ! Sparsify current ZVAL and put into ZMAT
       ! 
