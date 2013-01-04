@@ -247,7 +247,7 @@ contains
 
         alpha = (-p(i)/p(j))
 
-        if (abs(alpha) > sp_thresh) then 
+        if (.false..or.(abs(alpha) > sp_thresh)) then 
           do k=z%icp(j), z%icp(j+1)-1
             kr     = z%ia(k)
             zval(kr) = zval(kr) + alpha*z%val(k)
@@ -363,7 +363,7 @@ contains
         ! !$          write(psb_err_unit,*) j,i,p(i)
 
         alpha = (-q(i)/q(j))
-        if (abs(alpha) > sp_thresh) then 
+        if (.false..or.(abs(alpha) > sp_thresh)) then 
 
           do k=w%icp(j), w%icp(j+1)-1
             kr     = w%ia(k)
@@ -575,7 +575,7 @@ contains
         ipz2 = z%icp(j+1) 
         nzrz = ipz2-ipz1
         alpha = (-p(i)/p(j))
-        if (abs(alpha) > sp_thresh) then 
+        if (.false..or.(abs(alpha) > sp_thresh)) then 
 
           do k=ipz1, ipz2-1
             kr     = z%ia(k)
@@ -700,7 +700,7 @@ contains
         ipz2 = w%icp(j+1) 
         nzrz = ipz2-ipz1
         alpha = (-q(i)/q(j))
-        if (abs(alpha) > sp_thresh) then 
+        if (.false..or.(abs(alpha) > sp_thresh)) then 
 
           do k=ipz1, ipz2-1
             kr     = w%ia(k)
@@ -924,7 +924,7 @@ contains
         nzrz = ipz2-ipz1
         alpha = (-p(i)/p(j))
 !!$        write(0,*) ' p(i)/p(j) ',i,j,alpha,p(i),p(j)
-        if (abs(alpha) > sp_thresh) then 
+        if (.false..or.(abs(alpha) > sp_thresh)) then 
 
           do k=ipz1, ipz2-1
             kr     = z%ia(k)
@@ -1060,7 +1060,7 @@ contains
         nzrz = ipz2-ipz1
         alpha = (-q(i)/q(j))
 !!$        write(0,*) ' q(i)/q(j) ',i,j,alpha,q(i),q(j)
-        if (abs(alpha) > sp_thresh) then 
+        if (.false..or.(abs(alpha) > sp_thresh)) then 
 
           do k=ipz1, ipz2-1
             kr     = w%ia(k)
