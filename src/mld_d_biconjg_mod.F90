@@ -79,9 +79,11 @@ contains
       call mld_dsparse_biconjg_s_ft_llk(n,acsr,p,zcsc,wcsc,nzrmax,sp_thresh,info)
     case (mld_ainv_llk_noth_)
       call mld_dsparse_biconjg_llk_noth(n,acsr,p,zcsc,wcsc,nzrmax,sp_thresh,info)
+
+#ifdef HAVE_TUMA_SAINV      
     case (mld_ainv_tuma_)
       call mld_dsparse_tuma_sainv(n,acsr,p,zcsc,wcsc,nzrmax,sp_thresh,info)
-
+#endif
     case default
       info = psb_err_internal_error_
       call psb_errpush(info,name,a_err='Invalid alg')
@@ -1878,7 +1880,7 @@ contains
     end do
   end subroutine zero_sp2dn
   
-
+#ifdef HAVE_TUMA_SAINV
   subroutine mld_dsparse_tuma_sainv(n,a,p,z,w,nzrmax,sp_thresh,info)
     use psb_base_mod
     use mld_base_ainv_mod
@@ -1999,6 +2001,7 @@ contains
     return
 
   end subroutine mld_dsparse_tuma_sainv
+#endif
 
 
 
