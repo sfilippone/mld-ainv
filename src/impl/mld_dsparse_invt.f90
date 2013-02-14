@@ -78,9 +78,9 @@ subroutine mld_dsparse_invt(n,a,z,nzrmax,sp_thresh,info)
   end if
 
   call zcsr%allocate(n,n,n*nzrmax)
-!!$  call zcsr%set_triangle()
-!!$  call zcsr%set_unit(.false.)
-!!$  call zcsr%set_upper()
+  call zcsr%set_triangle()
+  call zcsr%set_unit(.false.)
+  call zcsr%set_upper()
   ! 
   !
   nzz        = 0

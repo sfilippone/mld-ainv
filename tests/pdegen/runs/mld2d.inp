@@ -2,7 +2,7 @@ CG                      Iterative method BICGSTAB CGS  BICG BICGSTABL RGMRES
 AINV                     Preconditioner NONE  DIAG  BJAC AINV
 CSR                      Storage format for matrix A:  CSR COO JAD 
 NONE                     Renum 
-0080                     Domain size (acutal system is this**2)
+0100                     Domain size (acutal system is this**2)
 0.00625			 NU parm in the PDE. 
 2                        Stopping criterion
 2000                     MAXIT
@@ -13,5 +13,5 @@ AINV                     AINV variant: AINVK, AINVT, AORTH
 02                       Inverse fill
 1.d-2 		         Threshold
 1.d-2                    Inverse threshold
-17                       AORTH variant: 13,14,15,16, 17, 18
+21                      AORTH variant: 13,14,15,16, 17, 18
 

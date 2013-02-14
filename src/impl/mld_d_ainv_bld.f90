@@ -149,7 +149,8 @@ subroutine mld_d_ainv_bld(a,alg,fillin,thresh,wmat,d,zmat,desc,info,blck,iscale)
          & call mld_sparse_orthbase(alg,n_row,acsr,pq,&
          &   wmat,nzrmax,sp_thresh,info)
     call wmat%transp()
-  case(mld_ainv_llk_,mld_ainv_s_llk_,mld_ainv_s_ft_llk_,mld_ainv_llk_noth_)
+  case(mld_ainv_llk_,mld_ainv_s_llk_,mld_ainv_s_ft_llk_,&
+       & mld_ainv_llk_noth_,mld_ainv_tuma_)
     call mld_sparse_biconjg(alg,n_row,acsr,pq,&
          &   zmat,wmat,nzrmax,sp_thresh,info)
   case default

@@ -60,6 +60,7 @@ module mld_base_ainv_mod
   integer, parameter   :: mld_ainv_s_llk_ = mld_ainv_llk_ + 1
   integer, parameter   :: mld_ainv_s_ft_llk_ = mld_ainv_s_llk_ + 1
   integer, parameter   :: mld_ainv_llk_noth_ = mld_ainv_s_ft_llk_  + 1
+  integer, parameter   :: mld_ainv_tuma_     = mld_ainv_llk_noth_  + 1
 
 
 contains
@@ -112,7 +113,7 @@ contains
     real(psb_dpk_), allocatable :: xw(:)
     integer, allocatable        :: xwid(:), indx(:)
     type(psb_dreal_idx_heap)    :: heap
-
+ 
 
     info = psb_success_
     istart_ = 1

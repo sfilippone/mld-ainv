@@ -89,9 +89,9 @@ subroutine mld_dsparse_invk(n,a,z,fill_in,sp_thresh,info,inlevs)
   rowlevs(:) = -(n+1)
 
   call zcsr%allocate(n,n,n*fill_in)
-!!$  call zcsr%set_triangle()
-!!$  call zcsr%set_unit(.false.)
-!!$  call zcsr%set_upper()
+  call zcsr%set_triangle()
+  call zcsr%set_unit(.false.)
+  call zcsr%set_upper()
   call psb_ensure_size(n+1, idxs,  info)
 
 

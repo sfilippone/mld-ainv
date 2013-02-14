@@ -79,6 +79,9 @@ contains
       call mld_dsparse_biconjg_s_ft_llk(n,acsr,p,zcsc,wcsc,nzrmax,sp_thresh,info)
     case (mld_ainv_llk_noth_)
       call mld_dsparse_biconjg_llk_noth(n,acsr,p,zcsc,wcsc,nzrmax,sp_thresh,info)
+    case (mld_ainv_tuma_)
+      call mld_dsparse_tuma_sainv(n,acsr,p,zcsc,wcsc,nzrmax,sp_thresh,info)
+
     case default
       info = psb_err_internal_error_
       call psb_errpush(info,name,a_err='Invalid alg')
@@ -436,12 +439,11 @@ contains
 
   end subroutine mld_dsparse_biconjg_llk
 
-
   subroutine mld_dsparse_biconjg_s_llk(n,a,p,z,w,nzrmax,sp_thresh,info)
     use psb_base_mod
     use mld_base_ainv_mod
     !
-    ! Left-looking variant
+    ! Left-looking variant SYMMETRIC A. You have been warned!
     !
     !
     implicit none 
@@ -454,27 +456,27 @@ contains
     integer, intent(out)                      :: info
 
     ! Locals
-    integer, allocatable        :: ia(:), ja(:), izkr(:), izcr(:),iww(:) 
-    real(psb_dpk_), allocatable :: zval(:),val(:), q(:),  ww(:) 
-    integer :: i,j,k, kc, kr, err_act, nz, nzra, nzrz, ipzi,ipzj, nzww,&
+    integer, allocatable        :: ia(:), ja(:), izkr(:), izcr(:)
+    real(psb_dpk_), allocatable :: zval(:),val(:), q(:)
+    integer :: i,j,k, kc, kr, err_act, nz, nzra, nzrz, ipzi,ipzj,&
          & nzzi,nzzj, nzz, ip1, ip2, ipza,ipzz, ipzn, nzzn, ipz1, ipz2,&
-         &  ipj, lastj, nextj, nzw, nzrw
+         &  ipj, lastj, nextj, nzw
     type(psb_int_heap) :: heap, rheap
     type(psb_d_csc_sparse_mat) :: ac
-    real(psb_dpk_)     :: alpha, tmpq,tmpq2
+    real(psb_dpk_)     :: alpha
     character(len=20)  :: name='mld_orth_llk'
     logical, parameter :: debug=.false.
 
-    allocate(zval(n),ia(n),val(n),izkr(n),izcr(n),q(n),iww(n),ww(n),stat=info)
+    allocate(zval(n),ia(n),val(n),izkr(n),izcr(n),stat=info)
     if (info == psb_success_) call ac%cp_from_fmt(a,info)
     if (info /= psb_success_) then 
       call psb_errpush(psb_err_from_subroutine_,name,a_err='Allocate')
       return      
     end if
     !
-    ! Init pointers to:
-    !  ljr(i): last occupied column index within row  I
-    !  izcr(i): first occupied row index within column I
+    ! izkr(i): flag nonzeros in ZVAL. To minimize traffic into heap.
+    ! izcr(i): flag rows to be used for the dot products. Used to minimize
+    !               traffic in rheap.  
     !
     do i=1,n
       izkr(i) = 0
@@ -495,7 +497,6 @@ contains
     if (abs(p(1)) < d_epstol) &
          & p(1) = 1.d-3 
 
-    q(1) = p(1)
     ! 
     !
     call z%allocate(n,n,n*nzrmax)
@@ -506,12 +507,6 @@ contains
     z%val(1) = done
     nzz       = 1
 
-    call w%allocate(n,n,n*nzrmax)
-    w%icp(1)  = 1
-    w%icp(2)  = 2
-    w%ia(1)  = 1
-    w%val(1) = done
-    nzw       = 1
 
     do i = 2, n
       if (debug) write(0,*) 'Main loop iteration ',i,n
@@ -530,9 +525,10 @@ contains
       izkr(i) = 1
       call psb_init_heap(heap,info)
       if (info == psb_success_) call psb_insert_heap(i,heap,info)
+
       if (info == psb_success_) call psb_init_heap(rheap,info)
       do j = ac%icp(i), ac%icp(i+1)-1
-        if (ac%ia(j) <i) then 
+        if (ac%ia(j) < i) then 
           if (info == psb_success_) call psb_insert_heap(ac%ia(j),rheap,info)
           izcr(ac%ia(j)) = 1
         end if
@@ -559,9 +555,10 @@ contains
             exit inner
           end if
         end do inner
+        
         izcr(j) = 0
         if (j>=i) cycle outer
-        if (debug) write(0,*) 'update loop, using row: ',j
+        if (debug) write(0,*) 'update loop, using row: ',j,i
         ip1 = a%irp(j)
         ip2 = a%irp(j+1) - 1
         do 
@@ -573,16 +570,14 @@ contains
         p(i) = psb_spge_dot(nzra,a%ja(ip1:ip2),a%val(ip1:ip2),zval)
         ! !$          write(psb_err_unit,*) j,i,p(i)
 
-        ipz1 = z%icp(j) 
-        ipz2 = z%icp(j+1) 
-        nzrz = ipz2-ipz1
         alpha = (-p(i)/p(j))
-        if (.false..or.(abs(alpha) > sp_thresh)) then 
 
-          do k=ipz1, ipz2-1
+        if (.false..or.(abs(alpha) > sp_thresh)) then 
+          do k=z%icp(j), z%icp(j+1)-1
             kr     = z%ia(k)
             zval(kr) = zval(kr) + alpha*z%val(k)
             if (izkr(kr) == 0) then 
+
               call psb_insert_heap(kr,heap,info) 
               if (info /= psb_success_) exit
               izkr(kr) = 1
@@ -612,13 +607,14 @@ contains
           end if
         end if
       end do outer
+      call a%csget(i,i,nzra,ia,ja,val,info)
+      call rwclip(nzra,ia,ja,val,1,n,1,n)      
+      p(i) = psb_spge_dot(nzra,ja,val,zval)
+      if (abs(p(i)) < d_epstol) &
+         & p(i) = 1.d-3 
 
-!!$      call a%csget(i,i,nzra,ia,ja,val,info)
-!!$      call rwclip(nzra,ia,ja,val,1,n,1,n)      
-!!$      p(i) = psb_spge_dot(nzra,ja,val,zval)
-!!$      if (abs(p(i)) < d_epstol) &
-!!$         & p(i) = 1.d-3 
-!!$          
+! !$      write(0,*) 'Dropping from a column with: ',i,psb_howmany_heap(heap),sp_thresh
+          
       !
       ! Sparsify current ZVAL and put into ZMAT
       ! 
@@ -637,155 +633,363 @@ contains
       end do
       z%icp(i+1) = ipz1 + nzrz
       nzz        = nzz + nzrz
-      nzww = 0
 
-!!$      call psb_d_spmspv(done,ac,nzrz,ia,val,dzero,nzww,iww,ww,info)
-!!$      p(i) = psb_spdot_srtd(nzww,iww,ww,nzrz,ia,val)
-!!$      if (abs(p(i)) < d_epstol) &
-!!$         & p(i) = 1.d-3 
-      
-
-      
-
-      ! WVAL = e_i
-      ! !$        do j=1, i-1
-      ! !$          zval(j) = dzero
-      ! !$        end do
-      zval(i)  = done
-      izkr(i) = 1
-      call psb_init_heap(heap,info)
-      if (info == psb_success_) call psb_insert_heap(i,heap,info)
-      if (info == psb_success_) call psb_init_heap(rheap,info)
-      do j = a%irp(i), a%irp(i+1)-1
-        if (a%ja(j)<i) then
-          if (info == psb_success_) call psb_insert_heap(a%ja(j),rheap,info)
-          izcr(a%ja(j)) = 1
-        end if
-      end do
-      if (info /= psb_success_) then
-        info=psb_err_from_subroutine_
-        call psb_errpush(info,name,a_err='psb_init_heap')
-        return
-      end if
-
-      ! Update loop
-      ! The idea is to keep track of the indices of the nonzeros in zval,
-      ! so as to only do the dot products on the rows which have nonzeros
-      ! in their positions; to do this we keep an extra
-      ! copy of A in CSC, and the row indices to be considered are in rheap. 
-      lastj = -1 
-      outerw: do 
-        innerw: do 
-          call psb_heap_get_first(j,rheap,info)
-          if (debug) write(0,*) 'from get_first: ',j,info
-          if (info == -1) exit outerw ! Empty heap
-          if (j > lastj) then 
-            lastj = j 
-            exit innerw
-          end if
-        end do innerw
-        izcr(j) = 0
-        if (j>=i) cycle outerw
-        if (debug) write(0,*) 'update loop, using row: ',j
-        ip1 = ac%icp(j)
-        ip2 = ac%icp(j+1) - 1
-        do 
-          if (ip2 < ip1 ) exit
-          if (ac%ia(ip2) <= n) exit
-          ip2 = ip2 -1 
-        end do
-        nzra = max(0,ip2 - ip1 + 1) 
-        q(i) = psb_spge_dot(nzra,ac%ia(ip1:ip2),ac%val(ip1:ip2),zval)
-        ! !$          write(psb_err_unit,*) j,i,p(i)
-
-        ipz1 = w%icp(j) 
-        ipz2 = w%icp(j+1) 
-        nzrz = ipz2-ipz1
-        alpha = (-q(i)/q(j))
-        if (.false..or.(abs(alpha) > sp_thresh)) then 
-
-          do k=ipz1, ipz2-1
-            kr     = w%ia(k)
-            zval(kr) = zval(kr) + alpha*w%val(k)
-            if (izkr(kr) == 0) then 
-              call psb_insert_heap(kr,heap,info) 
-              if (info /= psb_success_) exit
-              izkr(kr) = 1
-              ! We have just added a new nonzero in KR. Thus, we will
-              ! need to explicitly compute the dot products on all
-              ! rows j<k<i with nonzeros in column kr; we keep  them in 
-              ! a heap.
-              ! 
-              do kc = a%irp(kr), a%irp(kr+1)-1
-                nextj=a%ja(kc)
-                if ((info == psb_success_).and.(izcr(nextj)==0)&
-                     & .and.(nextj>j).and.(nextj<i) ) then
-                  call psb_insert_heap(nextj,rheap,info)
-                  izcr(nextj) = 1
-                end if
-              end do
-              if (debug) write(0,*) 'update loop, adding indices: ',&
-                   &  a%ja(a%irp(kr):a%irp(kr+1)-1)
-
-            end if
-            if (info /= psb_success_) exit
-          end do
-          if (info /= psb_success_) then
-            info=psb_err_from_subroutine_
-            call psb_errpush(info,name,a_err='psb_insert_heap')
-            return
-          end if
-        end if
-      end do outerw
-      ip1 = ac%icp(i)
-      ip2 = ac%icp(i+1) - 1
-      do 
-        if (ip2 < ip1 ) exit
-        if (ac%ia(ip2) <= n) exit
-        ip2 = ip2 -1 
-      end do
-      nzra = max(0,ip2 - ip1 + 1) 
-      
-      q(i) = psb_spge_dot(nzra,ac%ia(ip1:ip2),ac%val(ip1:ip2),zval)
-      if (abs(q(i)) < d_epstol) &
-           & q(i) = 1.d-3 
-      !
-      ! Sparsify current ZVAL and put into ZMAT
-      ! 
-      call sparsify(i,nzrmax,sp_thresh,n,zval,nzrw,ia,val,info,iheap=heap,ikr=izkr)
-      if (info /= psb_success_) then 
-        info = psb_err_internal_error_
-        call psb_errpush(info,name,a_err='sparsify')
-        return
-      end if
-      call psb_ensure_size(nzw+nzrw, w%ia,  info)
-      call psb_ensure_size(nzw+nzrw, w%val, info)
-      ipz1 = w%icp(i)
-      do j=1, nzrw
-        w%ia(ipz1  + j -1) = ia(j)
-        w%val(ipz1 + j -1) = val(j)
-      end do
-      w%icp(i+1) = ipz1 + nzrw
-      nzw        = nzw + nzrw
-
-!!$      !
-!!$      ! Ok, now compute w_i^T A z_i
-!!$      !      
-      nzww = 0
-      nzrz = z%icp(i+1)-z%icp(i)
-      ipz1 = z%icp(i)
-      call psb_d_spmspv(done,ac,&
-           & nzrz,z%ia(ipz1:ipz1+nzrz-1),z%val(ipz1:ipz1+nzrz-1),&
-           & dzero,nzww,iww,ww,info)
-      tmpq  = psb_spdot_srtd(nzww,iww,ww,nzrw,ia,val)
-      q(i) = tmpq
-      if (abs(q(i)) < d_epstol) &
-           & q(i) = 1.d-3 
-      p(i) = q(i)
-      
     end do
+    
+    call z%cp_to_fmt(w,info)
 
   end subroutine mld_dsparse_biconjg_s_llk
+
+!!$
+!!$  subroutine mld_dsparse_biconjg_s_llk(n,a,p,z,w,nzrmax,sp_thresh,info)
+!!$    use psb_base_mod
+!!$    use mld_base_ainv_mod
+!!$    !
+!!$    ! Left-looking variant
+!!$    !
+!!$    !
+!!$    implicit none 
+!!$    integer, intent(in)                       :: n
+!!$    type(psb_d_csr_sparse_mat), intent(in)    :: a
+!!$    type(psb_d_csc_sparse_mat), intent(inout) :: z,w
+!!$    integer, intent(in)                       :: nzrmax
+!!$    real(psb_dpk_), intent(in)                :: sp_thresh
+!!$    real(psb_dpk_), intent(out)               :: p(:)
+!!$    integer, intent(out)                      :: info
+!!$
+!!$    ! Locals
+!!$    integer, allocatable        :: ia(:), ja(:), izkr(:), izcr(:),iww(:) 
+!!$    real(psb_dpk_), allocatable :: zval(:),val(:), q(:),  ww(:) 
+!!$    integer :: i,j,k, kc, kr, err_act, nz, nzra, nzrz, ipzi,ipzj, nzww,&
+!!$         & nzzi,nzzj, nzz, ip1, ip2, ipza,ipzz, ipzn, nzzn, ipz1, ipz2,&
+!!$         &  ipj, lastj, nextj, nzw, nzrw
+!!$    type(psb_int_heap) :: heap, rheap
+!!$    type(psb_d_csc_sparse_mat) :: ac
+!!$    real(psb_dpk_)     :: alpha, tmpq,tmpq2
+!!$    character(len=20)  :: name='mld_orth_llk'
+!!$    logical, parameter :: debug=.false.
+!!$
+!!$    allocate(zval(n),ia(n),val(n),izkr(n),izcr(n),q(n),iww(n),ww(n),stat=info)
+!!$    if (info == psb_success_) call ac%cp_from_fmt(a,info)
+!!$    if (info /= psb_success_) then 
+!!$      call psb_errpush(psb_err_from_subroutine_,name,a_err='Allocate')
+!!$      return      
+!!$    end if
+!!$    !
+!!$    ! Init pointers to:
+!!$    !  ljr(i): last occupied column index within row  I
+!!$    !  izcr(i): first occupied row index within column I
+!!$    !
+!!$    do i=1,n
+!!$      izkr(i) = 0
+!!$      izcr(i) = 0 
+!!$      zval(i)  = dzero
+!!$    end do
+!!$
+!!$    ! Init z_1=e_1 and p_1=a_11
+!!$    p(1) = dzero
+!!$    i   = 1
+!!$    nz  = a%irp(i+1) - a%irp(i)
+!!$    do j=1,nz
+!!$      if (a%ja(j) == 1) then 
+!!$        p(1) = a%val(j)
+!!$        exit
+!!$      end if
+!!$    end do
+!!$    if (abs(p(1)) < d_epstol) &
+!!$         & p(1) = 1.d-3 
+!!$
+!!$    q(1) = p(1)
+!!$    ! 
+!!$    !
+!!$    call z%allocate(n,n,n*nzrmax)
+!!$
+!!$    z%icp(1)  = 1
+!!$    z%icp(2)  = 2
+!!$    z%ia(1)  = 1
+!!$    z%val(1) = done
+!!$    nzz       = 1
+!!$
+!!$    call w%allocate(n,n,n*nzrmax)
+!!$    w%icp(1)  = 1
+!!$    w%icp(2)  = 2
+!!$    w%ia(1)  = 1
+!!$    w%val(1) = done
+!!$    nzw       = 1
+!!$
+!!$    do i = 2, n
+!!$      if (debug) write(0,*) 'Main loop iteration ',i,n
+!!$
+!!$      !
+!!$      ! Update loop on Z.
+!!$      ! Must be separated from update loop of W because of
+!!$      ! the conflict on J that would result. 
+!!$      !
+!!$
+!!$      ! ZVAL = e_i
+!!$      ! !$        do j=1, i-1
+!!$      ! !$          zval(j) = dzero
+!!$      ! !$        end do
+!!$      zval(i)  = done
+!!$      izkr(i) = 1
+!!$      call psb_init_heap(heap,info)
+!!$      if (info == psb_success_) call psb_insert_heap(i,heap,info)
+!!$      if (info == psb_success_) call psb_init_heap(rheap,info)
+!!$      do j = ac%icp(i), ac%icp(i+1)-1
+!!$        if (ac%ia(j) <i) then 
+!!$          if (info == psb_success_) call psb_insert_heap(ac%ia(j),rheap,info)
+!!$          izcr(ac%ia(j)) = 1
+!!$        end if
+!!$      end do
+!!$      if (info /= psb_success_) then
+!!$        info=psb_err_from_subroutine_
+!!$        call psb_errpush(info,name,a_err='psb_init_heap')
+!!$        return
+!!$      end if
+!!$
+!!$      ! Update loop
+!!$      ! The idea is to keep track of the indices of the nonzeros in zval,
+!!$      ! so as to only do the dot products on the rows which have nonzeros
+!!$      ! in their positions; to do this we keep an extra
+!!$      ! copy of A in CSC, and the row indices to be considered are in rheap. 
+!!$      lastj = -1 
+!!$      outer: do 
+!!$        inner: do 
+!!$          call psb_heap_get_first(j,rheap,info)
+!!$          if (debug) write(0,*) 'from get_first: ',j,info
+!!$          if (info == -1) exit outer ! Empty heap
+!!$          if (j > lastj) then 
+!!$            lastj = j 
+!!$            exit inner
+!!$          end if
+!!$        end do inner
+!!$        izcr(j) = 0
+!!$        if (j>=i) cycle outer
+!!$        if (debug) write(0,*) 'update loop, using row: ',j
+!!$        ip1 = a%irp(j)
+!!$        ip2 = a%irp(j+1) - 1
+!!$        do 
+!!$          if (ip2 < ip1 ) exit
+!!$          if (a%ja(ip2) <= n) exit
+!!$          ip2 = ip2 -1 
+!!$        end do
+!!$        nzra = max(0,ip2 - ip1 + 1) 
+!!$        p(i) = psb_spge_dot(nzra,a%ja(ip1:ip2),a%val(ip1:ip2),zval)
+!!$        ! !$          write(psb_err_unit,*) j,i,p(i)
+!!$
+!!$        ipz1 = z%icp(j) 
+!!$        ipz2 = z%icp(j+1) 
+!!$        nzrz = ipz2-ipz1
+!!$        alpha = (-p(i)/p(j))
+!!$        if (.false..or.(abs(alpha) > sp_thresh)) then 
+!!$
+!!$          do k=ipz1, ipz2-1
+!!$            kr     = z%ia(k)
+!!$            zval(kr) = zval(kr) + alpha*z%val(k)
+!!$            if (izkr(kr) == 0) then 
+!!$              call psb_insert_heap(kr,heap,info) 
+!!$              if (info /= psb_success_) exit
+!!$              izkr(kr) = 1
+!!$              ! We have just added a new nonzero in KR. Thus, we will
+!!$              ! need to explicitly compute the dot products on all
+!!$              ! rows j<k<i with nonzeros in column kr; we keep  them in 
+!!$              ! a heap.
+!!$              ! 
+!!$              do kc = ac%icp(kr), ac%icp(kr+1)-1
+!!$                nextj=ac%ia(kc)
+!!$                if ((info == psb_success_).and.(izcr(nextj)==0)&
+!!$                     & .and.(nextj>j).and.(nextj<i)) then
+!!$                  call psb_insert_heap(nextj,rheap,info)
+!!$                  izcr(nextj) = 1
+!!$                end if
+!!$              end do
+!!$              if (debug) write(0,*) 'update loop, adding indices: ',&
+!!$                   &  ac%ia(ac%icp(kr):ac%icp(kr+1)-1)
+!!$
+!!$            end if
+!!$            if (info /= psb_success_) exit
+!!$          end do
+!!$          if (info /= psb_success_) then
+!!$            info=psb_err_from_subroutine_
+!!$            call psb_errpush(info,name,a_err='psb_insert_heap')
+!!$            return
+!!$          end if
+!!$        end if
+!!$      end do outer
+!!$
+!!$! !$      call a%csget(i,i,nzra,ia,ja,val,info)
+!!$! !$      call rwclip(nzra,ia,ja,val,1,n,1,n)      
+!!$! !$      p(i) = psb_spge_dot(nzra,ja,val,zval)
+!!$! !$      if (abs(p(i)) < d_epstol) &
+!!$! !$         & p(i) = 1.d-3 
+!!$! !$          
+!!$      !
+!!$      ! Sparsify current ZVAL and put into ZMAT
+!!$      ! 
+!!$      call sparsify(i,nzrmax,sp_thresh,n,zval,nzrz,ia,val,info,iheap=heap,ikr=izkr)
+!!$      if (info /= psb_success_) then 
+!!$        info = psb_err_internal_error_
+!!$        call psb_errpush(info,name,a_err='sparsify')
+!!$        return
+!!$      end if
+!!$      call psb_ensure_size(nzz+nzrz, z%ia,  info)
+!!$      call psb_ensure_size(nzz+nzrz, z%val, info)
+!!$      ipz1 = z%icp(i)
+!!$      do j=1, nzrz
+!!$        z%ia(ipz1  + j -1) = ia(j)
+!!$        z%val(ipz1 + j -1) = val(j)
+!!$      end do
+!!$      z%icp(i+1) = ipz1 + nzrz
+!!$      nzz        = nzz + nzrz
+!!$      nzww = 0
+!!$
+!!$! !$      call psb_d_spmspv(done,ac,nzrz,ia,val,dzero,nzww,iww,ww,info)
+!!$! !$      p(i) = psb_spdot_srtd(nzww,iww,ww,nzrz,ia,val)
+!!$! !$      if (abs(p(i)) < d_epstol) &
+!!$! !$         & p(i) = 1.d-3 
+!!$      
+!!$
+!!$      
+!!$
+!!$      ! WVAL = e_i
+!!$      ! !$        do j=1, i-1
+!!$      ! !$          zval(j) = dzero
+!!$      ! !$        end do
+!!$      zval(i)  = done
+!!$      izkr(i) = 1
+!!$      call psb_init_heap(heap,info)
+!!$      if (info == psb_success_) call psb_insert_heap(i,heap,info)
+!!$      if (info == psb_success_) call psb_init_heap(rheap,info)
+!!$      do j = a%irp(i), a%irp(i+1)-1
+!!$        if (a%ja(j)<i) then
+!!$          if (info == psb_success_) call psb_insert_heap(a%ja(j),rheap,info)
+!!$          izcr(a%ja(j)) = 1
+!!$        end if
+!!$      end do
+!!$      if (info /= psb_success_) then
+!!$        info=psb_err_from_subroutine_
+!!$        call psb_errpush(info,name,a_err='psb_init_heap')
+!!$        return
+!!$      end if
+!!$
+!!$      ! Update loop
+!!$      ! The idea is to keep track of the indices of the nonzeros in zval,
+!!$      ! so as to only do the dot products on the rows which have nonzeros
+!!$      ! in their positions; to do this we keep an extra
+!!$      ! copy of A in CSC, and the row indices to be considered are in rheap. 
+!!$      lastj = -1 
+!!$      outerw: do 
+!!$        innerw: do 
+!!$          call psb_heap_get_first(j,rheap,info)
+!!$          if (debug) write(0,*) 'from get_first: ',j,info
+!!$          if (info == -1) exit outerw ! Empty heap
+!!$          if (j > lastj) then 
+!!$            lastj = j 
+!!$            exit innerw
+!!$          end if
+!!$        end do innerw
+!!$        izcr(j) = 0
+!!$        if (j>=i) cycle outerw
+!!$        if (debug) write(0,*) 'update loop, using row: ',j
+!!$        ip1 = ac%icp(j)
+!!$        ip2 = ac%icp(j+1) - 1
+!!$        do 
+!!$          if (ip2 < ip1 ) exit
+!!$          if (ac%ia(ip2) <= n) exit
+!!$          ip2 = ip2 -1 
+!!$        end do
+!!$        nzra = max(0,ip2 - ip1 + 1) 
+!!$        q(i) = psb_spge_dot(nzra,ac%ia(ip1:ip2),ac%val(ip1:ip2),zval)
+!!$        ! !$          write(psb_err_unit,*) j,i,p(i)
+!!$
+!!$        ipz1 = w%icp(j) 
+!!$        ipz2 = w%icp(j+1) 
+!!$        nzrz = ipz2-ipz1
+!!$        alpha = (-q(i)/q(j))
+!!$        if (.false..or.(abs(alpha) > sp_thresh)) then 
+!!$
+!!$          do k=ipz1, ipz2-1
+!!$            kr     = w%ia(k)
+!!$            zval(kr) = zval(kr) + alpha*w%val(k)
+!!$            if (izkr(kr) == 0) then 
+!!$              call psb_insert_heap(kr,heap,info) 
+!!$              if (info /= psb_success_) exit
+!!$              izkr(kr) = 1
+!!$              ! We have just added a new nonzero in KR. Thus, we will
+!!$              ! need to explicitly compute the dot products on all
+!!$              ! rows j<k<i with nonzeros in column kr; we keep  them in 
+!!$              ! a heap.
+!!$              ! 
+!!$              do kc = a%irp(kr), a%irp(kr+1)-1
+!!$                nextj=a%ja(kc)
+!!$                if ((info == psb_success_).and.(izcr(nextj)==0)&
+!!$                     & .and.(nextj>j).and.(nextj<i) ) then
+!!$                  call psb_insert_heap(nextj,rheap,info)
+!!$                  izcr(nextj) = 1
+!!$                end if
+!!$              end do
+!!$              if (debug) write(0,*) 'update loop, adding indices: ',&
+!!$                   &  a%ja(a%irp(kr):a%irp(kr+1)-1)
+!!$
+!!$            end if
+!!$            if (info /= psb_success_) exit
+!!$          end do
+!!$          if (info /= psb_success_) then
+!!$            info=psb_err_from_subroutine_
+!!$            call psb_errpush(info,name,a_err='psb_insert_heap')
+!!$            return
+!!$          end if
+!!$        end if
+!!$      end do outerw
+!!$      ip1 = ac%icp(i)
+!!$      ip2 = ac%icp(i+1) - 1
+!!$      do 
+!!$        if (ip2 < ip1 ) exit
+!!$        if (ac%ia(ip2) <= n) exit
+!!$        ip2 = ip2 -1 
+!!$      end do
+!!$      nzra = max(0,ip2 - ip1 + 1) 
+!!$      
+!!$      q(i) = psb_spge_dot(nzra,ac%ia(ip1:ip2),ac%val(ip1:ip2),zval)
+!!$      if (abs(q(i)) < d_epstol) &
+!!$           & q(i) = 1.d-3 
+!!$      !
+!!$      ! Sparsify current ZVAL and put into ZMAT
+!!$      ! 
+!!$      call sparsify(i,nzrmax,sp_thresh,n,zval,nzrw,ia,val,info,iheap=heap,ikr=izkr)
+!!$      if (info /= psb_success_) then 
+!!$        info = psb_err_internal_error_
+!!$        call psb_errpush(info,name,a_err='sparsify')
+!!$        return
+!!$      end if
+!!$      call psb_ensure_size(nzw+nzrw, w%ia,  info)
+!!$      call psb_ensure_size(nzw+nzrw, w%val, info)
+!!$      ipz1 = w%icp(i)
+!!$      do j=1, nzrw
+!!$        w%ia(ipz1  + j -1) = ia(j)
+!!$        w%val(ipz1 + j -1) = val(j)
+!!$      end do
+!!$      w%icp(i+1) = ipz1 + nzrw
+!!$      nzw        = nzw + nzrw
+!!$
+!!$! !$      !
+!!$! !$      ! Ok, now compute w_i^T A z_i
+!!$! !$      !      
+!!$      nzww = 0
+!!$      nzrz = z%icp(i+1)-z%icp(i)
+!!$      ipz1 = z%icp(i)
+!!$      call psb_d_spmspv(done,ac,&
+!!$           & nzrz,z%ia(ipz1:ipz1+nzrz-1),z%val(ipz1:ipz1+nzrz-1),&
+!!$           & dzero,nzww,iww,ww,info)
+!!$      tmpq  = psb_spdot_srtd(nzww,iww,ww,nzrw,ia,val)
+!!$      q(i) = tmpq
+!!$      if (abs(q(i)) < d_epstol) &
+!!$           & q(i) = 1.d-3 
+!!$      p(i) = q(i)
+!!$      
+!!$    end do
+!!$
+!!$  end subroutine mld_dsparse_biconjg_s_llk
 
   subroutine mld_dsparse_biconjg_s_ft_llk(n,a,p,z,w,nzrmax,sp_thresh,info)
     use psb_base_mod
@@ -1674,5 +1878,128 @@ contains
     end do
   end subroutine zero_sp2dn
   
+
+  subroutine mld_dsparse_tuma_sainv(n,a,p,z,w,nzrmax,sp_thresh,info)
+    use psb_base_mod
+    use mld_base_ainv_mod
+    ! Interface to TUMA's code
+      !
+    implicit none 
+    integer, intent(in)                       :: n
+    type(psb_d_csr_sparse_mat), intent(in)    :: a
+    type(psb_d_csc_sparse_mat), intent(inout) :: z,w
+    integer, intent(in)                       :: nzrmax
+    real(psb_dpk_), intent(in)                :: sp_thresh
+    real(psb_dpk_), intent(out)               :: p(:)
+    integer, intent(out)                      :: info
+
+    
+    ! Locals
+    type(psb_d_csr_sparse_mat)  :: ztum
+    
+    integer, pointer        :: ia(:), ja(:), iz(:),jz(:)
+    real(psb_dpk_), pointer :: val(:), valz(:)
+    integer :: i,j,k, kc, kr, err_act, nz, nzra, nzrz, ipzi,ipzj, nza,&
+         & nzzi,nzzj, nzz, ip1, ip2, ipza,ipzz, ipzn, nzzn,ifnz, ipz1, ipz2
+    integer ::  msglvl,msgunit,size_r,size_c,size_p
+    integer garcol,garrow,droptyp
+    integer imodif,diag_one,fill,fillmax,ifillmax
+    double precision mi,drfl,diagtol
+
+    type(psb_int_heap) :: heap 
+    real(psb_dpk_)     :: alpha, t0, t1
+    character(len=20)  :: name='mld_TUMA_sainv'
+
+    interface 
+      subroutine ainvsr2(msglvl,msgunit,n,ia,ja,a,ip,jp,ap,&
+           &  size_p,size_c,size_r,diagtol,&
+           &  drfl,mi,diag_one,droptyp,imodif,fill,fillmax,&
+           &  ifillmax,garrow,garcol,info)
+        integer msglvl,msgunit,n,size_r,size_c,size_p
+        integer, intent(in) :: ia(*),ja(*)
+        double precision, intent(in) :: a(*)
+        integer, pointer :: ip(:),jp(:)
+        double precision, pointer :: ap(:)
+        integer garcol,garrow,droptyp
+        integer imodif,diag_one,fill,fillmax,ifillmax,info
+        double precision mi,drfl,diagtol
+      end subroutine ainvsr2
+    end interface
+
+
+
+    if (psb_get_errstatus() /= psb_success_) return 
+    info = psb_success_
+    call psb_erractionsave(err_act)
+
+    !
+    ! First step. 
+    ! 
+    nza = a%get_nzeros()
+    allocate(ia(n+1),ja(nza),val(nza),stat=info)
+    nullify(iz,jz,valz)
+    if (info /= 0) then 
+      info = psb_err_internal_error_
+      call psb_errpush(psb_err_internal_error_,name,a_err='Allocate')
+      goto 9999      
+    end if
+    
+    msglvl  = 0
+    msgunit = psb_err_unit
+    drfl    = sp_thresh
+
+
+
+    size_p  = nza
+    size_r  = nza
+    size_c  = nza
+    ! These are taken straight from TUMA's code. 
+    diagtol  = 1.1d-16
+    droptyp  = 0
+    mi       = 0.1d0
+    diag_one = 1
+    t0 = psb_wtime()
+    call  ainvsr2(msglvl,msgunit,n,a%irp,a%ja,a%val,iz,jz,valz,&
+           &  size_p,size_c,size_r,diagtol,&
+           &  drfl,mi,diag_one,droptyp,imodif,fill,fillmax,&
+           &  ifillmax,garrow,garcol,info)
+    t1 = psb_wtime()
+    nz=iz(n+1)-1
+!!$    write(0,*) 'On output from AINVSR2 ',info,fillmax,a%get_nzeros(),iz(n+1)-1,t1-t0
+    if (info /= 0) then 
+      info = psb_err_internal_error_
+      call psb_errpush(psb_err_internal_error_,name,a_err='ainvsr2')
+      goto 9999      
+    end if
+    call ztum%allocate(n,n,nz)
+    ztum%irp(1:n+1) = iz(1:n+1)
+    ztum%ja(1:nz)   = jz(1:nz)
+    ztum%val(1:nz)  = valz(1:nz)
+    call ztum%transp(w)
+!!$    call w%cp_from_fmt(ztum,info)
+!!$    call w%transp()
+    call w%cp_to_fmt(z,info)
+    p = done
+    deallocate(iz,jz,valz,stat=info)
+    if (info /= 0) then 
+      info = psb_err_internal_error_
+      call psb_errpush(psb_err_internal_error_,name,a_err='ainvsr2')
+      goto 9999      
+    end if
+    
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+    if (err_act.eq.psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+    return
+
+  end subroutine mld_dsparse_tuma_sainv
+
+
 
 end module mld_d_biconjg_mod

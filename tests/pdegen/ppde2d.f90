@@ -205,22 +205,22 @@ program ppde2d
   if (info /= 0) call psb_error(ictxt)
 
   if (psb_toupper(ptype) == 'DIAG') then 
-    call mld_precset(prec,mld_smoother_sweeps_,1,info)
+    call prec%set(mld_smoother_sweeps_,1,info)
   end if
   if (psb_toupper(ptype) == 'AINV') then 
     select case (psb_toupper(parms%alg)) 
     case ('INVK') 
-      call mld_inner_precset(prec,invksv,info) 
+      call prec%set(invksv,info) 
     case ('INVT') 
-      call mld_inner_precset(prec,invtsv,info) 
+      call prec%set(invtsv,info) 
     case ('AINV') 
-      call mld_inner_precset(prec,ainvsv,info) 
+      call prec%set(ainvsv,info) 
     end select
-    call mld_precset(prec,mld_ainv_alg_,  parms%orth_alg,  info)
-    call mld_precset(prec,mld_sub_fillin_,  parms%fill,    info)
-    call mld_precset(prec,mld_sub_iluthrs_, parms%thresh,  info)
-    call mld_precset(prec,mld_inv_fillin_, parms%inv_fill, info)
-    call mld_precset(prec,mld_inv_thresh_, parms%inv_thresh, info)
+    call prec%set(mld_ainv_alg_,  parms%orth_alg,  info)
+    call prec%set(mld_sub_fillin_,  parms%fill,    info)
+    call prec%set(mld_sub_iluthrs_, parms%thresh,  info)
+    call prec%set(mld_inv_fillin_, parms%inv_fill, info)
+    call prec%set(mld_inv_thresh_, parms%inv_thresh, info)
   end if
   info = psb_get_errstatus()
   if (info /= 0) call psb_error(ictxt)
