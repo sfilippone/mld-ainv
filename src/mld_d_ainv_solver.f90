@@ -58,14 +58,18 @@ module mld_d_ainv_solver
     procedure, pass(sv) :: seti    => mld_d_ainv_solver_seti
     procedure, pass(sv) :: setc    => mld_d_ainv_solver_setc
     procedure, pass(sv) :: setr    => mld_d_ainv_solver_setr
+    procedure, pass(sv) :: cseti   => mld_d_ainv_solver_cseti
+    procedure, pass(sv) :: csetc   => mld_d_ainv_solver_csetc
+    procedure, pass(sv) :: csetr   => mld_d_ainv_solver_csetr
     procedure, pass(sv) :: descr   => mld_d_ainv_solver_descr
     procedure, pass(sv) :: sizeof  => d_ainv_solver_sizeof
     procedure, pass(sv) :: default => d_ainv_solver_default
     procedure, pass(sv) :: get_nzeros => d_ainv_get_nzeros
+    procedure, nopass   :: stringval  => d_ainv_stringval
   end type mld_d_ainv_solver_type
 
 
-  private :: d_ainv_solver_sizeof, &
+  private :: d_ainv_solver_sizeof, d_ainv_stringval, &
        &  d_ainv_solver_default, d_ainv_get_nzeros
 
   interface 
@@ -172,6 +176,37 @@ module mld_d_ainv_solver
       integer, intent(out)                         :: info
     end subroutine mld_d_ainv_solver_setr
   end interface 
+  
+  interface 
+    subroutine mld_d_ainv_solver_cseti(sv,what,val,info)
+      import :: psb_desc_type, psb_dspmat_type,  psb_d_base_sparse_mat, &
+           & psb_d_vect_type, psb_d_base_vect_type, psb_dpk_, mld_d_ainv_solver_type
+      
+      Implicit None
+      
+      ! Arguments
+      class(mld_d_ainv_solver_type), intent(inout) :: sv 
+      character(len=*), intent(in)                 :: what 
+      integer, intent(in)                          :: val
+      integer, intent(out)                         :: info
+    end subroutine mld_d_ainv_solver_cseti
+  end interface 
+  
+  interface 
+    subroutine mld_d_ainv_solver_csetr(sv,what,val,info)
+      import :: psb_desc_type, psb_dspmat_type,  psb_d_base_sparse_mat, &
+           & psb_d_vect_type, psb_d_base_vect_type, psb_dpk_, mld_d_ainv_solver_type
+            
+      Implicit None
+      
+      ! Arguments
+      class(mld_d_ainv_solver_type), intent(inout) :: sv 
+      character(len=*), intent(in)                 :: what 
+      real(psb_dpk_), intent(in)                   :: val
+      integer, intent(out)                         :: info
+    end subroutine mld_d_ainv_solver_csetr
+  end interface 
+ 
   
   interface
     subroutine mld_d_ainv_solver_free(sv,info)
@@ -283,5 +318,25 @@ contains
     
     return
   end function d_ainv_solver_sizeof
+
+  function d_ainv_stringval(string) result(val)
+    use psb_base_mode, only : psb_ipk_,psb_toupper
+    implicit none 
+  ! Arguments
+    character(len=*), intent(in) :: string
+    integer(psb_ipk_) :: val 
+    character(len=*), parameter :: name='d_ainv_stringval'
+    
+    select case(psb_toupper(trim(string)))
+      val = mld_min_energy_
+    case('LLK')
+      val = mld_ainv_llk_
+    case('S-LLK')
+      val = mld_ainv_s_llk_
+    case default
+      val  = mld_stringval(string)
+    end select
+  end function d_ainv_stringval
+
 
 end module mld_d_ainv_solver
