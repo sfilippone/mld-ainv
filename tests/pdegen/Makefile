@@ -6,7 +6,7 @@ MLDINCDIR=$(MLDDIR)/include
 MLDLIBDIR=$(MLDDIR)/lib
 MLD_LIB=-L$(MLDLIBDIR) -lpsb_krylov -lmld_prec -lpsb_prec
 AINVLIBDIR=$(AINVDIR)/lib
-AINV_LIB=-L$(AINVLIBDIR) -lainv_prec
+AINV_LIB=-L$(AINVLIBDIR) -lainv_prec -lsainv
 PSBLAS_LIB= -L$(PSBLIBDIR)  -lpsb_util  -lpsb_base
 FINCLUDES=$(FMFLAG). $(FMFLAG)$(AINVLIBDIR) $(FMFLAG)$(MLDINCDIR)  $(FMFLAG)$(PSBINCDIR) $(FIFLAG).
 

@@ -39,6 +39,9 @@ mld_d_ainv_solver_free.o \
 mld_d_ainv_solver_setc.o \
 mld_d_ainv_solver_seti.o \
 mld_d_ainv_solver_setr.o \
+mld_d_ainv_solver_csetc.o \
+mld_d_ainv_solver_cseti.o \
+mld_d_ainv_solver_csetr.o \
 mld_d_ainv_bld.o \
 mld_d_invk_copyin.o \
 mld_d_invk_copyout.o \

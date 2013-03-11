@@ -44,6 +44,12 @@ module mld_d_ainv_solver
   use psb_base_mod, only : psb_d_vect_type
 
   type, extends(mld_d_base_solver_type) :: mld_d_ainv_solver_type
+    ! 
+    !  Compute an approximate factorization
+    !      A^-1 = Z D^-1 W^T
+    !  Note that here W is going to be transposed explicitly,
+    !  so that the component w will in the end contain W^T.     
+    !
     type(psb_dspmat_type)       :: w, z
     type(psb_d_vect_type)       :: dv
     real(psb_dpk_), allocatable :: d(:)
@@ -192,6 +198,22 @@ module mld_d_ainv_solver
     end subroutine mld_d_ainv_solver_cseti
   end interface 
   
+  
+  interface 
+    subroutine mld_d_ainv_solver_csetc(sv,what,val,info)
+      import :: psb_desc_type, psb_dspmat_type,  psb_d_base_sparse_mat, &
+           & psb_d_vect_type, psb_d_base_vect_type, psb_dpk_, mld_d_ainv_solver_type
+      
+      Implicit None
+      
+      ! Arguments
+      class(mld_d_ainv_solver_type), intent(inout) :: sv 
+      character(len=*), intent(in)                 :: what 
+      character(len=*), intent(in)                 :: val
+      integer, intent(out)                         :: info
+    end subroutine mld_d_ainv_solver_csetc
+  end interface 
+  
   interface 
     subroutine mld_d_ainv_solver_csetr(sv,what,val,info)
       import :: psb_desc_type, psb_dspmat_type,  psb_d_base_sparse_mat, &
@@ -320,7 +342,7 @@ contains
   end function d_ainv_solver_sizeof
 
   function d_ainv_stringval(string) result(val)
-    use psb_base_mode, only : psb_ipk_,psb_toupper
+    use psb_base_mod, only : psb_ipk_,psb_toupper
     implicit none 
   ! Arguments
     character(len=*), intent(in) :: string
@@ -328,11 +350,14 @@ contains
     character(len=*), parameter :: name='d_ainv_stringval'
     
     select case(psb_toupper(trim(string)))
-      val = mld_min_energy_
     case('LLK')
       val = mld_ainv_llk_
     case('S-LLK')
       val = mld_ainv_s_llk_
+#if defined(HAVE_TUMA_SAINV)
+    case('SAINV-TUMA')
+      val = mld_ainv_s_tuma_ 
+#endif 
     case default
       val  = mld_stringval(string)
     end select

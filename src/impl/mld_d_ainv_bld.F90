@@ -140,6 +140,7 @@ subroutine mld_d_ainv_bld(a,alg,fillin,thresh,wmat,d,zmat,desc,info,blck,iscale)
   ! Only biconjg is surviving for now....
   !
   select case(alg)
+#if 0
   case(mld_ainv_orth1_,mld_ainv_orth2_,mld_ainv_orth3_,mld_ainv_orth4_)
     call mld_sparse_orthbase(alg,n_row,acsr,pq,&
          & zmat,nzrmax,sp_thresh,info)
@@ -149,12 +150,14 @@ subroutine mld_d_ainv_bld(a,alg,fillin,thresh,wmat,d,zmat,desc,info,blck,iscale)
          & call mld_sparse_orthbase(alg,n_row,acsr,pq,&
          &   wmat,nzrmax,sp_thresh,info)
     call wmat%transp()
+#endif
+    
   case(mld_ainv_llk_,mld_ainv_s_llk_,mld_ainv_s_ft_llk_,&
        & mld_ainv_llk_noth_)
     call mld_sparse_biconjg(alg,n_row,acsr,pq,&
          &   zmat,wmat,nzrmax,sp_thresh,info)
 #ifdef HAVE_TUMA_SAINV
-  case(mld_ainv_tuma_)
+  case(mld_ainv_s_tuma_)
     call mld_sparse_biconjg(alg,n_row,acsr,pq,&
          &   zmat,wmat,nzrmax,sp_thresh,info)
 #endif

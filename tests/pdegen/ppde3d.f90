@@ -91,8 +91,8 @@ program ppde3d
   type(mld_d_invk_solver_type) :: invksv
   type(mld_d_ainv_solver_type) :: ainvsv
   type ainvparms 
-    character(len=12) :: alg
-    integer           :: fill, inv_fill, orth_alg
+    character(len=12) :: alg, orth_alg
+    integer           :: fill, inv_fill
     real(psb_dpk_)    :: thresh, inv_thresh
   end type ainvparms
   type(ainvparms)     :: parms
@@ -210,17 +210,17 @@ program ppde3d
   if (psb_toupper(ptype) == 'AINV') then 
     select case (psb_toupper(parms%alg)) 
     case ('INVK') 
-      call mld_inner_precset(prec,invksv,info) 
+      call prec%set(invksv,info) 
     case ('INVT') 
-      call mld_inner_precset(prec,invtsv,info) 
+      call prec%set(invtsv,info) 
     case ('AINV') 
-      call mld_inner_precset(prec,ainvsv,info) 
+      call prec%set(ainvsv,info) 
     end select
-    call mld_precset(prec,mld_ainv_alg_,  parms%orth_alg,  info)
-    call mld_precset(prec,mld_sub_fillin_,  parms%fill,    info)
-    call mld_precset(prec,mld_sub_iluthrs_, parms%thresh,  info)
-    call mld_precset(prec,mld_inv_fillin_, parms%inv_fill, info)
-    call mld_precset(prec,mld_inv_thresh_, parms%inv_thresh, info)
+    call prec%set('ainv_alg',  parms%orth_alg,  info)
+    call prec%set('sub_fillin',  parms%fill,    info)
+    call prec%set('sub_iluthrs', parms%thresh,  info)
+    call prec%set(mld_inv_fillin_, parms%inv_fill, info)
+    call prec%set(mld_inv_thresh_, parms%inv_thresh, info)
   end if
   info = psb_get_errstatus()
   if (info /= 0) call psb_error(ictxt)

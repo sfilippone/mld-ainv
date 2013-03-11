@@ -91,8 +91,8 @@ program ppde2d
   type(mld_d_invk_solver_type) :: invksv
   type(mld_d_ainv_solver_type) :: ainvsv
   type ainvparms 
-    character(len=12) :: alg
-    integer           :: fill, inv_fill, orth_alg
+    character(len=12) :: alg, orth_alg
+    integer           :: fill, inv_fill
     real(psb_dpk_)    :: thresh, inv_thresh
   end type ainvparms
   type(ainvparms)     :: parms
@@ -216,9 +216,9 @@ program ppde2d
     case ('AINV') 
       call prec%set(ainvsv,info) 
     end select
-    call prec%set(mld_ainv_alg_,  parms%orth_alg,  info)
-    call prec%set(mld_sub_fillin_,  parms%fill,    info)
-    call prec%set(mld_sub_iluthrs_, parms%thresh,  info)
+    call prec%set('ainv_alg',  parms%orth_alg,  info)
+    call prec%set('sub_fillin',  parms%fill,    info)
+    call prec%set('sub_iluthrs', parms%thresh,  info)
     call prec%set(mld_inv_fillin_, parms%inv_fill, info)
     call prec%set(mld_inv_thresh_, parms%inv_thresh, info)
   end if
