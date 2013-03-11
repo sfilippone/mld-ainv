@@ -72,11 +72,13 @@ module mld_d_ainv_solver
     procedure, pass(sv) :: default => d_ainv_solver_default
     procedure, pass(sv) :: get_nzeros => d_ainv_get_nzeros
     procedure, nopass   :: stringval  => d_ainv_stringval
+    procedure, nopass   :: algname => d_ainv_algname
   end type mld_d_ainv_solver_type
 
 
   private :: d_ainv_solver_sizeof, d_ainv_stringval, &
-       &  d_ainv_solver_default, d_ainv_get_nzeros
+       &  d_ainv_solver_default, d_ainv_get_nzeros, &
+       &  d_ainv_algname
 
   interface 
     subroutine mld_d_ainv_solver_apply(alpha,sv,x,beta,y,desc_data,trans,work,info)
@@ -301,7 +303,7 @@ contains
     ! Arguments
     class(mld_d_ainv_solver_type), intent(inout) :: sv
 
-    sv%alg     = mld_ainv_orth3_
+    sv%alg     = mld_ainv_llk_
     sv%fill_in = 0
     sv%thresh  = dzero
 
@@ -363,5 +365,29 @@ contains
     end select
   end function d_ainv_stringval
 
+
+  function d_ainv_algname(ialg) result(val)
+    integer(psb_ipk_), intent(in) :: ialg 
+    character(len=40) :: val
+    
+    character(len=*), parameter :: llkname   = 'Left-looking '
+    character(len=*), parameter :: sllkname  = 'Symmetric Left-looking '
+    character(len=*), parameter :: sainvname = 'SAINV (Benzi & Tuma) '
+    character(len=*), parameter :: defname   = 'Unknown alg variant '
+    
+    select case (ialg)
+    case(mld_ainv_llk_)
+      val = llkname
+    case(mld_ainv_s_llk_)
+      val = sllkname
+#if defined(HAVE_TUMA_SAINV)
+    case(mld_ainv_s_tuma_ )
+      val = sainvname
+#endif 
+    case default
+      val = defname
+    end select
+    
+  end function d_ainv_algname
 
 end module mld_d_ainv_solver

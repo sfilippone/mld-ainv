@@ -61,9 +61,9 @@ subroutine mld_d_ainv_solver_descr(sv,info,iout,coarse)
   endif
 
   write(iout_,*) '  AINV: Approximate Inverse with sparse biconjugation '
-  write(iout_,*) '  Algorithm variant      :',sv%alg    
-  write(iout_,*) '  Fill level             :',sv%fill_in
-  write(iout_,*) '  Fill threshold         :',sv%thresh
+  write(iout_,*) '  Algorithm variant      : ',sv%algname(sv%alg)
+  write(iout_,*) '  Fill level             : ',sv%fill_in
+  write(iout_,*) '  Fill threshold         : ',sv%thresh
 
   call psb_erractionrestore(err_act)
   return

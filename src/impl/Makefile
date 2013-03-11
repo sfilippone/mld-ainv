@@ -53,40 +53,7 @@ mld_d_invt_inv.o \
 mld_d_invt_bld.o \
 mld_dsparse_invk.o \
 mld_dsparse_invt.o \
-psb_d_cp_dsc_from_coo.o \
-psb_d_cp_dsc_from_fmt.o \
-psb_d_cp_dsc_to_coo.o \
-psb_d_cp_dsc_to_fmt.o \
-psb_d_dsc_aclsum.o \
-psb_d_dsc_allocate_mnnz.o \
-psb_d_dsc_arwsum.o \
-psb_d_dsc_colsum.o \
-psb_d_dsc_cp_from.o \
-psb_d_dsc_csgetblk.o \
-psb_d_dsc_csgetptn.o \
-psb_d_dsc_csgetrow.o \
-psb_d_dsc_csmm.o \
-psb_d_dsc_csmv.o \
-psb_d_dsc_csnm1.o \
-psb_d_dsc_csnmi.o \
-psb_d_dsc_csput.o \
-psb_d_dsc_cssm.o \
-psb_d_dsc_cssv.o \
-psb_d_dsc_get_diag.o \
-psb_d_dsc_mold.o \
-psb_d_dsc_mv_from.o \
-psb_d_dsc_print.o \
-psb_d_dsc_reallocate_nz.o \
-psb_d_dsc_reinit.o \
-psb_d_dsc_rowsum.o \
-psb_d_dsc_scal.o \
-psb_d_dsc_scals.o \
-psb_d_dsc_trim.o \
-psb_d_mv_dsc_from_coo.o \
-psb_d_mv_dsc_from_fmt.o \
-psb_d_mv_dsc_to_coo.o \
-psb_d_mv_dsc_to_fmt.o 
-
+mld_d_biconjg_impl.o
 
 
 OBJS=$(F90OBJS) 

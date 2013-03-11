@@ -52,11 +52,15 @@ module mld_base_ainv_mod
   integer, parameter   :: mld_inv_fillin_ = mld_ifpsz_ + 1
   integer, parameter   :: mld_ainv_alg_   = mld_inv_fillin_ + 1
   integer, parameter   :: mld_inv_thresh_ = mld_max_sub_solve_ + 1
+#if 0
   integer, parameter   :: mld_ainv_orth1_ = mld_inv_thresh_ + 1
   integer, parameter   :: mld_ainv_orth2_ = mld_ainv_orth1_ + 1
   integer, parameter   :: mld_ainv_orth3_ = mld_ainv_orth2_ + 1
   integer, parameter   :: mld_ainv_orth4_ = mld_ainv_orth3_ + 1 
   integer, parameter   :: mld_ainv_llk_   = mld_ainv_orth4_ + 1
+#else 
+  integer, parameter   :: mld_ainv_llk_   = mld_inv_thresh_ + 1
+#endif
   integer, parameter   :: mld_ainv_s_llk_ = mld_ainv_llk_ + 1
   integer, parameter   :: mld_ainv_s_ft_llk_ = mld_ainv_s_llk_ + 1
   integer, parameter   :: mld_ainv_llk_noth_ = mld_ainv_s_ft_llk_  + 1
