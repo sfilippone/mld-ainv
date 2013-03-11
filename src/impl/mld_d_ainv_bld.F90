@@ -38,7 +38,9 @@ subroutine mld_d_ainv_bld(a,alg,fillin,thresh,wmat,d,zmat,desc,info,blck,iscale)
   use mld_prec_mod
   use mld_d_ainv_solver, mld_protect_name => mld_d_ainv_bld
   use mld_d_biconjg_mod
+#if 0
   use mld_d_orthbase_mod
+#endif
 
   implicit none
 
