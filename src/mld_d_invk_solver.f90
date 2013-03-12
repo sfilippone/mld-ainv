@@ -49,7 +49,6 @@ module mld_d_invk_solver
     type(psb_d_vect_type)       :: dv
     real(psb_dpk_), allocatable :: d(:)
     integer                     :: fill_in, inv_fill
-    real(psb_dpk_)              :: thresh
   contains
     procedure, pass(sv) :: dump    => mld_d_invk_solver_dmp
     procedure, pass(sv) :: build   => mld_d_invk_solver_bld
@@ -57,8 +56,7 @@ module mld_d_invk_solver
     procedure, pass(sv) :: apply_a => mld_d_invk_solver_apply
     procedure, pass(sv) :: free    => mld_d_invk_solver_free
     procedure, pass(sv) :: seti    => mld_d_invk_solver_seti
-    procedure, pass(sv) :: setc    => mld_d_invk_solver_setc
-    procedure, pass(sv) :: setr    => mld_d_invk_solver_setr
+    procedure, pass(sv) :: cseti   => mld_d_invk_solver_cseti
     procedure, pass(sv) :: descr   => mld_d_invk_solver_descr
     procedure, pass(sv) :: sizeof  => d_invk_solver_sizeof
     procedure, pass(sv) :: default => d_invk_solver_default
@@ -151,33 +149,19 @@ module mld_d_invk_solver
   end interface
   
   interface 
-    subroutine mld_d_invk_solver_setc(sv,what,val,info)
+    subroutine mld_d_invk_solver_cseti(sv,what,val,info)
       import :: psb_desc_type, psb_dspmat_type,  psb_d_base_sparse_mat, &
            & psb_d_vect_type, psb_d_base_vect_type, psb_dpk_, mld_d_invk_solver_type
-      Implicit None
       
-      ! Arguments
-      class(mld_d_invk_solver_type), intent(inout) :: sv
-      integer, intent(in)                          :: what 
-      character(len=*), intent(in)                 :: val
-      integer, intent(out)                         :: info
-    end subroutine mld_d_invk_solver_setc
-  end interface 
-  
-  interface 
-    subroutine mld_d_invk_solver_setr(sv,what,val,info)
-      import :: psb_desc_type, psb_dspmat_type,  psb_d_base_sparse_mat, &
-           & psb_d_vect_type, psb_d_base_vect_type, psb_dpk_, mld_d_invk_solver_type
-            
       Implicit None
       
       ! Arguments
       class(mld_d_invk_solver_type), intent(inout) :: sv 
-      integer, intent(in)                          :: what 
-      real(psb_dpk_), intent(in)                   :: val
+      character(len=*), intent(in)                 :: what 
+      integer, intent(in)                          :: val
       integer, intent(out)                         :: info
-    end subroutine mld_d_invk_solver_setr
-  end interface 
+    end subroutine mld_d_invk_solver_cseti
+  end interface
   
   interface
     subroutine mld_d_invk_solver_free(sv,info)
@@ -223,7 +207,7 @@ module mld_d_invk_solver
 
 
   interface mld_invk_bld
-    subroutine mld_d_invk_bld(a,fill1, fill2,thresh,lmat,d,umat,desc,info,blck)
+    subroutine mld_d_invk_bld(a,fill1, fill2,lmat,d,umat,desc,info,blck)
       import :: psb_desc_type, psb_dspmat_type,  psb_d_base_sparse_mat, &
            & psb_dpk_ 
       
@@ -232,7 +216,6 @@ module mld_d_invk_solver
       ! Arguments                                                     
       type(psb_dspmat_type), intent(in), target   :: a
       integer, intent(in)                         :: fill1, fill2 
-      real(psb_dpk_), intent(in)                  :: thresh
       type(psb_dspmat_type), intent(inout)        :: lmat, umat
       real(psb_dpk_), allocatable                 :: d(:)
       Type(psb_desc_type), Intent(in)             :: desc
@@ -304,13 +287,12 @@ module mld_d_invk_solver
   end interface
   
   interface mld_sparse_invk
-    subroutine mld_dsparse_invk(n,a,z,fill_in,sp_thresh,info,inlevs)
+    subroutine mld_dsparse_invk(n,a,z,fill_in,info,inlevs)
       use psb_base_mod, only : psb_dspmat_type, psb_dpk_, psb_int_heap
       integer, intent(in)                  :: n
       type(psb_dspmat_type), intent(in)    :: a
       type(psb_dspmat_type), intent(inout) :: z
       integer, intent(in)                  :: fill_in
-      real(psb_dpk_), intent(in)           :: sp_thresh
       integer, intent(out)                 :: info
       integer, intent(in), optional        :: inlevs(:)
 
@@ -332,7 +314,6 @@ contains
 
     sv%fill_in    = 0
     sv%inv_fill   = 0
-    sv%thresh     = dzero
 
     return
   end subroutine d_invk_solver_default

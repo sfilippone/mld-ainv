@@ -18,6 +18,7 @@ install:
 	   $(INSTALL_DATA) lib/*$(.mod) $(INSTALL_INCLUDEDIR))
 #	(./mkdir.sh  $(INSTALL_DOCSDIR) && \
 #	   /bin/cp -fr docs/*pdf docs/html $(INSTALL_DOCSDIR))
+
 veryclean: 
 	cd src && $(MAKE) veryclean
 	(cd lib; /bin/rm -fr *.a *$(.mod))

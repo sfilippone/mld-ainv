@@ -219,8 +219,8 @@ program ppde3d
     call prec%set('ainv_alg',  parms%orth_alg,  info)
     call prec%set('sub_fillin',  parms%fill,    info)
     call prec%set('sub_iluthrs', parms%thresh,  info)
-    call prec%set(mld_inv_fillin_, parms%inv_fill, info)
-    call prec%set(mld_inv_thresh_, parms%inv_thresh, info)
+    call prec%set('inv_fillin', parms%inv_fill, info)
+    call prec%set('inv_thresh', parms%inv_thresh, info)
   end if
   info = psb_get_errstatus()
   if (info /= 0) call psb_error(ictxt)

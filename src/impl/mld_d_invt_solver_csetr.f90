@@ -32,30 +32,29 @@
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
 !!$
-subroutine mld_d_invk_solver_seti(sv,what,val,info)
+subroutine mld_d_invt_solver_csetr(sv,what,val,info)
   
-
   use psb_base_mod
-  use mld_d_invk_solver, mld_protect_name => mld_d_invk_solver_seti
+  use mld_d_invt_solver, mld_protect_name => mld_d_invt_solver_csetr
 
   Implicit None
 
   ! Arguments
-  class(mld_d_invk_solver_type), intent(inout) :: sv 
-  integer, intent(in)                    :: what 
-  integer, intent(in)                    :: val
+  class(mld_d_invt_solver_type), intent(inout) :: sv 
+  character(len=*), intent(in)                 :: what 
+  real(psb_dpk_), intent(in)             :: val
   integer, intent(out)                   :: info
   Integer :: err_act
-  character(len=20)  :: name='d_invk_solver_seti'
+  character(len=20)  :: name='mld_d_invt_solver_csetr'
 
-  info = psb_success_
   call psb_erractionsave(err_act)
+  info = psb_success_
 
-  select case(what) 
-  case(mld_sub_fillin_)
-    sv%fill_in   = val
-  case(mld_inv_fillin_)
-    sv%inv_fill  = val
+  select case(psb_toupper(what))
+  case('SUB_ILUTHRS') 
+    sv%thresh = val
+  case('INV_THRESH') 
+    sv%inv_thresh = val
   case default
     call sv%mld_d_base_solver_type%set(what,val,info)
   end select
@@ -70,4 +69,4 @@ subroutine mld_d_invk_solver_seti(sv,what,val,info)
     return
   end if
   return
-end subroutine mld_d_invk_solver_seti
+end subroutine mld_d_invt_solver_csetr

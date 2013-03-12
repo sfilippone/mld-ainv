@@ -56,8 +56,9 @@ module mld_d_invt_solver
     procedure, pass(sv) :: apply_a => mld_d_invt_solver_apply
     procedure, pass(sv) :: free    => mld_d_invt_solver_free
     procedure, pass(sv) :: seti    => mld_d_invt_solver_seti
-    procedure, pass(sv) :: setc    => mld_d_invt_solver_setc
     procedure, pass(sv) :: setr    => mld_d_invt_solver_setr
+    procedure, pass(sv) :: cseti   => mld_d_invt_solver_cseti
+    procedure, pass(sv) :: csetr   => mld_d_invt_solver_csetr
     procedure, pass(sv) :: descr   => mld_d_invt_solver_descr
     procedure, pass(sv) :: sizeof  => d_invt_solver_sizeof
     procedure, pass(sv) :: default => d_invt_solver_default
@@ -150,20 +151,6 @@ module mld_d_invt_solver
   end interface
   
   interface 
-    subroutine mld_d_invt_solver_setc(sv,what,val,info)
-      import :: psb_desc_type, psb_dspmat_type,  psb_d_base_sparse_mat, &
-           & psb_d_vect_type, psb_d_base_vect_type, psb_dpk_, mld_d_invt_solver_type
-      Implicit None
-      
-      ! Arguments
-      class(mld_d_invt_solver_type), intent(inout) :: sv
-      integer, intent(in)                          :: what 
-      character(len=*), intent(in)                 :: val
-      integer, intent(out)                         :: info
-    end subroutine mld_d_invt_solver_setc
-  end interface 
-  
-  interface 
     subroutine mld_d_invt_solver_setr(sv,what,val,info)
       import :: psb_desc_type, psb_dspmat_type,  psb_d_base_sparse_mat, &
            & psb_d_vect_type, psb_d_base_vect_type, psb_dpk_, mld_d_invt_solver_type
@@ -176,6 +163,37 @@ module mld_d_invt_solver
       real(psb_dpk_), intent(in)                   :: val
       integer, intent(out)                         :: info
     end subroutine mld_d_invt_solver_setr
+  end interface 
+  
+  
+  interface 
+    subroutine mld_d_invt_solver_cseti(sv,what,val,info)
+      import :: psb_desc_type, psb_dspmat_type,  psb_d_base_sparse_mat, &
+           & psb_d_vect_type, psb_d_base_vect_type, psb_dpk_, mld_d_invt_solver_type
+      
+      Implicit None
+      
+      ! Arguments
+      class(mld_d_invt_solver_type), intent(inout) :: sv 
+      character(len=*), intent(in)                 :: what 
+      integer, intent(in)                          :: val
+      integer, intent(out)                         :: info
+    end subroutine mld_d_invt_solver_cseti
+  end interface
+  
+  interface 
+    subroutine mld_d_invt_solver_csetr(sv,what,val,info)
+      import :: psb_desc_type, psb_dspmat_type,  psb_d_base_sparse_mat, &
+           & psb_d_vect_type, psb_d_base_vect_type, psb_dpk_, mld_d_invt_solver_type
+            
+      Implicit None
+      
+      ! Arguments
+      class(mld_d_invt_solver_type), intent(inout) :: sv 
+      character(len=*), intent(in)                 :: what 
+      real(psb_dpk_), intent(in)                   :: val
+      integer, intent(out)                         :: info
+    end subroutine mld_d_invt_solver_csetr
   end interface 
   
   interface

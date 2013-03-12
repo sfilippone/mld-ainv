@@ -33,7 +33,7 @@
 !!$ 
 !!$
 
-subroutine mld_d_invk_bld(a,fill1, fill2,thresh,lmat,d,umat,desc,info,blck)
+subroutine mld_d_invk_bld(a,fill1, fill2,lmat,d,umat,desc,info,blck)
 
   use psb_base_mod
   use mld_d_invk_solver, mld_protect_name =>  mld_d_invk_bld
@@ -43,7 +43,6 @@ subroutine mld_d_invk_bld(a,fill1, fill2,thresh,lmat,d,umat,desc,info,blck)
   ! Arguments                                                     
   type(psb_dspmat_type), intent(in), target   :: a
   integer, intent(in)                         :: fill1, fill2 
-  real(psb_dpk_), intent(in)                  :: thresh
   type(psb_dspmat_type), intent(inout)        :: lmat, umat
   real(psb_dpk_), allocatable                 :: d(:)
   Type(psb_desc_type), Intent(in)             :: desc
@@ -56,7 +55,6 @@ subroutine mld_d_invk_bld(a,fill1, fill2,thresh,lmat,d,umat,desc,info,blck)
   integer   :: debug_level, debug_unit
   integer   :: ictxt,np,me
   integer            :: nzrmax
-  real(psb_dpk_)     :: sp_thresh
 
   character(len=20)  :: name, ch_err
 
@@ -96,7 +94,6 @@ subroutine mld_d_invk_bld(a,fill1, fill2,thresh,lmat,d,umat,desc,info,blck)
     goto 9999      
   end if
 
-  sp_thresh = thresh
 
   call lmat%csall(n_row,n_row,info,nz=nztota)
   if (info == psb_success_) call umat%csall(n_row,n_row,info,nz=nztota)
@@ -117,10 +114,10 @@ subroutine mld_d_invk_bld(a,fill1, fill2,thresh,lmat,d,umat,desc,info,blck)
   !
   ! Compute the aprox U^-1  and L^-1
   !
-  call mld_sparse_invk(n_row,umat,atmp,fill2,sp_thresh,info)
+  call mld_sparse_invk(n_row,umat,atmp,fill2,info)
   if (info == psb_success_) call psb_move_alloc(atmp,umat,info)
   if (info == psb_success_) call lmat%transp()
-  if (info == psb_success_) call mld_sparse_invk(n_row,lmat,atmp,fill2,sp_thresh,info)
+  if (info == psb_success_) call mld_sparse_invk(n_row,lmat,atmp,fill2,info)
   if (info == psb_success_) call psb_move_alloc(atmp,lmat,info)
   if (info == psb_success_) call lmat%transp()
   ! Done. Hopefully.... 

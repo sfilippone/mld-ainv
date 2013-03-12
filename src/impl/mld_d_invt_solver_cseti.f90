@@ -32,35 +32,32 @@
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
 !!$
-subroutine mld_d_invt_solver_setc(sv,what,val,info)
-  
+subroutine mld_d_invt_solver_cseti(sv,what,val,info)  
 
   use psb_base_mod
-  use mld_d_invt_solver, mld_protect_name => mld_d_invt_solver_setc
+  use mld_d_invt_solver, mld_protect_name => mld_d_invt_solver_cseti
 
   Implicit None
 
   ! Arguments
-  class(mld_d_invt_solver_type), intent(inout) :: sv
-  integer, intent(in)                    :: what 
-  character(len=*), intent(in)           :: val
+  class(mld_d_invt_solver_type), intent(inout) :: sv 
+  character(len=*), intent(in)                 :: what 
+  integer, intent(in)                    :: val
   integer, intent(out)                   :: info
-  Integer :: err_act, ival
-  character(len=20)  :: name='mld_d_invt_solver_setc'
+  Integer :: err_act
+  character(len=20)  :: name='mld_d_invt_solver_cseti'
 
   info = psb_success_
   call psb_erractionsave(err_act)
 
-  ival =  mld_stringval(val)
-  if (ival >=0) then 
-    call sv%set(what,ival,info)
-  end if
-
-  if (info /= psb_success_) then
-    info = psb_err_from_subroutine_
-    call psb_errpush(info, name)
-    goto 9999
-  end if
+  select case(psb_toupper(what)) 
+  case('SUB_FILLIN')
+    sv%fill_in   = val
+  case('INV_FILLIN')
+    sv%inv_fill  = val
+  case default
+    call sv%mld_d_base_solver_type%set(what,val,info)
+  end select
 
   call psb_erractionrestore(err_act)
   return
@@ -72,4 +69,4 @@ subroutine mld_d_invt_solver_setc(sv,what,val,info)
     return
   end if
   return
-end subroutine mld_d_invt_solver_setc
+end subroutine mld_d_invt_solver_cseti

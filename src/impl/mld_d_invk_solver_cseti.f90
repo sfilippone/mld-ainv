@@ -32,32 +32,31 @@
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
 !!$
-subroutine mld_d_invk_solver_setr(sv,what,val,info)
+subroutine mld_d_invk_solver_cseti(sv,what,val,info)
   
-
   use psb_base_mod
-  use mld_d_invk_solver, mld_protect_name => mld_d_invk_solver_setr
+  use mld_d_invk_solver, mld_protect_name => mld_d_invk_solver_cseti
 
   Implicit None
 
   ! Arguments
   class(mld_d_invk_solver_type), intent(inout) :: sv 
-  integer, intent(in)                    :: what 
-  real(psb_dpk_), intent(in)             :: val
+  character(len=*), intent(in)                 :: what 
+  integer, intent(in)                    :: val
   integer, intent(out)                   :: info
   Integer :: err_act
-  character(len=20)  :: name='d_invk_solver_setr'
+  character(len=20)  :: name='d_invk_solver_cseti'
 
-  call psb_erractionsave(err_act)
   info = psb_success_
+  call psb_erractionsave(err_act)
 
-  select case(what)
-  case(mld_sub_iluthrs_) 
-    sv%thresh = val
+  select case(psb_toupper(what))
+  case('SUB_FILLIN')
+    sv%fill_in   = val
+  case('INV_FILLIN')
+    sv%inv_fill  = val
   case default
-!!$      write(0,*) name,': Error: invalid WHAT'
-!!$      info = -2
-!!$      goto 9999
+    call sv%mld_d_base_solver_type%set(what,val,info)
   end select
 
   call psb_erractionrestore(err_act)
@@ -70,4 +69,4 @@ subroutine mld_d_invk_solver_setr(sv,what,val,info)
     return
   end if
   return
-end subroutine mld_d_invk_solver_setr
+end subroutine mld_d_invk_solver_cseti

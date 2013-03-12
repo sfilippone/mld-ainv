@@ -66,7 +66,7 @@ subroutine mld_d_invk_solver_bld(a,desc_a,sv,upd,info,b,amold,vmold)
        & write(debug_unit,*) me,' ',trim(name),' start'
 
 
-  call mld_invk_bld(a,sv%fill_in,sv%inv_fill,sv%thresh,&
+  call mld_invk_bld(a,sv%fill_in,sv%inv_fill,&
        & sv%l,sv%d,sv%u,desc_a,info,b)    
 
 

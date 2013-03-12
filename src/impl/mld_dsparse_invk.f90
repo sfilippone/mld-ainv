@@ -32,7 +32,7 @@
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
 !!$
-subroutine mld_dsparse_invk(n,a,z,fill_in,sp_thresh,info,inlevs)
+subroutine mld_dsparse_invk(n,a,z,fill_in,info,inlevs)
   
   use psb_base_mod
   use mld_d_invk_solver, mld_protect_name => mld_dsparse_invk
@@ -41,7 +41,6 @@ subroutine mld_dsparse_invk(n,a,z,fill_in,sp_thresh,info,inlevs)
   type(psb_dspmat_type), intent(in)    :: a
   type(psb_dspmat_type), intent(inout) :: z
   integer, intent(in)                  :: fill_in
-  real(psb_dpk_), intent(in)           :: sp_thresh
   integer, intent(out)                 :: info
   integer, intent(in), optional        :: inlevs(:)
 

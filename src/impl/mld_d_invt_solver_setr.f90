@@ -57,9 +57,7 @@ subroutine mld_d_invt_solver_setr(sv,what,val,info)
   case(mld_inv_thresh_) 
     sv%inv_thresh = val
   case default
-!!$      write(0,*) name,': Error: invalid WHAT'
-!!$      info = -2
-!!$      goto 9999
+    call sv%mld_d_base_solver_type%set(what,val,info)
   end select
 
   call psb_erractionrestore(err_act)

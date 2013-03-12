@@ -8,10 +8,10 @@ NONE                     Renum
 2000                     MAXIT
 -001                     ITRACE
 02                       IRST    restart for RGMRES  and BiCGSTABL
-AINV                     AINV variant: AINVK, AINVT, AORTH
-04                       Direct fill
+INVT                     AINV variant: AINVK, AINVT, AORTH
+01                       Direct fill
 02                       Inverse fill
 1.d-2		         Threshold
 1.d-2                    Inverse threshold
-LLK                         AORTH variant: 13,14,15,16, 17, 18
+LLK                      AORTH variant: 13,14,15,16, 17, 18
 

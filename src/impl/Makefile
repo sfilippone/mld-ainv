@@ -16,9 +16,8 @@ mld_d_invk_solver_check.o \
 mld_d_invk_solver_descr.o \
 mld_d_invk_solver_dmp.o \
 mld_d_invk_solver_free.o \
-mld_d_invk_solver_setc.o \
 mld_d_invk_solver_seti.o \
-mld_d_invk_solver_setr.o \
+mld_d_invk_solver_cseti.o \
 mld_d_invt_solver_apply.o \
 mld_d_invt_solver_apply_vect.o \
 mld_d_invt_solver_bld.o \
@@ -26,9 +25,10 @@ mld_d_invt_solver_check.o \
 mld_d_invt_solver_descr.o \
 mld_d_invt_solver_dmp.o \
 mld_d_invt_solver_free.o \
-mld_d_invt_solver_setc.o \
 mld_d_invt_solver_seti.o \
 mld_d_invt_solver_setr.o \
+mld_d_invt_solver_cseti.o \
+mld_d_invt_solver_csetr.o \
 mld_d_ainv_solver_apply.o \
 mld_d_ainv_solver_apply_vect.o \
 mld_d_ainv_solver_bld.o \
