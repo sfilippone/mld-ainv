@@ -112,7 +112,7 @@ program ppde2d
   integer, allocatable :: perm(:)
 
   ! other variables
-  logical            :: pdump=.true.
+  logical            :: pdump=.false.
   integer            :: info, i
   character(len=20)  :: name,ch_err
   character(len=40)  :: fname
