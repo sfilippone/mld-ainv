@@ -53,7 +53,12 @@ mld_d_invt_inv.o \
 mld_d_invt_bld.o \
 mld_dsparse_invk.o \
 mld_dsparse_invt.o \
-mld_d_biconjg_impl.o
+mld_dsparse_biconjg_llk.o \
+mld_dsparse_biconjg_llk_noth.o \
+mld_dsparse_biconjg_s_ft_llk.o \
+mld_dsparse_biconjg_s_llk.o
+
+#mld_d_biconjg_impl.o
 
 
 OBJS=$(F90OBJS) 
