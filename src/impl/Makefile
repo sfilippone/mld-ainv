@@ -53,6 +53,7 @@ mld_d_invt_inv.o \
 mld_d_invt_bld.o \
 mld_dsparse_invk.o \
 mld_dsparse_invt.o \
+mld_dsparse_tuma_sainv.o \
 mld_dsparse_biconjg_llk.o \
 mld_dsparse_biconjg_llk_noth.o \
 mld_dsparse_biconjg_s_ft_llk.o \
