@@ -272,33 +272,6 @@ AC_MSG_RESULT(no)
 )
 ]
 )
-dnl @synopsis PAC_ARG_WITH_MLD2P4
-dnl
-dnl Test for --with-mld2p4="pathname".
-dnl 
-dnl Defines the path to MLD2P4 install dir.
-dnl
-dnl note: Renamed after PAC_ARG_WITH_LIBS as in the Trilinos package.
-dnl
-dnl Example use:
-dnl
-dnl PAC_ARG_WITH_MLD2P4
-dnl 
-dnl tests for --with-mld2p4 and pre-pends to MLD2P4_PATH
-dnl
-dnl @author Salvatore Filippone <salvatore.filippone@uniroma2.it>
-dnl
-AC_DEFUN([PAC_ARG_WITH_MLD2P4],
-[
-AC_ARG_WITH(mld2p4,
-AC_HELP_STRING([--with-mld2p4], [The directory for MLD2P4, for example,
- --with-mld2p4=/opt/packages/mld2p4-2.0]),
-[pac_cv_mld2p4_dir=$withval],
-[pac_cv_mld2p4_dir=''])
-]
-)
-
-
 
 dnl @synopsis PAC_ARG_SERIAL_MPI
 dnl
@@ -329,6 +302,33 @@ else
  pac_cv_serial_mpi="no";
  AC_MSG_RESULT([no.])
 fi
+]
+)
+
+
+dnl @synopsis PAC_ARG_WITH_MLD2P4
+dnl
+dnl Test for --with-mld2p4="pathname".
+dnl 
+dnl Defines the path to MLD2P4 install dir.
+dnl
+dnl note: Renamed after PAC_ARG_WITH_LIBS as in the Trilinos package.
+dnl
+dnl Example use:
+dnl
+dnl PAC_ARG_WITH_MLD2P4
+dnl 
+dnl tests for --with-mld2p4 and pre-pends to MLD2P4_PATH
+dnl
+dnl @author Salvatore Filippone <salvatore.filippone@uniroma2.it>
+dnl
+AC_DEFUN([PAC_ARG_WITH_MLD2P4],
+[
+AC_ARG_WITH(mld2p4,
+AC_HELP_STRING([--with-mld2p4], [The directory for MLD2P4, for example,
+ --with-mld2p4=/opt/packages/mld2p4-2.0]),
+[pac_cv_mld2p4_dir=$withval],
+[pac_cv_mld2p4_dir=''])
 ]
 )
 
@@ -380,6 +380,87 @@ ifelse([$2], , , [  rm -rf conftest*
 fi
 cd ..
 rm -fr tmpdir_$i])g
+
+
+dnl @synopsis PAC_ARG_WITH_AINV
+dnl
+dnl Test for --with-ainv="pathname".
+dnl 
+dnl Defines the path to AINV install dir.
+dnl
+dnl note: Renamed after PAC_ARG_WITH_LIBS as in the Trilinos package.
+dnl
+dnl Example use:
+dnl
+dnl PAC_ARG_WITH_AINV
+dnl 
+dnl tests for --with-ainv and pre-pends to AINV_PATH
+dnl
+dnl @author Salvatore Filippone <salvatore.filippone@uniroma2.it>
+dnl
+AC_DEFUN([PAC_ARG_WITH_AINV],
+[
+AC_ARG_WITH(ainv,
+AC_HELP_STRING([--with-ainv], [Where to find  AINV, for example,
+ --with-ainv=/opt/packages/ainv or
+ --with-ainv="-lainv -LAINVDIR"]),
+[pac_cv_ainv=$withval],
+[pac_cv_ainv=''])
+])
+
+
+dnl @synopsis PAC_FORTRAN_HAVE_AINV( [ACTION-IF-FOUND [, ACTION-IF-NOT-FOUND]])
+dnl
+dnl Will try to compile and link a program using the AINV library
+dnl
+dnl Will use MPIFC, otherwise '$FC'.
+dnl
+dnl If the test passes, will execute ACTION-IF-FOUND. Otherwise, ACTION-IF-NOT-FOUND.
+dnl
+dnl @author Michele Martone <michele.martone@uniroma2.it>
+dnl
+AC_DEFUN(PAC_FORTRAN_HAVE_AINV,
+ac_objext='.o'
+ac_ext='f90'
+ac_compile='${MPIFC-$FC} -c -o conftest${ac_objext} $FMFLAG$PSBLAS_DIR/include $FMFLAG$PSBLAS_DIR/lib conftest.$ac_ext  1>&5'
+ac_link='${MPIFC-$FC} -o conftest${ac_exeext} $FCFLAGS $LDFLAGS conftest.$ac_ext $LIBS 1>&5'
+dnl Warning : square brackets are EVIL!
+[AC_MSG_CHECKING([for working version of AINV])
+cat > conftest.$ac_ext <<EOF
+        program test_ainvsr2
+          call ainvsr2
+        end 
+EOF
+if test "x$pac_cv_ainv" != "x" ; then 	 
+  case $pac_cv_ainv in
+        yes | "") ;;
+        no) pac_ainv_ok=disable ;;
+        -* | */* | *.a | *.so | *.so.* | *.o) AINV_LIBS="$with_ainv" ;;
+        *) AINV_LIBS="-l$with_ainv" ;;
+  esac
+fi
+save_LIBS="$LIBS"; 
+if test "x$AINV_LIBS" != x; then
+       LIBS="$AINV_LIBS $LIBS $FLIBS"
+fi
+if AC_TRY_EVAL(ac_link) && test -s conftest${ac_exeext}; then
+  AC_MSG_RESULT([yes.])
+  ifelse([$1], , :, [rm -rf conftest*
+  $1])
+else
+  AC_MSG_RESULT([no.])
+  echo "configure: failed program was:" >&AC_FD_CC
+  cat conftest.$ac_ext >&AC_FD_CC
+ifelse([$2], , , [  rm -rf conftest*
+  $2
+])dnl
+fi
+rm -f conftest*
+LIBS="$save_LIBS"
+])
+
+
+
 
 dnl @synopsis PAC_FORTRAN_TEST_TR15581( [ACTION-IF-FOUND [, ACTION-IF-NOT-FOUND]])
 dnl

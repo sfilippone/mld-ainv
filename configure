@@ -605,8 +605,8 @@ ac_subst_vars='am__EXEEXT_FALSE
 am__EXEEXT_TRUE
 LTLIBOBJS
 LIBOBJS
-SAINV_LIBS
-SAINV_DEFS
+EXT_AINV_LIBS
+EXT_AINV_DEFS
 CDEFINES
 FDEFINES
 INSTALL_DOCSDIR
@@ -709,6 +709,7 @@ with_mld2p4
 with_libs
 enable_serial
 enable_dependency_tracking
+with_ainv
 '
       ac_precious_vars='build_alias
 host_alias
@@ -1364,6 +1365,9 @@ Optional Packages:
   --with-libs             List additional link flags here. For example,
                           --with-libs=-lspecial_system_lib or
                           --with-libs=-L/path/to/libs
+  --with-ainv             Where to find AINV, for example,
+                          --with-ainv=/opt/packages/ainv or
+                          --with-ainv="-lainv -LAINVDIR"
 
 Some influential environment variables:
   FC          Fortran compiler command
@@ -6101,15 +6105,74 @@ else
   echo "configure: failed program was:" >&5
   cat conftest.$ac_ext >&5
   rm -rf conftest*
-  { { $as_echo "$as_me:$LINENO: error: no.
-  Could not find working version of MLD2P4." >&5
-$as_echo "$as_me: error: no.
-  Could not find working version of MLD2P4." >&2;}
+  { { $as_echo "$as_me:$LINENO: error: no. Could not find working version of MLD2P4." >&5
+$as_echo "$as_me: error: no. Could not find working version of MLD2P4." >&2;}
    { (exit 1); exit 1; }; }
+
 fi
 cd ..
 rm -fr tmpdir_$i
 
+
+
+# Check whether --with-ainv was given.
+if test "${with_ainv+set}" = set; then
+  withval=$with_ainv; pac_cv_ainv=$withval
+else
+  pac_cv_ainv=''
+fi
+
+
+
+ac_objext='.o'
+ac_ext='f90'
+ac_compile='${MPIFC-$FC} -c -o conftest${ac_objext} $FMFLAG$PSBLAS_DIR/include $FMFLAG$PSBLAS_DIR/lib conftest.$ac_ext  1>&5'
+ac_link='${MPIFC-$FC} -o conftest${ac_exeext} $FCFLAGS $LDFLAGS conftest.$ac_ext $LIBS 1>&5'
+{ $as_echo "$as_me:$LINENO: checking for working version of AINV" >&5
+$as_echo_n "checking for working version of AINV... " >&6; }
+cat > conftest.$ac_ext <<EOF
+        program test_ainvsr2
+          call ainvsr2
+        end
+EOF
+if test "x$pac_cv_ainv" != "x" ; then
+  case $pac_cv_ainv in
+        yes | "") ;;
+        no) pac_ainv_ok=disable ;;
+        -* | */* | *.a | *.so | *.so.* | *.o) AINV_LIBS="$with_ainv" ;;
+        *) AINV_LIBS="-l$with_ainv" ;;
+  esac
+fi
+save_LIBS="$LIBS";
+if test "x$AINV_LIBS" != x; then
+       LIBS="$AINV_LIBS $LIBS $FLIBS"
+fi
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>&5
+  ac_status=$?
+  $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && test -s conftest${ac_exeext}; then
+  { $as_echo "$as_me:$LINENO: result: yes." >&5
+$as_echo "yes." >&6; }
+  rm -rf conftest*
+  mld_ainv_ext_sainv="yes"
+else
+  { $as_echo "$as_me:$LINENO: result: no." >&5
+$as_echo "no." >&6; }
+  echo "configure: failed program was:" >&5
+  cat conftest.$ac_ext >&5
+  rm -rf conftest*
+  mld_ainv_ext_sainv="no"
+
+fi
+rm -f conftest*
+LIBS="$save_LIBS"
+
+
+if test "X$mld_ainv_ext_sainv" == "Xyes" ; then
+   EXT_AINV_DEFS="$psblas_cv_define_prepend-DHAVE_TUMA_SAINV";
+   EXT_AINV_LIBS="$AINV_LIBS";
+fi
 
 
 ###############################################################################

@@ -263,10 +263,20 @@ FIFLAG=-I
 #		The same for pg (Portland Group compilers).
 ###############################################################################
 
-PAC_FORTRAN_HAVE_MLD2P4([AC_MSG_RESULT([yes.])],[AC_MSG_ERROR([no.
-  Could not find working version of MLD2P4.])])
+PAC_FORTRAN_HAVE_MLD2P4([AC_MSG_RESULT([yes.])],
+	[AC_MSG_ERROR([no. Could not find working version of MLD2P4.])]
+)
 
-dnl PAC_CHECK_AINV
+PAC_ARG_WITH_AINV
+
+PAC_FORTRAN_HAVE_AINV([mld_ainv_ext_sainv="yes"],
+	[mld_ainv_ext_sainv="no"]
+)
+
+if test "X$mld_ainv_ext_sainv" == "Xyes" ; then
+   EXT_AINV_DEFS="$psblas_cv_define_prepend-DHAVE_TUMA_SAINV";
+   EXT_AINV_LIBS="$AINV_LIBS";
+fi
 
 
 ###############################################################################
@@ -282,8 +292,8 @@ AC_SUBST(INSTALL_INCLUDEDIR)
 AC_SUBST(INSTALL_DOCSDIR)
 AC_SUBST(FDEFINES)
 AC_SUBST(CDEFINES)
-AC_SUBST(SAINV_DEFS)
-AC_SUBST(SAINV_LIBS)
+AC_SUBST(EXT_AINV_DEFS)
+AC_SUBST(EXT_AINV_LIBS)
 
 
 
