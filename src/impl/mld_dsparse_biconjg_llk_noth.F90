@@ -38,7 +38,7 @@ subroutine mld_dsparse_biconjg_llk_noth(n,a,p,z,w,nzrmax,sp_thresh,info)
   use mld_d_biconjg_mod, mld_protect_name => mld_dsparse_biconjg_llk_noth
 
   !
-  ! Left-looking variant
+  ! Left-looking variant, with NO drop rule on p(i)/p(j)
   !
   !
   implicit none 

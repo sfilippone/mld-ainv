@@ -7502,13 +7502,13 @@ fi
 
 { $as_echo "$as_me:$LINENO:
 	${PACKAGE_NAME} ${mld_ainv_cv_version} has been configured as follows:
-	EXT_AINV = ${EXT_AINV}
+	EXT_AINV = ${EXT_AINV_LIBS}
 	If you are satisfied, run 'make' to build ${PACKAGE_NAME} and its documentation; otherwise
 	type  ./configure --help=short for a complete list of configure options specific to ${PACKAGE_NAME}.
 " >&5
 $as_echo "$as_me:
 	${PACKAGE_NAME} ${mld_ainv_cv_version} has been configured as follows:
-	EXT_AINV = ${EXT_AINV}
+	EXT_AINV = ${EXT_AINV_LIBS}
 	If you are satisfied, run 'make' to build ${PACKAGE_NAME} and its documentation; otherwise
 	type  ./configure --help=short for a complete list of configure options specific to ${PACKAGE_NAME}.
 " >&6;}

@@ -38,7 +38,8 @@ subroutine mld_dsparse_biconjg_s_ft_llk(n,a,p,z,w,nzrmax,sp_thresh,info)
   use mld_d_biconjg_mod, mld_protect_name => mld_dsparse_biconjg_s_ft_llk
 
   !
-  ! Left-looking variant
+  ! Left-looking variant, stabilized i.e. product by A is applied
+  ! to compute the diagonal elements. 
   !
   !
   implicit none 
