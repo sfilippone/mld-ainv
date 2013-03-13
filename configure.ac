@@ -309,7 +309,7 @@ AC_OUTPUT()
 dnl Please note that brackets around variable identifiers are absolutely needed for compatibility..
 AC_MSG_NOTICE([
 	${PACKAGE_NAME} ${mld_ainv_cv_version} has been configured as follows:
-	EXT_AINV = ${EXT_AINV}
+	EXT_AINV = ${EXT_AINV_LIBS}
 	If you are satisfied, run 'make' to build ${PACKAGE_NAME} and its documentation; otherwise
 	type  ./configure --help=short for a complete list of configure options specific to ${PACKAGE_NAME}.
 dnl	To install the program and its documentation, run 'make install' if you are root,
