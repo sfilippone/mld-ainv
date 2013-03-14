@@ -9,8 +9,10 @@ submitted to SIAM J. Sci. Comp.
 
 PREREQUISITES
 
-To build this code you need to have PSBLAS 3.0.2 or later and MLD2P4
-2.0-beta or later, together with their prerequisites. 
+To build this code you need to have PSBLAS 3.0.2 or later from
+http://www.ce.uniroma2.it/psblas,  and MLD2P4
+2.0-beta or later from http://www.mld2p4.it, together with their
+prerequisites.  
 
 We provide an interface to the AINV code by M. Tuma, and specifically
 the code for sainvsr
