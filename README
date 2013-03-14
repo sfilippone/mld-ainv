@@ -1,0 +1,35 @@
+This is the AINV  plugin for MLD2P4 2, version 1.0-beta.
+
+
+The algorithms are described in
+D. Bertaccini, S. Filippone
+Sparse Approximate Inverse Preconditioners on High Performance GPU Platforms
+submitted to SIAM J. Sci. Comp. 
+
+
+PREREQUISITES
+
+To build this code you need to have PSBLAS 3.0.2 or later and MLD2P4
+2.0-beta or later, together with their prerequisites. 
+
+We provide an interface to the AINV code by M. Tuma, and specifically
+the code for sainvsr
+http://www2.cs.cas.cz/~tuma/sparslab/sainvsr.tar.gz
+to enable you have to download the code from Tuma's website and unpack
+it. The sainvsr_driver.F file contains all the code for the ainvsr2
+method, together with a  sample main program; you have to take out the
+main program and compile ainvsr2 with all its support subroutines. 
+
+
+INSTALLING
+
+./configure --prefix=/path/to/install \
+            --with-mld2p4=/path/to/MLD2P4 \
+	    --with-ainv=/TUMA/ainv/install_file
+
+make;
+make install
+
+
+
+Contact: Salvatore Filippone     salvatore.filippone@uniroma2.it
