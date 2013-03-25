@@ -35,7 +35,7 @@
 subroutine mld_d_base_ainv_solver_dmp(sv,ictxt,level,info,prefix,head,solver)
   
   use psb_base_mod
-  use mld_base_ainv_mod, mld_protect_name => mld_d_base_ainv_solver_dmp
+  use mld_d_base_ainv_mod, mld_protect_name => mld_d_base_ainv_solver_dmp
   implicit none 
   class(mld_d_base_ainv_solver_type), intent(in) :: sv
   integer, intent(in)              :: ictxt,level

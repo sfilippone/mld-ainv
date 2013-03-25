@@ -34,7 +34,7 @@
 !!$
 subroutine mld_dsparse_biconjg_s_ft_llk(n,a,p,z,w,nzrmax,sp_thresh,info)
   use psb_base_mod
-  use mld_base_ainv_mod
+  use mld_d_base_ainv_mod
   use mld_d_biconjg_mod, mld_protect_name => mld_dsparse_biconjg_s_ft_llk
 
   !

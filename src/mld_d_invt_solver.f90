@@ -40,7 +40,7 @@
 module mld_d_invt_solver
 
   use mld_d_base_solver_mod
-  use mld_base_ainv_mod 
+  use mld_d_base_ainv_mod 
   use psb_base_mod, only : psb_d_vect_type
 
   type, extends(mld_d_base_solver_type) :: mld_d_invt_solver_type

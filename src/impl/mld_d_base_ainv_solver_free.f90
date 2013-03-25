@@ -35,7 +35,7 @@
 subroutine mld_d_base_ainv_solver_free(sv,info)
   
   use psb_base_mod
-  use mld_base_ainv_mod, mld_protect_name => mld_d_base_ainv_solver_free
+  use mld_d_base_ainv_mod, mld_protect_name => mld_d_base_ainv_solver_free
 
   Implicit None
 
