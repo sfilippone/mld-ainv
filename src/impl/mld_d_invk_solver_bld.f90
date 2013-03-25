@@ -67,13 +67,13 @@ subroutine mld_d_invk_solver_bld(a,desc_a,sv,upd,info,b,amold,vmold)
 
 
   call mld_invk_bld(a,sv%fill_in,sv%inv_fill,&
-       & sv%l,sv%d,sv%u,desc_a,info,b)    
+       & sv%w,sv%d,sv%z,desc_a,info,b)    
 
 
   if ((info == psb_success_) .and.present(amold)) then 
-    call sv%l%cscnv(info,mold=amold)
+    call sv%w%cscnv(info,mold=amold)
     if (info == psb_success_) &
-         & call sv%u%cscnv(info,mold=amold)
+         & call sv%z%cscnv(info,mold=amold)
   end if
 
   if (info == psb_success_) then 
