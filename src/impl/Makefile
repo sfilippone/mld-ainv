@@ -9,33 +9,21 @@ HERE=..
 FINCLUDES=$(FMFLAG).. $(FMFLAG)$(LIBDIR) $(FMFLAG)$(MLDINCDIR)  $(FMFLAG)$(PSBINCDIR) 
 
 
-F90OBJS=mld_d_invk_solver_apply.o \
-mld_d_invk_solver_apply_vect.o \
-mld_d_invk_solver_bld.o \
+F90OBJS=mld_d_invk_solver_bld.o \
 mld_d_invk_solver_check.o \
 mld_d_invk_solver_descr.o \
-mld_d_invk_solver_dmp.o \
-mld_d_invk_solver_free.o \
 mld_d_invk_solver_seti.o \
 mld_d_invk_solver_cseti.o \
-mld_d_invt_solver_apply.o \
-mld_d_invt_solver_apply_vect.o \
 mld_d_invt_solver_bld.o \
 mld_d_invt_solver_check.o \
 mld_d_invt_solver_descr.o \
-mld_d_invt_solver_dmp.o \
-mld_d_invt_solver_free.o \
 mld_d_invt_solver_seti.o \
 mld_d_invt_solver_setr.o \
 mld_d_invt_solver_cseti.o \
 mld_d_invt_solver_csetr.o \
-mld_d_ainv_solver_apply.o \
-mld_d_ainv_solver_apply_vect.o \
 mld_d_ainv_solver_bld.o \
 mld_d_ainv_solver_check.o \
 mld_d_ainv_solver_descr.o \
-mld_d_ainv_solver_dmp.o \
-mld_d_ainv_solver_free.o \
 mld_d_ainv_solver_setc.o \
 mld_d_ainv_solver_seti.o \
 mld_d_ainv_solver_setr.o \
@@ -57,7 +45,12 @@ mld_dsparse_tuma_sainv.o \
 mld_dsparse_biconjg_llk.o \
 mld_dsparse_biconjg_llk_noth.o \
 mld_dsparse_biconjg_s_ft_llk.o \
-mld_dsparse_biconjg_s_llk.o
+mld_dsparse_biconjg_s_llk.o \
+mld_d_base_ainv_solver_apply.o \
+mld_d_base_ainv_solver_apply_vect.o \
+mld_d_base_ainv_solver_dmp.o \
+mld_d_base_ainv_solver_free.o
+
 
 #mld_d_biconjg_impl.o
 

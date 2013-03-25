@@ -1,7 +1,7 @@
   
   subroutine mld_dsparse_tuma_sainv(n,a,p,z,w,nzrmax,sp_thresh,info)
     use psb_base_mod
-    use mld_base_ainv_mod
+    use mld_d_base_ainv_mod
     ! Interface to TUMA's code
       !
     implicit none 

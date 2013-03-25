@@ -40,27 +40,20 @@
 module mld_d_ainv_solver
 
   use mld_d_prec_type
-  use mld_base_ainv_mod 
+  use mld_d_base_ainv_mod 
   use psb_base_mod, only : psb_d_vect_type
 
-  type, extends(mld_d_base_solver_type) :: mld_d_ainv_solver_type
+  type, extends(mld_d_base_ainv_solver_type) :: mld_d_ainv_solver_type
     ! 
     !  Compute an approximate factorization
     !      A^-1 = Z D^-1 W^T
     !  Note that here W is going to be transposed explicitly,
     !  so that the component w will in the end contain W^T.     
     !
-    type(psb_dspmat_type)       :: w, z
-    type(psb_d_vect_type)       :: dv
-    real(psb_dpk_), allocatable :: d(:)
     integer                     :: alg, fill_in
     real(psb_dpk_)              :: thresh
   contains
-    procedure, pass(sv) :: dump    => mld_d_ainv_solver_dmp
     procedure, pass(sv) :: build   => mld_d_ainv_solver_bld
-    procedure, pass(sv) :: apply_v => mld_d_ainv_solver_apply_vect
-    procedure, pass(sv) :: apply_a => mld_d_ainv_solver_apply
-    procedure, pass(sv) :: free    => mld_d_ainv_solver_free
     procedure, pass(sv) :: seti    => mld_d_ainv_solver_seti
     procedure, pass(sv) :: setc    => mld_d_ainv_solver_setc
     procedure, pass(sv) :: setr    => mld_d_ainv_solver_setr
@@ -68,46 +61,15 @@ module mld_d_ainv_solver
     procedure, pass(sv) :: csetc   => mld_d_ainv_solver_csetc
     procedure, pass(sv) :: csetr   => mld_d_ainv_solver_csetr
     procedure, pass(sv) :: descr   => mld_d_ainv_solver_descr
-    procedure, pass(sv) :: sizeof  => d_ainv_solver_sizeof
     procedure, pass(sv) :: default => d_ainv_solver_default
-    procedure, pass(sv) :: get_nzeros => d_ainv_get_nzeros
     procedure, nopass   :: stringval  => d_ainv_stringval
     procedure, nopass   :: algname => d_ainv_algname
   end type mld_d_ainv_solver_type
 
 
-  private :: d_ainv_solver_sizeof, d_ainv_stringval, &
-       &  d_ainv_solver_default, d_ainv_get_nzeros, &
+  private :: d_ainv_stringval, d_ainv_solver_default, &
        &  d_ainv_algname
 
-  interface 
-    subroutine mld_d_ainv_solver_apply(alpha,sv,x,beta,y,desc_data,trans,work,info)
-      import :: psb_desc_type, psb_dpk_,mld_d_ainv_solver_type
-      type(psb_desc_type), intent(in)      :: desc_data
-      class(mld_d_ainv_solver_type), intent(in) :: sv
-      real(psb_dpk_),intent(inout)         :: x(:)
-      real(psb_dpk_),intent(inout)         :: y(:)
-      real(psb_dpk_),intent(in)            :: alpha,beta
-      character(len=1),intent(in)          :: trans
-      real(psb_dpk_),target, intent(inout) :: work(:)
-      integer, intent(out)                 :: info
-    end subroutine mld_d_ainv_solver_apply
-  end interface
-
-  interface 
-    subroutine mld_d_ainv_solver_apply_vect(alpha,sv,x,beta,y,desc_data,trans,work,info)
-      import :: psb_desc_type, psb_dpk_,mld_d_ainv_solver_type, psb_d_vect_type
-      type(psb_desc_type), intent(in)      :: desc_data
-      class(mld_d_ainv_solver_type), intent(inout) :: sv
-      type(psb_d_vect_type),intent(inout)  :: x
-      type(psb_d_vect_type),intent(inout)  :: y
-      real(psb_dpk_),intent(in)            :: alpha,beta
-      character(len=1),intent(in)          :: trans
-      real(psb_dpk_),target, intent(inout) :: work(:)
-      integer, intent(out)                 :: info
-    end subroutine mld_d_ainv_solver_apply_vect
-  end interface
- 
   
   interface 
     subroutine mld_d_ainv_solver_bld(a,desc_a,sv,upd,info,b,amold,vmold)
@@ -231,19 +193,6 @@ module mld_d_ainv_solver
     end subroutine mld_d_ainv_solver_csetr
   end interface 
  
-  
-  interface
-    subroutine mld_d_ainv_solver_free(sv,info)
-      import :: psb_desc_type, psb_dspmat_type,  psb_d_base_sparse_mat, &
-           & psb_d_vect_type, psb_d_base_vect_type, psb_dpk_, mld_d_ainv_solver_type
-      Implicit None
-      
-      ! Arguments
-      class(mld_d_ainv_solver_type), intent(inout) :: sv
-      integer, intent(out)                         :: info
-    end subroutine mld_d_ainv_solver_free
-  end interface
-  
   interface
     subroutine mld_d_ainv_solver_descr(sv,info,iout,coarse)
       import :: psb_desc_type, psb_dspmat_type,  psb_d_base_sparse_mat, &
@@ -259,20 +208,6 @@ module mld_d_ainv_solver
 
     end subroutine mld_d_ainv_solver_descr
   end interface 
-  
-  interface 
-    subroutine mld_d_ainv_solver_dmp(sv,ictxt,level,info,prefix,head,solver)
-      import :: psb_desc_type, psb_dspmat_type,  psb_d_base_sparse_mat, &
-           & psb_d_vect_type, psb_d_base_vect_type, psb_dpk_, mld_d_ainv_solver_type
-      
-      implicit none 
-      class(mld_d_ainv_solver_type), intent(in) :: sv
-      integer, intent(in)              :: ictxt,level
-      integer, intent(out)             :: info
-      character(len=*), intent(in), optional :: prefix, head
-      logical, optional, intent(in)    :: solver
-    end subroutine mld_d_ainv_solver_dmp
-  end interface
   
   interface  mld_ainv_bld
     subroutine mld_d_ainv_bld(a,alg,fillin,thresh,wmat,d,zmat,desc,info,blck,iscale)
@@ -309,39 +244,6 @@ contains
 
     return
   end subroutine d_ainv_solver_default
-
-
-  function d_ainv_get_nzeros(sv) result(val)
-    use psb_base_mod, only : psb_long_int_k_
-    implicit none 
-    ! Arguments
-    class(mld_d_ainv_solver_type), intent(in) :: sv
-    integer(psb_long_int_k_) :: val
-    integer             :: i
-
-    val = 0
-    val = val + sv%dv%get_nrows()
-    val = val + sv%w%get_nzeros()
-    val = val + sv%z%get_nzeros()
-
-    return
-  end function d_ainv_get_nzeros
-
-  function d_ainv_solver_sizeof(sv) result(val)
-    use psb_base_mod, only : psb_long_int_k_
-    implicit none 
-    ! Arguments
-    class(mld_d_ainv_solver_type), intent(in) :: sv
-    integer(psb_long_int_k_) :: val
-    integer             :: i
-
-    val = 2*psb_sizeof_int + psb_sizeof_dp
-    val = val + sv%dv%sizeof()
-    val = val + sv%w%sizeof()
-    val = val + sv%z%sizeof()
-    
-    return
-  end function d_ainv_solver_sizeof
 
   function d_ainv_stringval(string) result(val)
     use psb_base_mod, only : psb_ipk_,psb_toupper
