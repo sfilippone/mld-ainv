@@ -11,7 +11,7 @@ ML                          ! Preconditioner NONE  JACOBI  BJAC  AS ML
 1                           ! Number of overlap layers AS preconditioner at finest level
 HALO                        ! Restriction operator NONE HALO 
 NONE                        ! Prolongation operator NONE SUM AVG
-AORTH                       ! Subdomain solver DSCALE ILU MILU ILUT UMF SLU 
+AINV                        ! Subdomain solver DSCALE ILU MILU ILUT UMF SLU 
 5                           ! Level-set N for ILU(N)
 1.d-2                       ! Threshold T for ILU(T,P) 
 1                           ! Smoother/Jacobi  sweeps 
