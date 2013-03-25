@@ -24,22 +24,20 @@ subroutine mld_d_base_ainv_update_a(sv,x,desc_data,info)
   end if
   
   ee = x(1:size(dd))
-  ! Now compute the update
   call sv%z%cp_to(ac)
   call sv%w%cp_to(ar)
   ! Compute diag(W ee Z)
-  ! ee Z
+  ! First  ee Z
   call ac%scal(ee,info,side='L')
-  ! Compute diag(W ee Z)
+  ! Then  diag(W (ee Z))
   do i=1,ar%get_nrows()
-    ir  = ar%irp(i)
-    nzr = ar%irp(i+1)-ar%irp(i)
-    ic  = ac%icp(i)
-    nzc = ac%icp(i+1)-ac%icp(i)
-    ee(i) = psb_spdot_srtd(nzr,ar%ja(ir:ir+nzr-1),ar%val(ir:ir+nzr-1),&
+    ir  = ar%irp(i);  nzr = ar%irp(i+1)-ar%irp(i)
+    ic  = ac%icp(i);  nzc = ac%icp(i+1)-ac%icp(i)
+    ee(i) = psb_spdot_srtd(&
+         & nzr,ar%ja(ir:ir+nzr-1),ar%val(ir:ir+nzr-1),&
          & nzc,ac%ia(ic:ic+nzc-1),ac%val(ic:ic+nzc-1))    
   end do
-  ! Need to invert
+  ! Now invert diagonal 
   dd = done/dd
   dd = dd + ee
   dd = done/dd
