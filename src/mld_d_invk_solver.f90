@@ -47,6 +47,7 @@ module mld_d_invk_solver
   type, extends(mld_d_base_ainv_solver_type) :: mld_d_invk_solver_type
     integer                     :: fill_in, inv_fill
   contains
+    procedure, pass(sv) :: clone   => mld_d_invk_solver_clone
     procedure, pass(sv) :: build   => mld_d_invk_solver_bld
     procedure, pass(sv) :: seti    => mld_d_invk_solver_seti
     procedure, pass(sv) :: cseti   => mld_d_invk_solver_cseti
@@ -57,6 +58,18 @@ module mld_d_invk_solver
 
   private ::  d_invk_solver_default
 
+
+  interface 
+    subroutine mld_d_invk_solver_clone(sv,svout,info)
+      import :: psb_desc_type, psb_dspmat_type,  psb_d_base_sparse_mat, &
+       & mld_d_base_solver_type, psb_dpk_, mld_d_invk_solver_type, psb_ipk_
+      Implicit None
+      class(mld_d_invk_solver_type), intent(inout)              :: sv
+      class(mld_d_base_solver_type), allocatable, intent(inout) :: svout
+      integer(psb_ipk_), intent(out)                            :: info
+    end subroutine mld_d_invk_solver_clone
+  end interface
+  
   interface 
     subroutine mld_d_invk_solver_bld(a,desc_a,sv,upd,info,b,amold,vmold)
       import :: psb_desc_type, psb_dspmat_type,  psb_d_base_sparse_mat, &

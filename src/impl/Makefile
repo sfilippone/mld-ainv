@@ -14,6 +14,7 @@ mld_d_invk_solver_check.o \
 mld_d_invk_solver_descr.o \
 mld_d_invk_solver_seti.o \
 mld_d_invk_solver_cseti.o \
+mld_d_invk_solver_clone.o \
 mld_d_invt_solver_bld.o \
 mld_d_invt_solver_check.o \
 mld_d_invt_solver_descr.o \
@@ -21,6 +22,7 @@ mld_d_invt_solver_seti.o \
 mld_d_invt_solver_setr.o \
 mld_d_invt_solver_cseti.o \
 mld_d_invt_solver_csetr.o \
+mld_d_invt_solver_clone.o \
 mld_d_ainv_solver_bld.o \
 mld_d_ainv_solver_check.o \
 mld_d_ainv_solver_descr.o \
@@ -30,6 +32,7 @@ mld_d_ainv_solver_setr.o \
 mld_d_ainv_solver_csetc.o \
 mld_d_ainv_solver_cseti.o \
 mld_d_ainv_solver_csetr.o \
+mld_d_ainv_solver_clone.o \
 mld_d_ainv_bld.o \
 mld_d_invk_copyin.o \
 mld_d_invk_copyout.o \

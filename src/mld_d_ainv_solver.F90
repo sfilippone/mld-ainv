@@ -54,6 +54,7 @@ module mld_d_ainv_solver
     real(psb_dpk_)              :: thresh
   contains
     procedure, pass(sv) :: build   => mld_d_ainv_solver_bld
+    procedure, pass(sv) :: clone   => mld_d_ainv_solver_clone
     procedure, pass(sv) :: seti    => mld_d_ainv_solver_seti
     procedure, pass(sv) :: setc    => mld_d_ainv_solver_setc
     procedure, pass(sv) :: setr    => mld_d_ainv_solver_setr
@@ -70,6 +71,17 @@ module mld_d_ainv_solver
   private :: d_ainv_stringval, d_ainv_solver_default, &
        &  d_ainv_algname
 
+  interface 
+    subroutine mld_d_ainv_solver_clone(sv,svout,info)
+      import :: psb_desc_type, psb_dspmat_type,  psb_d_base_sparse_mat, &
+       & mld_d_base_solver_type, psb_dpk_, mld_d_ainv_solver_type, psb_ipk_
+      Implicit None
+      class(mld_d_ainv_solver_type), intent(inout)              :: sv
+      class(mld_d_base_solver_type), allocatable, intent(inout) :: svout
+      integer(psb_ipk_), intent(out)                            :: info
+    end subroutine mld_d_ainv_solver_clone
+  end interface
+  
   
   interface 
     subroutine mld_d_ainv_solver_bld(a,desc_a,sv,upd,info,b,amold,vmold)
