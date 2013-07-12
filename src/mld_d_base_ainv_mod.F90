@@ -89,7 +89,7 @@ module mld_d_base_ainv_mod
     subroutine mld_d_base_ainv_solver_apply(alpha,sv,x,beta,y,desc_data,trans,work,info)
       import :: psb_desc_type, psb_dpk_,mld_d_base_ainv_solver_type
       type(psb_desc_type), intent(in)      :: desc_data
-      class(mld_d_base_ainv_solver_type), intent(in) :: sv
+      class(mld_d_base_ainv_solver_type), intent(inout) :: sv
       real(psb_dpk_),intent(inout)         :: x(:)
       real(psb_dpk_),intent(inout)         :: y(:)
       real(psb_dpk_),intent(in)            :: alpha,beta
@@ -339,26 +339,19 @@ contains
 
 
     info = psb_success_
-!!$    if (nz <= nzrmax) return 
-!!$    write(0,*) 'sp_drop start',nz
-!!$    write(0,*) 'sp_drop start',nz,size(iz),size(valz)
 
     if (nz > min(size(iz),size(valz))) then 
       write(0,*) 'Serious size problem ',nz,size(iz),size(valz)
       info = -2
       return
     end if
-!!$    write(0,*) 'sp_drop allocation',nz
     allocate(xw(nz),xwid(nz),indx(nz),stat=info) 
-!!$    write(0,*) 'sp_drop allocation',nz,info
     if (info /= psb_success_) then 
       write(psb_err_unit,*) ' Memory allocation failure in sp_drop',nz,info
       return
     endif
 
     ! Always keep the diagonal element
-!!$    write(0,*) 'sp_drop looking for diag ',idiag
-!!$    call flush(0)
     idf = -1 
     do i=1, nz
       if (iz(i) == idiag) then 
@@ -372,7 +365,6 @@ contains
         exit
       end if
     end do
-!!$    write(0,*) 'sp_drop diag found :',idf
 
     if (idf == -1) then
 
@@ -382,7 +374,6 @@ contains
         xwid(i) = iz(indx(i))
       end do
       nw = min(nz,nzrmax)
-!!$      write(0,*) nw,sp_thresh,' Values before drop:',xw(1:nw)
       do 
         if (nw <= 1) exit
         if (abs(xw(nw)) < sp_thresh) then 
@@ -392,7 +383,6 @@ contains
         end if
       end do
       nw = max(nw, 1)
-!!$      write(0,*) nw,sp_thresh,' Values after drop:',xw(1:nw)
 
     else
 
@@ -402,7 +392,6 @@ contains
 
       call psb_qsort(xw(1:nw),indx(1:nw),dir=psb_asort_down_)
       nw = min(nw,nzrmax-1)
-!!$      write(0,*) nw,sp_thresh,' Values before drop:',xw(1:nw)
       do 
         if (nw <= 1) exit
         if (abs(xw(nw)) < sp_thresh) then 
@@ -411,7 +400,6 @@ contains
           exit
         end if
       end do
-!!$      write(0,*) nw,sp_thresh,' Values after drop:',xw(1:nw)
 
       do i=1, nw
         xwid(i) = iz(1+indx(i))
@@ -420,10 +408,8 @@ contains
       xw(nw)   = valz(1)
       xwid(nw) = iz(1)
     end if
-!!$    write(0,*) 'sp_drop into msort ',nw,xwid(1:nw),indx(1:nw)
 
     call psb_msort(xwid(1:nw),indx(1:nw),dir=psb_sort_up_)
-!!$    write(0,*) 'sp_drop done msort ',nw
     
     do i=1, nw
       valz(i) = xw(indx(i))
@@ -436,7 +422,6 @@ contains
       write(psb_err_unit,*) ' Memory deallocation failure in sp_drop',info
       return
     endif
-!!$    call flush(0)
     return
   end subroutine d_sp_drop
 

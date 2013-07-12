@@ -38,7 +38,7 @@ subroutine mld_d_base_ainv_solver_apply(alpha,sv,x,beta,y,desc_data,trans,work,i
   use mld_d_base_ainv_mod, mld_protect_name => mld_d_base_ainv_solver_apply
   implicit none 
   type(psb_desc_type), intent(in)      :: desc_data
-  class(mld_d_base_ainv_solver_type), intent(in) :: sv
+  class(mld_d_base_ainv_solver_type), intent(inout) :: sv
   real(psb_dpk_),intent(inout)         :: x(:)
   real(psb_dpk_),intent(inout)         :: y(:)
   real(psb_dpk_),intent(in)            :: alpha,beta

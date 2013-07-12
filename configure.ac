@@ -267,9 +267,9 @@ PAC_FORTRAN_HAVE_MLD2P4([AC_MSG_RESULT([yes.])],
 	[AC_MSG_ERROR([no. Could not find working version of MLD2P4.])]
 )
 
-PAC_ARG_WITH_AINV
+PAC_ARG_WITH_SAINV
 
-PAC_FORTRAN_HAVE_AINV([mld_ainv_ext_sainv="yes"],
+PAC_FORTRAN_HAVE_SAINV([mld_ainv_ext_sainv="yes"],
 	[mld_ainv_ext_sainv="no"]
 )
 

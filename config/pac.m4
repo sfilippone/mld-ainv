@@ -382,34 +382,34 @@ cd ..
 rm -fr tmpdir_$i])g
 
 
-dnl @synopsis PAC_ARG_WITH_AINV
+dnl @synopsis PAC_ARG_WITH_SAINV
 dnl
-dnl Test for --with-ainv="pathname".
+dnl Test for --with-sainv="pathname".
 dnl 
-dnl Defines the path to AINV install dir.
+dnl Defines the path to SAINV install dir.
 dnl
 dnl note: Renamed after PAC_ARG_WITH_LIBS as in the Trilinos package.
 dnl
 dnl Example use:
 dnl
-dnl PAC_ARG_WITH_AINV
+dnl PAC_ARG_WITH_SAINV
 dnl 
-dnl tests for --with-ainv and pre-pends to AINV_PATH
+dnl tests for --with-sainv and pre-pends to SAINV_PATH
 dnl
 dnl @author Salvatore Filippone <salvatore.filippone@uniroma2.it>
 dnl
-AC_DEFUN([PAC_ARG_WITH_AINV],
+AC_DEFUN([PAC_ARG_WITH_SAINV],
 [
 AC_ARG_WITH(ainv,
-AC_HELP_STRING([--with-ainv], [Where to find  AINV, for example,
- --with-ainv=/opt/packages/ainv or
- --with-ainv="-lainv -LAINVDIR"]),
-[pac_cv_ainv=$withval],
-[pac_cv_ainv=''])
+AC_HELP_STRING([--with-sainv], [Where to find  SAINV, for example,
+ --with-sainv=/opt/packages/sainv or
+ --with-sainv="-lsainv -LSAINVDIR"]),
+[pac_cv_sainv=$withval],
+[pac_cv_sainv=''])
 ])
 
 
-dnl @synopsis PAC_FORTRAN_HAVE_AINV( [ACTION-IF-FOUND [, ACTION-IF-NOT-FOUND]])
+dnl @synopsis PAC_FORTRAN_HAVE_SAINV( [ACTION-IF-FOUND [, ACTION-IF-NOT-FOUND]])
 dnl
 dnl Will try to compile and link a program using the AINV library
 dnl
@@ -419,29 +419,29 @@ dnl If the test passes, will execute ACTION-IF-FOUND. Otherwise, ACTION-IF-NOT-F
 dnl
 dnl @author Michele Martone <michele.martone@uniroma2.it>
 dnl
-AC_DEFUN(PAC_FORTRAN_HAVE_AINV,
+AC_DEFUN(PAC_FORTRAN_HAVE_SAINV,
 ac_objext='.o'
 ac_ext='f90'
 ac_compile='${MPIFC-$FC} -c -o conftest${ac_objext} $FMFLAG$PSBLAS_DIR/include $FMFLAG$PSBLAS_DIR/lib conftest.$ac_ext  1>&5'
 ac_link='${MPIFC-$FC} -o conftest${ac_exeext} $FCFLAGS $LDFLAGS conftest.$ac_ext $LIBS 1>&5'
 dnl Warning : square brackets are EVIL!
-[AC_MSG_CHECKING([for working version of AINV])
+[AC_MSG_CHECKING([for working version of SAINV])
 cat > conftest.$ac_ext <<EOF
         program test_ainvsr2
           call ainvsr2
         end 
 EOF
-if test "x$pac_cv_ainv" != "x" ; then 	 
-  case $pac_cv_ainv in
+if test "x$pac_cv_sainv" != "x" ; then 	 
+  case $pac_cv_sainv in
         yes | "") ;;
-        no) pac_ainv_ok=disable ;;
-        -* | */* | *.a | *.so | *.so.* | *.o) AINV_LIBS="$with_ainv" ;;
-        *) AINV_LIBS="-l$with_ainv" ;;
+        no) pac_sainv_ok=disable ;;
+        -* | */* | *.a | *.so | *.so.* | *.o) SAINV_LIBS="$with_sainv" ;;
+        *) SAINV_LIBS="-l$with_sainv" ;;
   esac
 fi
 save_LIBS="$LIBS"; 
-if test "x$AINV_LIBS" != x; then
-       LIBS="$AINV_LIBS $LIBS $FLIBS"
+if test "x$SAINV_LIBS" != x; then
+       LIBS="$SAINV_LIBS $LIBS $FLIBS"
 fi
 if AC_TRY_EVAL(ac_link) && test -s conftest${ac_exeext}; then
   AC_MSG_RESULT([yes.])
