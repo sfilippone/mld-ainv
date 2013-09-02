@@ -32,7 +32,7 @@
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
 !!$
-subroutine mld_d_invk_solver_bld(a,desc_a,sv,upd,info,b,amold,vmold)
+subroutine mld_d_invk_solver_bld(a,desc_a,sv,upd,info,b,amold,vmold,imold)
   
 
   use psb_base_mod
@@ -49,6 +49,7 @@ subroutine mld_d_invk_solver_bld(a,desc_a,sv,upd,info,b,amold,vmold)
   type(psb_dspmat_type), intent(in), target, optional :: b
   class(psb_d_base_sparse_mat), intent(in), optional  :: amold
   class(psb_d_base_vect_type), intent(in), optional   :: vmold
+  class(psb_i_base_vect_type), intent(in), optional  :: imold
 
   ! Local variables
   integer :: n_row,n_col, nrow_a, nztota

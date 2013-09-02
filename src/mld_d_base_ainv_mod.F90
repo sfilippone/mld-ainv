@@ -54,6 +54,7 @@ module mld_d_base_ainv_mod
     real(psb_dpk_), allocatable :: d(:)
 
   contains
+    procedure, pass(sv) :: cnv     => mld_d_base_ainv_solver_cnv
     procedure, pass(sv) :: dump    => mld_d_base_ainv_solver_dmp
     procedure, pass(sv) :: apply_v => mld_d_base_ainv_solver_apply_vect
     procedure, pass(sv) :: apply_a => mld_d_base_ainv_solver_apply
@@ -63,6 +64,20 @@ module mld_d_base_ainv_mod
     procedure, pass(sv) :: update_a => mld_d_base_ainv_update_a
     generic, public     :: update => update_a
   end type mld_d_base_ainv_solver_type
+
+  interface 
+    subroutine mld_d_base_ainv_solver_cnv(sv,info,amold,vmold,imold)
+      import :: psb_d_base_sparse_mat, psb_d_base_vect_type, psb_dpk_, &
+       & mld_d_base_ainv_solver_type, psb_ipk_, psb_i_base_vect_type      
+      Implicit None      
+      ! Arguments
+      class(mld_d_base_ainv_solver_type), intent(inout)  :: sv
+      integer(psb_ipk_), intent(out)                     :: info
+      class(psb_d_base_sparse_mat), intent(in), optional :: amold
+      class(psb_d_base_vect_type), intent(in), optional  :: vmold
+      class(psb_i_base_vect_type), intent(in), optional  :: imold
+    end subroutine mld_d_base_ainv_solver_cnv
+  end interface
 
   interface 
     subroutine mld_d_base_ainv_update_a(sv,x,desc_data,info)

@@ -84,9 +84,10 @@ module mld_d_ainv_solver
   
   
   interface 
-    subroutine mld_d_ainv_solver_bld(a,desc_a,sv,upd,info,b,amold,vmold)
+    subroutine mld_d_ainv_solver_bld(a,desc_a,sv,upd,info,b,amold,vmold,imold)
       import :: psb_desc_type, psb_dspmat_type,  psb_d_base_sparse_mat, &
-       & psb_d_vect_type, psb_d_base_vect_type, psb_dpk_, mld_d_ainv_solver_type
+       & psb_d_vect_type, psb_d_base_vect_type, psb_dpk_,&
+       & mld_d_ainv_solver_type, psb_i_base_vect_type
       
       Implicit None
       
@@ -99,6 +100,7 @@ module mld_d_ainv_solver
       type(psb_dspmat_type), intent(in), target, optional :: b
       class(psb_d_base_sparse_mat), intent(in), optional  :: amold
       class(psb_d_base_vect_type), intent(in), optional   :: vmold
+      class(psb_i_base_vect_type), intent(in), optional  :: imold
     end subroutine mld_d_ainv_solver_bld
   end interface
   
