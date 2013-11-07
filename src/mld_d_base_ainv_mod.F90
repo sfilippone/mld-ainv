@@ -37,20 +37,9 @@ module mld_d_base_ainv_mod
   
   use mld_base_ainv_mod
   use mld_d_prec_type
-  use psb_base_mod, only : psb_d_vect_type
+  use mld_d_ainv_tools_mod
+  use psb_base_mod, only : psb_d_vect_type, psb_dpk_,psb_long_int_k_
 
-
-  interface sp_drop
-    module procedure d_sp_drop
-  end interface
-
-  interface rwclip
-    module procedure drwclip
-  end interface
-  
-  interface sparsify
-    module procedure d_sparsify
-  end interface
   
 
   type, extends(mld_d_base_solver_type) :: mld_d_base_ainv_solver_type
@@ -65,6 +54,7 @@ module mld_d_base_ainv_mod
     real(psb_dpk_), allocatable :: d(:)
 
   contains
+    procedure, pass(sv) :: cnv     => mld_d_base_ainv_solver_cnv
     procedure, pass(sv) :: dump    => mld_d_base_ainv_solver_dmp
     procedure, pass(sv) :: apply_v => mld_d_base_ainv_solver_apply_vect
     procedure, pass(sv) :: apply_a => mld_d_base_ainv_solver_apply
@@ -74,6 +64,20 @@ module mld_d_base_ainv_mod
     procedure, pass(sv) :: update_a => mld_d_base_ainv_update_a
     generic, public     :: update => update_a
   end type mld_d_base_ainv_solver_type
+
+  interface 
+    subroutine mld_d_base_ainv_solver_cnv(sv,info,amold,vmold,imold)
+      import :: psb_d_base_sparse_mat, psb_d_base_vect_type, psb_dpk_, &
+       & mld_d_base_ainv_solver_type, psb_ipk_, psb_i_base_vect_type      
+      Implicit None      
+      ! Arguments
+      class(mld_d_base_ainv_solver_type), intent(inout)  :: sv
+      integer(psb_ipk_), intent(out)                     :: info
+      class(psb_d_base_sparse_mat), intent(in), optional :: amold
+      class(psb_d_base_vect_type), intent(in), optional  :: vmold
+      class(psb_i_base_vect_type), intent(in), optional  :: imold
+    end subroutine mld_d_base_ainv_solver_cnv
+  end interface
 
   interface 
     subroutine mld_d_base_ainv_update_a(sv,x,desc_data,info)
@@ -148,7 +152,6 @@ contains
 
 
   function d_base_ainv_get_nzeros(sv) result(val)
-    use psb_base_mod, only : psb_long_int_k_
     implicit none 
     ! Arguments
     class(mld_d_base_ainv_solver_type), intent(in) :: sv
@@ -164,7 +167,6 @@ contains
   end function d_base_ainv_get_nzeros
 
   function d_base_ainv_solver_sizeof(sv) result(val)
-    use psb_base_mod, only : psb_long_int_k_
     implicit none 
     ! Arguments
     class(mld_d_base_ainv_solver_type), intent(in) :: sv
@@ -178,252 +180,6 @@ contains
     
     return
   end function d_base_ainv_solver_sizeof
-
-
-  subroutine drwclip(nz,ia,ja,val,imin,imax,jmin,jmax)
-    use psb_base_mod, only : psb_dpk_
-
-    implicit none 
-    integer, intent(inout) :: nz
-    integer, intent(inout) :: ia(*), ja(*)
-    real(psb_dpk_), intent(inout) :: val(*)
-    integer, intent(in)    :: imin,imax,jmin,jmax
-
-    integer :: i,j 
-
-    j = 0
-    do i=1, nz
-      if ((imin <= ia(i)).and.&
-           & (ia(i) <= imax).and.&
-           & (jmin <= ja(i)).and.&
-           & (ja(i) <= jmax) ) then 
-        j = j + 1 
-        ia(j) = ia(i) 
-        ja(j) = ja(i)
-        val(j) = val(i)
-      end if
-    end do
-    nz = j 
-  end subroutine drwclip
-
-
-  subroutine d_sparsify(idiag,nzrmax,sp_thresh,n,zw,nz,iz,valz,info,istart,iheap,ikr)
-    use psb_base_mod
-    implicit none 
-
-    real(psb_dpk_), intent(in)  :: sp_thresh
-    integer, intent(in)         :: idiag, n, nzrmax
-    real(psb_dpk_), intent(inout)  :: zw(:)
-    integer, intent(out)        :: nz
-    integer, intent(out)        :: iz(:)
-    real(psb_dpk_), intent(out) :: valz(:)
-    integer, intent(out)        :: info
-    integer, intent(in), optional :: istart
-    type(psb_int_heap), optional :: iheap
-    integer, optional            :: ikr(:)
-
-    integer :: i, istart_, last_i, iret,k
-    real(psb_dpk_)     :: witem
-    integer            :: widx
-    real(psb_dpk_), allocatable :: xw(:)
-    integer, allocatable        :: xwid(:), indx(:)
-    type(psb_dreal_idx_heap)    :: heap
- 
-
-    info = psb_success_
-    istart_ = 1
-    if (present(istart)) istart_ = max(1,istart)
-    if (.false.) then 
-      nz = 0
-      do i=istart_, n
-        if ((i == idiag).or.(abs(zw(i)) >= sp_thresh)) then 
-          nz       = nz + 1 
-          iz(nz)   = i
-          valz(nz) = zw(i) 
-        end if
-      end do
-
-    else
-
-      allocate(xw(nzrmax),xwid(nzrmax),indx(nzrmax),stat=info)
-      if (info /= psb_success_) then 
-        return
-      end if
-
-      call psb_init_heap(heap,info,dir=psb_asort_down_)
-
-      ! Keep at least the diagonal
-      nz = 0 
-
-      if (present(iheap)) then 
-        if (.not.(present(ikr))) then 
-          write(psb_err_unit,*) 'Error: if IHEAP then also IKR'
-          info = -1
-          return
-        end if
-        last_i = -1
-        do 
-          call psb_heap_get_first(i,iheap,iret) 
-          if (iret < 0) exit
-          ! An index may have been put on the heap more than once.
-          if (i == last_i) cycle
-          last_i = i 
-          if (i == idiag) then 
-            xw(1)   = zw(i)
-            xwid(1) = i
-          else if (abs(zw(i)) >= sp_thresh) then 
-            call psb_insert_heap(zw(i),i,heap,info)
-          end if
-          zw(i)  = dzero
-          ikr(i) = 0
-        end do
-
-      else
-
-        do i=istart_, n
-          if (i == idiag) then 
-            xw(1)   = zw(i)
-            xwid(1) = i
-          else if (abs(zw(i)) >= sp_thresh) then 
-            call psb_insert_heap(zw(i),i,heap,info)
-          end if
-          zw(i) = dzero
-        end do
-      end if
-
-      k = 1
-      do 
-        if (k == nzrmax) exit 
-        call psb_heap_get_first(witem,widx,heap,info)
-        if (info == -1) then 
-          info = psb_success_
-          exit 
-        endif
-        if (info /= psb_success_) then
-          info=psb_err_from_subroutine_
-          return
-        end if
-        k = k + 1 
-        xw(k)   = witem
-        xwid(k) = widx
-      end do
-      call psb_free_heap(heap,info)
-      nz = k 
-      call psb_msort(xwid(1:nz),indx(1:nz),dir=psb_sort_up_)
-      do i=1, nz
-        valz(i) = xw(indx(i))
-        iz(i)   = xwid(i)
-      end do
-
-    end if
-
-    return
-
-  end subroutine d_sparsify
-
-  subroutine d_sp_drop(idiag,nzrmax,sp_thresh,nz,iz,valz,info)
-    use psb_base_mod
-    implicit none 
-    real(psb_dpk_), intent(in)    :: sp_thresh
-    integer, intent(in)           :: idiag, nzrmax
-    integer, intent(inout)        :: nz
-    integer, intent(inout)        :: iz(:)
-    real(psb_dpk_), intent(inout) :: valz(:)
-    integer, intent(out)          :: info
-
-    integer :: i, j, idf, nw
-    real(psb_dpk_)     :: witem
-    integer            :: widx
-    real(psb_dpk_), allocatable :: xw(:)
-    integer, allocatable        :: xwid(:), indx(:)
-
-
-    info = psb_success_
-
-    if (nz > min(size(iz),size(valz))) then 
-      write(0,*) 'Serious size problem ',nz,size(iz),size(valz)
-      info = -2
-      return
-    end if
-    allocate(xw(nz),xwid(nz),indx(nz),stat=info) 
-    if (info /= psb_success_) then 
-      write(psb_err_unit,*) ' Memory allocation failure in sp_drop',nz,info
-      return
-    endif
-
-    ! Always keep the diagonal element
-    idf = -1 
-    do i=1, nz
-      if (iz(i) == idiag) then 
-        idf     = i
-        witem   = valz(i)
-        widx    = iz(i)
-        valz(i) = valz(1) 
-        iz(i)   = iz(1) 
-        valz(1) = witem
-        iz(1)   = widx
-        exit
-      end if
-    end do
-
-    if (idf == -1) then
-
-      xw(1:nz) = valz(1:nz)
-      call psb_qsort(xw(1:nz),indx(1:nz),dir=psb_asort_down_)
-      do i=1, nz
-        xwid(i) = iz(indx(i))
-      end do
-      nw = min(nz,nzrmax)
-      do 
-        if (nw <= 1) exit
-        if (abs(xw(nw)) < sp_thresh) then 
-          nw = nw - 1
-        else 
-          exit
-        end if
-      end do
-      nw = max(nw, 1)
-
-    else
-
-      nw = nz-1
-
-      xw(1:nw) = valz(2:nz)
-
-      call psb_qsort(xw(1:nw),indx(1:nw),dir=psb_asort_down_)
-      nw = min(nw,nzrmax-1)
-      do 
-        if (nw <= 1) exit
-        if (abs(xw(nw)) < sp_thresh) then 
-          nw = nw - 1
-        else 
-          exit
-        end if
-      end do
-
-      do i=1, nw
-        xwid(i) = iz(1+indx(i))
-      end do
-      nw       = nw + 1 
-      xw(nw)   = valz(1)
-      xwid(nw) = iz(1)
-    end if
-
-    call psb_msort(xwid(1:nw),indx(1:nw),dir=psb_sort_up_)
-    
-    do i=1, nw
-      valz(i) = xw(indx(i))
-      iz(i)   = xwid(i)
-    end do
-    nz = nw
-    if (nz>nzrmax) write(0,*) 'in sp_drop: ',nw,nzrmax,nz
-    deallocate(xw,xwid,indx,stat=info) 
-    if (info /= psb_success_) then 
-      write(psb_err_unit,*) ' Memory deallocation failure in sp_drop',info
-      return
-    endif
-    return
-  end subroutine d_sp_drop
 
 
 end module mld_d_base_ainv_mod

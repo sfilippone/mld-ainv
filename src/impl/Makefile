@@ -9,7 +9,10 @@ HERE=..
 FINCLUDES=$(FMFLAG).. $(FMFLAG)$(LIBDIR) $(FMFLAG)$(MLDINCDIR)  $(FMFLAG)$(PSBINCDIR) 
 
 
-F90OBJS=mld_d_invk_solver_bld.o \
+F90OBJS=mld_drwclip.o \
+mld_d_sp_drop.o \
+mld_d_sparsify.o \
+mld_d_invk_solver_bld.o \
 mld_d_invk_solver_check.o \
 mld_d_invk_solver_descr.o \
 mld_d_invk_solver_seti.o \
@@ -52,6 +55,7 @@ mld_dsparse_biconjg_s_llk.o \
 mld_d_base_ainv_update_a.o \
 mld_d_base_ainv_solver_apply.o \
 mld_d_base_ainv_solver_apply_vect.o \
+mld_d_base_ainv_solver_cnv.o \
 mld_d_base_ainv_solver_dmp.o \
 mld_d_base_ainv_solver_free.o
 
