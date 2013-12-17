@@ -400,7 +400,7 @@ dnl @author Salvatore Filippone <salvatore.filippone@uniroma2.it>
 dnl
 AC_DEFUN([PAC_ARG_WITH_SAINV],
 [
-AC_ARG_WITH(ainv,
+AC_ARG_WITH(sainv,
 AC_HELP_STRING([--with-sainv], [Where to find  SAINV, for example,
  --with-sainv=/opt/packages/sainv or
  --with-sainv="-lsainv -LSAINVDIR"]),
