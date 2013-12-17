@@ -109,6 +109,8 @@ contains
 #if defined(HAVE_TUMA_SAINV)
     case (mld_ainv_s_tuma_)
       call mld_dsparse_tuma_sainv(n,acsr,p,zcsc,wcsc,nzrmax,sp_thresh,info)
+    case (mld_ainv_l_tuma_)
+      call mld_dsparse_tuma_lainv(n,acsr,p,zcsc,wcsc,nzrmax,sp_thresh,info)
 #endif
     case default
       info = psb_err_internal_error_

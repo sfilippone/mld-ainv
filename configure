@@ -1365,9 +1365,9 @@ Optional Packages:
   --with-libs             List additional link flags here. For example,
                           --with-libs=-lspecial_system_lib or
                           --with-libs=-L/path/to/libs
-  --with-ainv             Where to find AINV, for example,
-                          --with-ainv=/opt/packages/ainv or
-                          --with-ainv="-lainv -LAINVDIR"
+  --with-sainv            Where to find SAINV, for example,
+                          --with-sainv=/opt/packages/sainv or
+                          --with-sainv="-lsainv -LSAINVDIR"
 
 Some influential environment variables:
   FC          Fortran compiler command
@@ -1899,7 +1899,7 @@ $as_echo "$as_me: error: Could not find MLD2P4 build dir $MLD2P4_DIR!" >&2;}
 fi
 { $as_echo "$as_me:$LINENO: result: $MLD2P4_DIR" >&5
 $as_echo "$MLD2P4_DIR" >&6; }
-pac_cv_status_file="$MLD2P4_DIR/Make.inc.MLD2P4"
+pac_cv_status_file="$MLD2P4_DIR/include/Make.inc.mld2p4"
 if test ! -f "$pac_cv_status_file" ; then
    { { $as_echo "$as_me:$LINENO: error: Could not find an installation  in $MLD2P4_DIR." >&5
 $as_echo "$as_me: error: Could not find an installation  in $MLD2P4_DIR." >&2;}
@@ -6117,9 +6117,9 @@ rm -fr tmpdir_$i
 
 # Check whether --with-ainv was given.
 if test "${with_ainv+set}" = set; then
-  withval=$with_ainv; pac_cv_ainv=$withval
+  withval=$with_ainv; pac_cv_sainv=$withval
 else
-  pac_cv_ainv=''
+  pac_cv_sainv=''
 fi
 
 
@@ -6128,24 +6128,24 @@ ac_objext='.o'
 ac_ext='f90'
 ac_compile='${MPIFC-$FC} -c -o conftest${ac_objext} $FMFLAG$PSBLAS_DIR/include $FMFLAG$PSBLAS_DIR/lib conftest.$ac_ext  1>&5'
 ac_link='${MPIFC-$FC} -o conftest${ac_exeext} $FCFLAGS $LDFLAGS conftest.$ac_ext $LIBS 1>&5'
-{ $as_echo "$as_me:$LINENO: checking for working version of AINV" >&5
-$as_echo_n "checking for working version of AINV... " >&6; }
+{ $as_echo "$as_me:$LINENO: checking for working version of SAINV" >&5
+$as_echo_n "checking for working version of SAINV... " >&6; }
 cat > conftest.$ac_ext <<EOF
         program test_ainvsr2
           call ainvsr2
         end
 EOF
-if test "x$pac_cv_ainv" != "x" ; then
-  case $pac_cv_ainv in
+if test "x$pac_cv_sainv" != "x" ; then
+  case $pac_cv_sainv in
         yes | "") ;;
-        no) pac_ainv_ok=disable ;;
-        -* | */* | *.a | *.so | *.so.* | *.o) AINV_LIBS="$with_ainv" ;;
-        *) AINV_LIBS="-l$with_ainv" ;;
+        no) pac_sainv_ok=disable ;;
+        -* | */* | *.a | *.so | *.so.* | *.o) SAINV_LIBS="$with_sainv" ;;
+        *) SAINV_LIBS="-l$with_sainv" ;;
   esac
 fi
 save_LIBS="$LIBS";
-if test "x$AINV_LIBS" != x; then
-       LIBS="$AINV_LIBS $LIBS $FLIBS"
+if test "x$SAINV_LIBS" != x; then
+       LIBS="$SAINV_LIBS $LIBS $FLIBS"
 fi
 if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
   (eval $ac_link) 2>&5

@@ -159,7 +159,7 @@ subroutine mld_d_ainv_bld(a,alg,fillin,thresh,wmat,d,zmat,desc,info,blck,iscale)
     call mld_sparse_biconjg(alg,n_row,acsr,pq,&
          &   zmat,wmat,nzrmax,sp_thresh,info)
 #ifdef HAVE_TUMA_SAINV
-  case(mld_ainv_s_tuma_)
+  case(mld_ainv_s_tuma_,mld_ainv_l_tuma_)
     call mld_sparse_biconjg(alg,n_row,acsr,pq,&
          &   zmat,wmat,nzrmax,sp_thresh,info)
 #endif

@@ -275,6 +275,8 @@ contains
 #if defined(HAVE_TUMA_SAINV)
     case('SAINV-TUMA')
       val = mld_ainv_s_tuma_ 
+    case('LAINV-TUMA')
+      val = mld_ainv_l_tuma_ 
 #endif 
     case default
       val  = mld_stringval(string)
@@ -289,6 +291,7 @@ contains
     character(len=*), parameter :: llkname   = 'Left-looking '
     character(len=*), parameter :: sllkname  = 'Symmetric Left-looking '
     character(len=*), parameter :: sainvname = 'SAINV (Benzi & Tuma) '
+    character(len=*), parameter :: lainvname = 'LAINV (Benzi & Tuma) '
     character(len=*), parameter :: defname   = 'Unknown alg variant '
     
     select case (ialg)
@@ -299,6 +302,8 @@ contains
 #if defined(HAVE_TUMA_SAINV)
     case(mld_ainv_s_tuma_ )
       val = sainvname
+    case(mld_ainv_l_tuma_ )
+      val = lainvname
 #endif 
     case default
       val = defname

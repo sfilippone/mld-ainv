@@ -77,7 +77,7 @@ if test ! -d "$MLD2P4_DIR" ; then
    AC_MSG_ERROR([Could not find MLD2P4 build dir $MLD2P4_DIR!])	
 fi
 AC_MSG_RESULT([$MLD2P4_DIR])
-pac_cv_status_file="$MLD2P4_DIR/Make.inc.MLD2P4"
+pac_cv_status_file="$MLD2P4_DIR/include/Make.inc.mld2p4"
 if test ! -f "$pac_cv_status_file" ; then 
    AC_MSG_ERROR([Could not find an installation  in $MLD2P4_DIR.])		
 fi

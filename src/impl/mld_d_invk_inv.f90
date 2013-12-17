@@ -32,7 +32,7 @@
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
 !!$
-subroutine mld_d_invk_inv(fill_in,i,row,rowlevs,heap,uia1,uia2,uaspk,uplevs,&
+subroutine mld_d_invk_inv(fill_in,i,row,rowlevs,heap,ja,irp,val,uplevs,&
      & nidx,idxs,info)
   
   use psb_base_mod
@@ -46,8 +46,8 @@ subroutine mld_d_invk_inv(fill_in,i,row,rowlevs,heap,uia1,uia2,uaspk,uplevs,&
   integer, intent(inout)               :: nidx,info
   integer, intent(inout)               :: rowlevs(:)
   integer, allocatable, intent(inout)  :: idxs(:)
-  integer, intent(in)                  :: uia1(:),uia2(:),uplevs(:)
-  real(psb_dpk_), intent(in)           :: uaspk(:)
+  integer, intent(in)                  :: ja(:),irp(:),uplevs(:)
+  real(psb_dpk_), intent(in)           :: val(:)
   real(psb_dpk_), intent(inout)        :: row(:)
 
   ! Local variables
@@ -95,8 +95,8 @@ subroutine mld_d_invk_inv(fill_in,i,row,rowlevs,heap,uia1,uia2,uaspk,uplevs,&
       rwk    = row(k)
       lrwk   = rowlevs(k)
 
-      do jj=uia2(k),uia2(k+1)-1
-        j = uia1(jj)
+      do jj=irp(k),irp(k+1)-1
+        j = ja(jj)
         if (j<=k) then 
           info = -i
           return
@@ -116,7 +116,7 @@ subroutine mld_d_invk_inv(fill_in,i,row,rowlevs,heap,uia1,uia2,uaspk,uplevs,&
         !
         ! Update row(j) and the corresponding fill level
         !
-        row(j)     = row(j) - rwk * uaspk(jj)
+        row(j)     = row(j) - rwk * val(jj)
         rowlevs(j) = min(rowlevs(j),lrwk+uplevs(jj)+1)
       end do
 
