@@ -175,11 +175,11 @@ subroutine mld_d_ainv_bld(a,alg,fillin,thresh,wmat,d,zmat,desc,info,blck,iscale)
     call psb_errpush(info,name,a_err='orthbase')
     goto 9999
   end if
-!!$  call atmp%mv_from(acsr)
-!!$  call atmp%print("ascale.mtx")
-!!$  call wmat%print("wmat.mtx")
-!!$  call zmat%print("zmat.mtx")
-!!$  call psb_geprt("pq.mtx",pq(1:n_row))
+  call atmp%mv_from(acsr)
+  call atmp%print("ascale.mtx")
+  call wmat%print("wmat.mtx")
+  call zmat%print("zmat.mtx")
+  call psb_geprt("pq.mtx",pq(1:n_row))
 
   !
   ! Is this right??? 

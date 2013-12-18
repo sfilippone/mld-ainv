@@ -52,6 +52,7 @@ subroutine mld_d_ainv_solver_csetc(sv,what,val,info)
   call psb_erractionsave(err_act)
 
   ival =  sv%stringval(val)
+
   if (ival >=0) then 
     call sv%set(what,ival,info)
   end if

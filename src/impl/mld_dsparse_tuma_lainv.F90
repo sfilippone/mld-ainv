@@ -70,7 +70,7 @@
     size_p  = nza
     ! These are taken straight from TUMA's code. 
     diagtol  = 1.1d-16
-    droptyp  = 0    
+    droptyp  = 1    
     dropup   = 0
     imodif   = 0
     ainvscal = 0

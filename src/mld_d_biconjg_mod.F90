@@ -61,7 +61,8 @@ module mld_d_biconjg_mod
        &  mld_dsparse_biconjg_llk_noth
 
 #if defined(HAVE_TUMA_SAINV) 
-  procedure(mld_dsparse_biconjg_variant)  ::  mld_dsparse_tuma_sainv
+  procedure(mld_dsparse_biconjg_variant)  ::  mld_dsparse_tuma_sainv,&
+       & mld_dsparse_tuma_lainv
 #endif
 
 

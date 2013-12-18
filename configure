@@ -709,7 +709,7 @@ with_mld2p4
 with_libs
 enable_serial
 enable_dependency_tracking
-with_ainv
+with_sainv
 '
       ac_precious_vars='build_alias
 host_alias
@@ -6115,9 +6115,9 @@ rm -fr tmpdir_$i
 
 
 
-# Check whether --with-ainv was given.
-if test "${with_ainv+set}" = set; then
-  withval=$with_ainv; pac_cv_sainv=$withval
+# Check whether --with-sainv was given.
+if test "${with_sainv+set}" = set; then
+  withval=$with_sainv; pac_cv_sainv=$withval
 else
   pac_cv_sainv=''
 fi
