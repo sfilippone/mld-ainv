@@ -51,7 +51,7 @@ subroutine mld_d_ainv_solver_cseti(sv,what,val,info)
   info = psb_success_
   call psb_erractionsave(err_act)
 
-  select case(psb_toupper(what))
+  select case(psb_toupper(trim(what)))
   case('SUB_FILLIN')
     sv%fill_in  = val
   case('AINV_ALG')

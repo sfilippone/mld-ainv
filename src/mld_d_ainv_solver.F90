@@ -270,7 +270,9 @@ contains
     select case(psb_toupper(trim(string)))
     case('LLK')
       val = mld_ainv_llk_
-    case('S-LLK')
+    case('STAB-LLK')
+      val = mld_ainv_s_ft_llk_
+    case('SYM-LLK')
       val = mld_ainv_s_llk_
 #if defined(HAVE_TUMA_SAINV)
     case('SAINV-TUMA')
@@ -289,6 +291,7 @@ contains
     character(len=40) :: val
     
     character(len=*), parameter :: llkname   = 'Left-looking '
+    character(len=*), parameter :: stabllkname  = 'Stabilized Left-looking '
     character(len=*), parameter :: sllkname  = 'Symmetric Left-looking '
     character(len=*), parameter :: sainvname = 'SAINV (Benzi & Tuma) '
     character(len=*), parameter :: lainvname = 'LAINV (Benzi & Tuma) '
@@ -299,6 +302,8 @@ contains
       val = llkname
     case(mld_ainv_s_llk_)
       val = sllkname
+    case(mld_ainv_s_ft_llk_)
+      val = stabllkname
 #if defined(HAVE_TUMA_SAINV)
     case(mld_ainv_s_tuma_ )
       val = sainvname

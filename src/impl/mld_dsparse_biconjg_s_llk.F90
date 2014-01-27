@@ -55,10 +55,10 @@ subroutine mld_dsparse_biconjg_s_llk(n,a,p,z,w,nzrmax,sp_thresh,info)
   real(psb_dpk_), allocatable :: zval(:),val(:), q(:)
   integer :: i,j,k, kc, kr, err_act, nz, nzra, nzrz, ipzi,ipzj,&
        & nzzi,nzzj, nzz, ip1, ip2, ipza,ipzz, ipzn, nzzn, ipz1, ipz2,&
-       &  ipj, lastj, nextj, nzw
+       &  ipj, lastj, nextj, nzw,kk
   type(psb_int_heap) :: heap, rheap
   type(psb_d_csc_sparse_mat) :: ac
-  real(psb_dpk_)     :: alpha
+  real(psb_dpk_)     :: alpha, zvalmax
   character(len=20)  :: name='mld_orth_llk'
   logical, parameter :: debug=.false.
 
@@ -96,12 +96,12 @@ subroutine mld_dsparse_biconjg_s_llk(n,a,p,z,w,nzrmax,sp_thresh,info)
   !
   call z%allocate(n,n,n*nzrmax)
 
-  z%icp(1)  = 1
-  z%icp(2)  = 2
+  z%icp(1) = 1
+  z%icp(2) = 2
   z%ia(1)  = 1
   z%val(1) = done
-  nzz       = 1
-
+  nzz      = 1
+  zvalmax  = done
 
   do i = 2, n
     if (debug) write(0,*) 'Main loop iteration ',i,n
@@ -171,6 +171,9 @@ subroutine mld_dsparse_biconjg_s_llk(n,a,p,z,w,nzrmax,sp_thresh,info)
         do k=z%icp(j), z%icp(j+1)-1
           kr     = z%ia(k)
           zval(kr) = zval(kr) + alpha*z%val(k)
+!!$          if (abs(zval(kr)) > 1e16) then 
+!!$            write(0,*) i,j,p(i),p(j),alpha,z%val(k),alpha*z%val(k),kr,zval(kr)
+!!$          end if
           if (izkr(kr) == 0) then 
 
             call psb_insert_heap(kr,heap,info) 
@@ -205,6 +208,13 @@ subroutine mld_dsparse_biconjg_s_llk(n,a,p,z,w,nzrmax,sp_thresh,info)
     call a%csget(i,i,nzra,ia,ja,val,info)
     call rwclip(nzra,ia,ja,val,1,n,1,n)      
     p(i) = psb_spge_dot(nzra,ja,val,zval)
+    if ((1761<=i).and.(i<=1780)) then 
+      write(0,*) 'Dot product terms at ',i,nzra
+      do kk=1,nzra
+        write(0,*) kk,ja(kk),val(kk),zval(ja(kk))
+      end do
+    end if
+    
     if (abs(p(i)) < d_epstol) &
          & p(i) = 1.d-3 
 
@@ -225,9 +235,11 @@ subroutine mld_dsparse_biconjg_s_llk(n,a,p,z,w,nzrmax,sp_thresh,info)
     do j=1, nzrz
       z%ia(ipz1  + j -1) = ia(j)
       z%val(ipz1 + j -1) = val(j)
+      zvalmax = max(zvalmax,abs(val(j)))
     end do
     z%icp(i+1) = ipz1 + nzrz
     nzz        = nzz + nzrz
+    write(0,*) ' Dot: ',i,p(i),zvalmax
 
   end do
 
