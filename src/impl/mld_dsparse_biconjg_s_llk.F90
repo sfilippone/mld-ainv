@@ -208,12 +208,12 @@ subroutine mld_dsparse_biconjg_s_llk(n,a,p,z,w,nzrmax,sp_thresh,info)
     call a%csget(i,i,nzra,ia,ja,val,info)
     call rwclip(nzra,ia,ja,val,1,n,1,n)      
     p(i) = psb_spge_dot(nzra,ja,val,zval)
-    if ((1761<=i).and.(i<=1780)) then 
-      write(0,*) 'Dot product terms at ',i,nzra
-      do kk=1,nzra
-        write(0,*) kk,ja(kk),val(kk),zval(ja(kk))
-      end do
-    end if
+!!$    if ((1761<=i).and.(i<=1780)) then 
+!!$      write(0,*) 'Dot product terms at ',i,nzra
+!!$      do kk=1,nzra
+!!$        write(0,*) kk,ja(kk),val(kk),zval(ja(kk))
+!!$      end do
+!!$    end if
     
     if (abs(p(i)) < d_epstol) &
          & p(i) = 1.d-3 
@@ -235,11 +235,11 @@ subroutine mld_dsparse_biconjg_s_llk(n,a,p,z,w,nzrmax,sp_thresh,info)
     do j=1, nzrz
       z%ia(ipz1  + j -1) = ia(j)
       z%val(ipz1 + j -1) = val(j)
-      zvalmax = max(zvalmax,abs(val(j)))
+!!$      zvalmax = max(zvalmax,abs(val(j)))
     end do
     z%icp(i+1) = ipz1 + nzrz
     nzz        = nzz + nzrz
-    write(0,*) ' Dot: ',i,p(i),zvalmax
+!!$    write(0,*) ' Dot: ',i,p(i),zvalmax
 
   end do
 
