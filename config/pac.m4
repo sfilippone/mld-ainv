@@ -356,7 +356,7 @@ done
 mkdir tmpdir_$i
 cd tmpdir_$i
 echo "MLDDIR=$MLD2P4_DIR">MakeFile
-echo 'include $(MLDDIR)/Make.inc.MLD2P4
+echo 'include $(MLDDIR)/include/Make.inc.mld2p4
 PSBINCDIR=$(PSBLASDIR)/include
 MLDINCDIR=$(MLDDIR)/include
 FINCLUDES=$(FMFLAG)$(MLDINCDIR)  $(FMFLAG)$(PSBINCDIR) '>>MakeFile
