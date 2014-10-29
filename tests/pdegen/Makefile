@@ -5,10 +5,11 @@ PSBINCDIR=$(PSBLASDIR)/include
 MLDINCDIR=$(MLDDIR)/include
 MLDLIBDIR=$(MLDDIR)/lib
 MLD_LIB=-L$(MLDLIBDIR) -lpsb_krylov -lmld_prec -lpsb_prec
+MLDAINVINCDIR=$(MLDAINVDIR)/include
 MLDAINVLIBDIR=$(MLDAINVDIR)/lib
 MLDAINV_LIB=-L$(MLDAINVLIBDIR) -lainv_prec 
 PSBLAS_LIB= -L$(PSBLIBDIR)  -lpsb_util  -lpsb_base
-FINCLUDES=$(FMFLAG). $(FMFLAG)$(MLDAINVLIBDIR) $(FMFLAG)$(MLDINCDIR)  $(FMFLAG)$(PSBINCDIR) $(FIFLAG).
+FINCLUDES=$(FMFLAG). $(FMFLAG)$(MLDAINVINCDIR) $(FMFLAG)$(MLDINCDIR)  $(FMFLAG)$(PSBINCDIR) $(FIFLAG).
 
 D3DOBJS=ppde3d.o data_input.o  pde3d_exp_mod.o pde3d_gauss_mod.o pde3d_base_mod.o \
 	psb_d_genpde_impl.o
