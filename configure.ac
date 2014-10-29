@@ -275,7 +275,7 @@ PAC_FORTRAN_HAVE_SAINV([mld_ainv_ext_sainv="yes"],
 
 if test "X$mld_ainv_ext_sainv" == "Xyes" ; then
    EXT_AINV_DEFS="$psblas_cv_define_prepend-DHAVE_TUMA_SAINV";
-   EXT_AINV_LIBS="$AINV_LIBS";
+   EXT_AINV_LIBS="$SAINV_LIBS";
 fi
 
 
