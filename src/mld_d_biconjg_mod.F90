@@ -58,7 +58,7 @@ module mld_d_biconjg_mod
 
   procedure(mld_dsparse_biconjg_variant) :: mld_dsparse_biconjg_llk,&
        & mld_dsparse_biconjg_s_llk,  mld_dsparse_biconjg_s_ft_llk,&
-       &  mld_dsparse_biconjg_llk_noth
+       &  mld_dsparse_biconjg_llk_noth, mld_dsparse_biconjg_mlk
 
 #if defined(HAVE_TUMA_SAINV) 
   procedure(mld_dsparse_biconjg_variant)  ::  mld_dsparse_tuma_sainv,&
@@ -103,6 +103,8 @@ contains
       call mld_dsparse_biconjg_llk(n,acsr,p,zcsc,wcsc,nzrmax,sp_thresh,info)
     case (mld_ainv_s_llk_) 
       call mld_dsparse_biconjg_s_llk(n,acsr,p,zcsc,wcsc,nzrmax,sp_thresh,info)
+    case (mld_ainv_mlk_) 
+      call mld_dsparse_biconjg_mlk(n,acsr,p,zcsc,wcsc,nzrmax,sp_thresh,info)
     case (mld_ainv_s_ft_llk_) 
       call mld_dsparse_biconjg_s_ft_llk(n,acsr,p,zcsc,wcsc,nzrmax,sp_thresh,info)
     case (mld_ainv_llk_noth_)

@@ -141,39 +141,38 @@ subroutine mld_d_ainv_bld(a,alg,fillin,thresh,wmat,d,zmat,desc,info,blck,iscale)
   ! Here for the actual workhorses.
   ! Only biconjg is surviving for now....
   !
-  select case(alg)
-#if 0
-  case(mld_ainv_orth1_,mld_ainv_orth2_,mld_ainv_orth3_,mld_ainv_orth4_)
-    call mld_sparse_orthbase(alg,n_row,acsr,pq,&
-         & zmat,nzrmax,sp_thresh,info)
-    ! Now for W  (i.e. Lower) 
-    if (info == psb_success_) call acsr%transp() 
-    if (info == psb_success_) &
-         & call mld_sparse_orthbase(alg,n_row,acsr,pq,&
-         &   wmat,nzrmax,sp_thresh,info)
-    call wmat%transp()
-#endif
-    
-  case(mld_ainv_llk_,mld_ainv_s_llk_,mld_ainv_s_ft_llk_,&
-       & mld_ainv_llk_noth_)
+!!$  select case(alg)
+!!$#if 0
+!!$  case(mld_ainv_orth1_,mld_ainv_orth2_,mld_ainv_orth3_,mld_ainv_orth4_)
+!!$    call mld_sparse_orthbase(alg,n_row,acsr,pq,&
+!!$         & zmat,nzrmax,sp_thresh,info)
+!!$    ! Now for W  (i.e. Lower) 
+!!$    if (info == psb_success_) call acsr%transp() 
+!!$    if (info == psb_success_) &
+!!$         & call mld_sparse_orthbase(alg,n_row,acsr,pq,&
+!!$         &   wmat,nzrmax,sp_thresh,info)
+!!$    call wmat%transp()
+!!$#endif
+!!$    
+!!$  case(mld_ainv_llk_,mld_ainv_s_llk_,mld_ainv_s_ft_llk_,&
+!!$       & mld_ainv_llk_noth_)
     call mld_sparse_biconjg(alg,n_row,acsr,pq,&
          &   zmat,wmat,nzrmax,sp_thresh,info)
-#ifdef HAVE_TUMA_SAINV
-  case(mld_ainv_s_tuma_,mld_ainv_l_tuma_)
-!!$    write(0,*) 'Building ainv ',alg,mld_ainv_s_tuma_,mld_ainv_l_tuma_
-    call mld_sparse_biconjg(alg,n_row,acsr,pq,&
-         &   zmat,wmat,nzrmax,sp_thresh,info)
-#endif
-  case default
-    info = psb_err_internal_error_
-    call psb_errpush(info,name,a_err='ainv_bld: bad alg')
-    goto 9999
-  end select
+!!$#ifdef HAVE_TUMA_SAINV
+!!$  case(mld_ainv_s_tuma_,mld_ainv_l_tuma_)
+!!$    call mld_sparse_biconjg(alg,n_row,acsr,pq,&
+!!$         &   zmat,wmat,nzrmax,sp_thresh,info)
+!!$#endif
+!!$  case default
+!!$    info = psb_err_internal_error_
+!!$    call psb_errpush(info,name,a_err='ainv_bld: bad alg')
+!!$    goto 9999
+!!$  end select
   ! Done. Hopefully.... 
 
   if (info /= psb_success_) then 
     info = psb_err_internal_error_
-    call psb_errpush(info,name,a_err='orthbase')
+    call psb_errpush(info,name,a_err='sparse_biconjg')
     goto 9999
   end if
   call atmp%mv_from(acsr)

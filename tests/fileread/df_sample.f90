@@ -51,15 +51,15 @@ program df_sample
   type precdata
     character(len=20)  :: descr       ! verbose description of the prec
     character(len=10)  :: prec        ! overall prectype
-    integer            :: novr        ! number of overlap layers
-    integer            :: jsweeps     ! Jacobi/smoother sweeps
+    integer(psb_ipk_)  :: novr        ! number of overlap layers
+    integer(psb_ipk_)  :: jsweeps     ! Jacobi/smoother sweeps
     character(len=16)  :: restr       ! restriction over application of AS
     character(len=16)  :: prol        ! prolongation over application of AS
     character(len=16)  :: solve       ! factorization type: ILU, SuperLU, UMFPACK 
-    integer            :: fill        ! fillin for factorization 
+    integer(psb_ipk_)  :: fill        ! fillin for factorization 
     real(psb_dpk_)     :: thr         ! threshold for fact.  ILU(T)
     character(len=16)  :: smther      ! Smoother                            
-    integer            :: nlev        ! number of levels in multilevel prec. 
+    integer(psb_ipk_)  :: nlev        ! number of levels in multilevel prec. 
     character(len=16)  :: aggrkind    ! smoothed, raw aggregation
     character(len=16)  :: aggr_alg    ! aggregation algorithm (currently only decoupled)
     character(len=16)  :: mltype      ! additive or multiplicative multi-level prec
@@ -67,9 +67,9 @@ program df_sample
     character(len=16)  :: cmat        ! coarse mat: distributed, replicated
     character(len=16)  :: csolve      ! coarse solver: bjac, umf, slu, sludist
     character(len=16)  :: csbsolve    ! coarse subsolver: ILU, ILU(T), SuperLU, UMFPACK 
-    integer            :: cfill       ! fillin for coarse factorization 
+    integer(psb_ipk_)  :: cfill       ! fillin for coarse factorization 
     real(psb_dpk_)     :: cthres      ! threshold for coarse fact.  ILU(T)
-    integer            :: cjswp       ! block-Jacobi sweeps
+    integer(psb_ipk_)  :: cjswp       ! block-Jacobi sweeps
     real(psb_dpk_)     :: athres      ! smoothed aggregation threshold
   end type precdata
   type(precdata)        :: prec_choice
@@ -82,34 +82,33 @@ program df_sample
 
   ! dense matrices
   real(psb_dpk_), allocatable, target ::  aux_b(:,:), d(:)
-  real(psb_dpk_), allocatable , save  :: b_col(:), x_col(:), r_col(:), &
-       & x_col_glob(:), r_col_glob(:)
+  real(psb_dpk_), allocatable , save  :: x_col_glob(:), r_col_glob(:)
   real(psb_dpk_), pointer  :: b_col_glob(:)
+  type(psb_d_vect_type)    :: b_col, x_col, r_col
 
   ! communications data structure
   type(psb_desc_type):: desc_a
 
-  integer            :: ictxt, iam, np
+  integer(psb_ipk_)   :: ictxt, iam, np
 
   ! solver paramters
   integer            :: iter, itmax, ierr, itrace, ircode, ipart,&
        & methd, istopc, irst, nlv
   integer(psb_long_int_k_) :: amatsize, precsize, descsize
-  real(psb_dpk_)   :: err, eps
-
-  character(len=5)   :: afmt
-  character(len=20)  :: name
-  integer, parameter :: iunit=12
-  integer   :: iparm(20)
+  real(psb_dpk_)    :: err, eps
+  logical           :: dump_sol
+  character(len=5)  :: afmt
+  character(len=20) :: name
+  integer(psb_ipk_), parameter :: iunit=12
+  integer(psb_ipk_) :: iparm(20)
 
   ! other variables
-  integer            :: i,info,j,m_problem
-  integer            :: internal, m,ii,nnzero
-  real(psb_dpk_) :: t1, t2, tprec
-  real(psb_dpk_) :: r_amax, b_amax, scale,resmx,resmxp
-  integer :: nrhs, nrow, n_row, dim, nv, ne
-  integer, allocatable :: ivg(:), ipv(:)
-
+  integer(psb_ipk_) :: i,info,j,m_problem
+  integer(psb_ipk_) :: internal, m,ii,nnzero
+  real(psb_dpk_)    :: t1, t2, tprec
+  real(psb_dpk_)    :: r_amax, b_amax, scale,resmx,resmxp
+  integer(psb_ipk_) :: nrhs, nrow, n_row, dim, nv, ne
+  integer(psb_ipk_), allocatable :: ivg(:), ipv(:)
 
   call psb_init(ictxt)
   call psb_info(ictxt,iam,np)
@@ -124,7 +123,14 @@ program df_sample
   name='df_sample'
   if(psb_get_errstatus() /= 0) goto 9999
   info=psb_success_
-  call psb_set_errverbosity(2)
+  call psb_set_errverbosity(itwo)
+  !
+  ! Hello world
+  !
+  if (iam == psb_root_) then 
+    write(*,*) 'Welcome to MLD2P4 version: ',mld_version_string_
+    write(*,*) 'This is the ',trim(name),' sample program'
+  end if
   !
   !  get parameters
   !
@@ -144,7 +150,7 @@ program df_sample
       call mm_mat_read(aux_a,info,iunit=iunit,filename=mtrx_file)
       if (info == psb_success_) then 
         if (rhs_file /= 'NONE') then
-          call mm_vet_read(aux_b,info,iunit=iunit,filename=rhs_file)
+          call mm_array_read(aux_b,info,iunit=iunit,filename=rhs_file)
         end if
       end if
 
@@ -166,7 +172,7 @@ program df_sample
     call psb_bcast(ictxt,m_problem)
 
     ! At this point aux_b may still be unallocated
-    if (psb_size(aux_b,dim=1) == m_problem) then
+    if (psb_size(aux_b,dim=ione) == m_problem) then
       ! if any rhs were present, broadcast the first one
       write(psb_err_unit,'("Ok, got an rhs ")')
       b_col_glob =>aux_b(:,1)
@@ -226,10 +232,10 @@ program df_sample
   end if
 
   call psb_geall(x_col,desc_a,info)
-  x_col(:) =0.0
+  call x_col%set(dzero)
   call psb_geasb(x_col,desc_a,info)
   call psb_geall(r_col,desc_a,info)
-  r_col(:) =0.0
+  call r_col%set(dzero)
   call psb_geasb(r_col,desc_a,info)
   t2 = psb_wtime() - t1
 
@@ -306,18 +312,19 @@ program df_sample
   call psb_amx(ictxt,t2)
   call psb_geaxpby(done,b_col,dzero,r_col,desc_a,info)
   call psb_spmm(-done,a,x_col,done,r_col,desc_a,info)
-  call psb_genrm2s(resmx,r_col,desc_a,info)
-  call psb_geamaxs(resmxp,r_col,desc_a,info)
+  resmx  = psb_genrm2(r_col,desc_a,info)
+  resmxp = psb_geamax(r_col,desc_a,info)
 
-  amatsize = psb_sizeof(a)
-  descsize = psb_sizeof(desc_a)
-  precsize = mld_sizeof(prec)
+  amatsize = a%sizeof()
+  descsize = desc_a%sizeof()
+  precsize = prec%sizeof()
   call psb_sum(ictxt,amatsize)
   call psb_sum(ictxt,descsize)
   call psb_sum(ictxt,precsize)
   if (iam == psb_root_) then 
     call mld_precdescr(prec,info)
-    write(psb_out_unit,'("Matrix: ",a)')mtrx_file
+    write(psb_out_unit,'("Matrix: ",a)') mtrx_file
+    write(psb_out_unit,'("Format   for A      : ",a)') a%get_fmt()
     write(psb_out_unit,'("Computed solution on ",i8," processors")')np
     write(psb_out_unit,'("Iterations to convergence : ",i6)')iter
     write(psb_out_unit,'("Error estimate on exit    : ",es12.5)')err
@@ -332,12 +339,11 @@ program df_sample
     write(psb_out_unit,'("Total memory occupation for PREC   : ",i12)')precsize
   end if
 
-  allocate(x_col_glob(m_problem),r_col_glob(m_problem),stat=ierr)
-  if (ierr /= 0) then 
-    write(psb_err_unit,*) 'allocation error: no data collection'
-  else
+  if (dump_sol) then 
     call psb_gather(x_col_glob,x_col,desc_a,info,root=psb_root_)
-    call psb_gather(r_col_glob,r_col,desc_a,info,root=psb_root_)
+    if (info == psb_success_) &
+         & call psb_gather(r_col_glob,r_col,desc_a,info,root=psb_root_)
+    if (info /= psb_success_) goto 9999
     if (iam == psb_root_) then
       write(psb_err_unit,'(" ")')
       write(psb_err_unit,'("Saving x on file")')

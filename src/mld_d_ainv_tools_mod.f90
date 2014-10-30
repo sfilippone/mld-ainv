@@ -42,6 +42,21 @@ module mld_d_ainv_tools_mod
       type(psb_int_heap), optional :: iheap
       integer, optional            :: ikr(:)
     end subroutine mld_d_sparsify
+    subroutine mld_d_sparsify_list(idiag,nzrmax,sp_thresh,n,zw,nz,iz,valz,lhead,listv,ikr,info)
+      use psb_base_mod, only : psb_dpk_, psb_ipk_
+      implicit none 
+      
+      real(psb_dpk_), intent(in)  :: sp_thresh
+      integer, intent(in)         :: idiag, n, nzrmax
+      real(psb_dpk_), intent(inout)  :: zw(:)
+      integer, intent(out)        :: nz
+      integer, intent(out)        :: iz(:)
+      real(psb_dpk_), intent(out) :: valz(:)
+      integer, intent(out)        :: info
+      integer, intent(inout)      :: lhead, listv(:)
+      integer                     :: ikr(:)
+    end subroutine mld_d_sparsify_list
+
   end interface
 
 end module mld_d_ainv_tools_mod

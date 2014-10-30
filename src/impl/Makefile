@@ -51,6 +51,7 @@ mld_dsparse_tuma_sainv.o \
 mld_dsparse_tuma_lainv.o \
 mld_dsparse_biconjg_llk.o \
 mld_dsparse_biconjg_llk_noth.o \
+mld_dsparse_biconjg_mlk.o \
 mld_dsparse_biconjg_s_ft_llk.o \
 mld_dsparse_biconjg_s_llk.o \
 mld_d_base_ainv_update_a.o \

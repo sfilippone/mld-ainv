@@ -2,11 +2,14 @@ MLDAINVDIR=../..
 include $(MLDAINVDIR)/Make.inc
 PSBLIBDIR=$(PSBLASDIR)/lib/
 PSBINCDIR=$(PSBLASDIR)/include
+MLDINCDIR=$(MLDDIR)/include
+MLDLIBDIR=$(MLDDIR)/lib
+MLD_LIB=-L$(MLDLIBDIR) -lpsb_krylov -lmld_prec -lpsb_prec
 MLDAINVINCDIR=$(MLDAINVDIR)/include
 MLDAINVLIBDIR=$(MLDAINVDIR)/lib
-MLDAINV_LIB=-L$(MLDAINVLIBDIR) -lpsb_krylov -lmld_prec -lpsb_prec
+MLDAINV_LIB=-L$(MLDAINVLIBDIR) -lainv_prec
 PSBLAS_LIB= -L$(PSBLIBDIR)  -lpsb_util  -lpsb_base
-FINCLUDES=$(FMFLAG). $(FMFLAG)$(MLDAINVINCDIR)  $(FMFLAG)$(PSBINCDIR) $(FIFLAG).
+FINCLUDES=$(FMFLAG). $(FMFLAG)$(MLDAINVINCDIR)  $(FMFLAG)$(MLDINCDIR) $(FMFLAG)$(PSBINCDIR) $(FIFLAG).
 
 DFSOBJS=df_sample.o data_input.o
 SFSOBJS=sf_sample.o data_input.o
@@ -19,22 +22,22 @@ all: sf_sample df_sample cf_sample zf_sample
 
 df_sample: $(DFSOBJS)
 	$(F90LINK) $(LINKOPT) $(DFSOBJS) -o df_sample \
-	$(MLDAINV_LIB)  $(PSBLAS_LIB) $(LDLIBS)
+	$(MLDAINV_LIB) $(MLD_LIB)  $(PSBLAS_LIB) $(LDLIBS)
 	/bin/mv df_sample $(EXEDIR) 
 
 sf_sample: $(SFSOBJS)
 	$(F90LINK) $(LINKOPT) $(SFSOBJS) -o sf_sample \
-	$(MLDAINV_LIB)  $(PSBLAS_LIB) $(LDLIBS)
+	$(MLDAINV_LIB) $(MLD_LIB)  $(PSBLAS_LIB) $(LDLIBS)
 	/bin/mv sf_sample $(EXEDIR) 
 
 cf_sample: $(CFSOBJS)
 	$(F90LINK) $(LINKOPT) $(CFSOBJS) -o cf_sample \
-	$(MLDAINV_LIB)  $(PSBLAS_LIB) $(LDLIBS)
+	$(MLDAINV_LIB) $(MLD_LIB)  $(PSBLAS_LIB) $(LDLIBS)
 	/bin/mv cf_sample $(EXEDIR) 
 
 zf_sample: $(ZFSOBJS)
 	$(F90LINK) $(LINKOPT) $(ZFSOBJS) -o zf_sample \
-	$(MLDAINV_LIB)  $(PSBLAS_LIB) $(LDLIBS)
+	$(MLDAINV_LIB) $(MLD_LIB)  $(PSBLAS_LIB) $(LDLIBS)
 	/bin/mv zf_sample $(EXEDIR) 
 
 sf_sample.o: data_input.o

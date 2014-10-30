@@ -274,6 +274,8 @@ contains
       val = mld_ainv_s_ft_llk_
     case('SYM-LLK')
       val = mld_ainv_s_llk_
+    case('MLK')
+      val = mld_ainv_mlk_
 #if defined(HAVE_TUMA_SAINV)
     case('SAINV-TUMA')
       val = mld_ainv_s_tuma_ 
@@ -290,6 +292,7 @@ contains
     integer(psb_ipk_), intent(in) :: ialg 
     character(len=40) :: val
     
+    character(len=*), parameter :: mlkname   = 'Left-looking, list merge '
     character(len=*), parameter :: llkname   = 'Left-looking '
     character(len=*), parameter :: stabllkname  = 'Stabilized Left-looking '
     character(len=*), parameter :: sllkname  = 'Symmetric Left-looking '
@@ -298,6 +301,8 @@ contains
     character(len=*), parameter :: defname   = 'Unknown alg variant '
     
     select case (ialg)
+    case(mld_ainv_mlk_)
+      val = mlkname
     case(mld_ainv_llk_)
       val = llkname
     case(mld_ainv_s_llk_)

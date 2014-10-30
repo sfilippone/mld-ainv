@@ -52,8 +52,10 @@ module mld_base_ainv_mod
   integer, parameter   :: mld_ainv_s_llk_ = mld_ainv_llk_ + 1
   integer, parameter   :: mld_ainv_s_ft_llk_ = mld_ainv_s_llk_ + 1
   integer, parameter   :: mld_ainv_llk_noth_ = mld_ainv_s_ft_llk_  + 1
+  integer, parameter   :: mld_ainv_mlk_      = mld_ainv_llk_noth_  + 1
+  integer, parameter   :: mld_ainv_lmx_      = mld_ainv_mlk_
 #if defined(HAVE_TUMA_SAINV)
-  integer, parameter   :: mld_ainv_s_tuma_    = mld_ainv_llk_noth_  + 1
+  integer, parameter   :: mld_ainv_s_tuma_    = mld_ainv_lmx_  + 1
   integer, parameter   :: mld_ainv_l_tuma_    = mld_ainv_s_tuma_  + 1
 #endif
 
