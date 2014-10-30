@@ -102,11 +102,12 @@ subroutine mld_d_sparsify(idiag,nzrmax,sp_thresh,n,zw,nz,iz,valz,info,istart,ihe
     call psb_free_heap(heap,info)
     nz = k 
     call psb_msort(xwid(1:nz),indx(1:nz),dir=psb_sort_up_)
+!!$    write(0,*) 'sparsify output for idiag ',idiag,' :',nz,sp_thresh
     do i=1, nz
       valz(i) = xw(indx(i))
       iz(i)   = xwid(i)
+!!$      write(0,*) '         ',iz(i),valz(i)
     end do
-!!$    write(0,*) 'sparsify output for idiag ',idiag,' :',nz
 
   end if
 
@@ -166,8 +167,13 @@ subroutine mld_d_sparsify_list(idiag,nzrmax,sp_thresh,n,zw,nz,iz,valz,lhead,list
     current = next
   end do
   nz = i
-  if (nz > 2) call psb_msort(xw(2:nz),ix=xwid(2:nz),dir=psb_asort_down_,flag=psb_sort_keep_idx_)
+  if (nz > 2) call psb_hsort(xw(2:nz),ix=xwid(2:nz),dir=psb_asort_down_,flag=psb_sort_keep_idx_)
 !!$  write(0,*) 'Done first msort '
+!!$  write(0,*) '   after first msort for idiag ',idiag,' :',nz,sp_thresh
+!!$  do i=1, nz
+!!$    write(0,*) '         ',xwid(i),xw(i)
+!!$  end do
+  
   i = 2
   do while (i<=nz)
     if (abs(xw(i)) < sp_thresh) exit
@@ -178,11 +184,12 @@ subroutine mld_d_sparsify_list(idiag,nzrmax,sp_thresh,n,zw,nz,iz,valz,lhead,list
   call psb_msort(xwid(1:nz),ix=indx(1:nz),dir=psb_sort_up_)
 !!$  write(0,*) 'Done second msort '
   
+!!$  write(0,*) 'sparsify output for idiag ',idiag,' :',nz,i,sp_thresh
   do i=1, nz
     valz(i) = xw(indx(i))
     iz(i)   = xwid(i)
+!!$      write(0,*) '         ',iz(i),valz(i)
   end do
-!!$  write(0,*) 'sparsify output for idiag ',idiag,' :',nz
 
   return
 

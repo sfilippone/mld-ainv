@@ -133,25 +133,26 @@ subroutine mld_dsparse_biconjg_mlk(n,a,p,z,w,nzrmax,sp_thresh,info)
     hlhead = -1 
 
     kkc = 0 
-    ilst  = ac%icp(i+1)-1
-    ifrst = ac%icp(i+1)
-    do j = ac%icp(i), ac%icp(i+1)-1
+    ilst  = ac%icp(i)-1
+    ifrst = ac%icp(i)
+    do j = ac%icp(i+1)-1, ac%icp(i), -1
       if (ac%ia(j) < i) then 
-        ifrst = j
+        ilst = j 
         exit
       end if
     end do
     kkc = ilst-ifrst+1
 
-    if (debug) then 
-      write(0,*) 'Outer Before insertion: '
+    if (.true..or.debug) then 
+!!$      write(0,*) 'Outer Before insertion  : ',hlhead
       call printlist(hlhead,hlist)
-      write(0,*) 'Outer Inserting : ',kkc,':',ac%ia(ifrst:ilst)
     end if
-
-    !call hlmerge(hlhead,hlist,bfr(1:kkc))
-    call hlmerge(hlhead,hlist,ac%ia(ifrst:ilst))
-
+    if (kkc > 0) then 
+!!$      write(0,*) i,' Outer Inserting : ',kkc,':',ac%ia(ifrst:ilst)
+      
+      !call hlmerge(hlhead,hlist,bfr(1:kkc))
+      call hlmerge(hlhead,hlist,ac%ia(ifrst:ilst))
+    end if
     if (debug) then 
       write(0,*) 'Outer After insertion: ',hlhead
       call printlist(hlhead,hlist)
@@ -171,7 +172,7 @@ subroutine mld_dsparse_biconjg_mlk(n,a,p,z,w,nzrmax,sp_thresh,info)
     lastj = -1 
     outer: do 
       mj      = hlhead 
-      if (hlhead > 0)  then 
+      if (mj > 0)  then 
         hlhead = hlist(mj) 
         hlist(mj) = -1 
       end if
@@ -194,17 +195,26 @@ subroutine mld_dsparse_biconjg_mlk(n,a,p,z,w,nzrmax,sp_thresh,info)
       ! !$          write(psb_err_unit,*) j,i,p(i)
 
       alpha = (-p(i)/p(j))
+!!$      write(0,*) 'At step ',i,j,' p(i) ',p(i),alpha
+!!$      write(0,*) '   Current list is : ',hlhead
+!!$      call printlist(hlhead,hlist)
+!!$      
+
 
       if (.false..or.(abs(alpha) > sp_thresh)) then 
         ifrst=z%icp(j)
         ilst=z%icp(j+1)-1
         call hlmerge(rwhead,rwlist,z%ia(ifrst:ilst))
+!!$        write(0,*) 'At step ',i,j,' range ',z%icp(j), z%icp(j+1)-1, &
+!!$             & ' vals ',z%ia(z%icp(j):z%icp(j+1)-1)
 
         do k=z%icp(j), z%icp(j+1)-1
           kr     = z%ia(k)
           zval(kr) = zval(kr) + alpha*z%val(k)
 
           if (izkr(kr) == 0) then 
+!!$            write(0,*) ' main inner Inserting ',kr
+!!$            call hlmerge(rwhead,rwlist,(/kr/))
             izkr(kr) = 1
             ! We have just added a new nonzero in KR. Thus, we will
             ! need to explicitly compute the dot products on all
@@ -226,8 +236,10 @@ subroutine mld_dsparse_biconjg_mlk(n,a,p,z,w,nzrmax,sp_thresh,info)
               call printlist(hlhead,hlist)
               write(0,*) 'Inner Inserting : ',kkc,':',ac%ia(ifrst:ilst)
             end if
-            
-            call hlmerge(hlhead,hlist,ac%ia(ifrst:ilst))
+            if (ilst >= ifrst) then 
+!!$              write(0,*) j,i,' Inner inserting ',ac%ia(ifrst:ilst)
+              call hlmerge(hlhead,hlist,ac%ia(ifrst:ilst))
+            end if
             
             if (debug) then 
               write(0,*) 'Inner After insertion: ',hlhead
@@ -283,11 +295,11 @@ subroutine mld_dsparse_biconjg_mlk(n,a,p,z,w,nzrmax,sp_thresh,info)
     hlhead = -1 
     
     kkc = 0 
-    ilst  = a%irp(i+1)-1
-    ifrst = a%irp(i+1)
-    do j = a%irp(i), a%irp(i+1)-1
+    ilst  = a%irp(i)-1
+    ifrst = a%irp(i)
+    do j = a%irp(i+1)-1, a%irp(i), -1
       if (a%ja(j) < i) then 
-        ifrst = j
+        ilst = j 
         exit
       end if
     end do
@@ -298,10 +310,10 @@ subroutine mld_dsparse_biconjg_mlk(n,a,p,z,w,nzrmax,sp_thresh,info)
       call printlist(hlhead,hlist)
       write(0,*) 'Outer Inserting : ',kkc,':',a%ja(ifrst:ilst)
     end if
-    
-    !call hlmerge(hlhead,hlist,bfr(1:kkc))
-    call hlmerge(hlhead,hlist,a%ja(ifrst:ilst))
-    
+    if (kkc > 0 ) then 
+      !call hlmerge(hlhead,hlist,bfr(1:kkc))
+      call hlmerge(hlhead,hlist,a%ja(ifrst:ilst))
+    end if
     if (debug) then 
       write(0,*) 'Outer After insertion: ',hlhead
       call printlist(hlhead,hlist)
@@ -469,6 +481,7 @@ contains
     lh = ph 
     do while (lv <= nv) 
       listv(lh) = vals(lv)
+      lh = listv(lh)
       lv = lv + 1
     end do
   end subroutine hlmerge

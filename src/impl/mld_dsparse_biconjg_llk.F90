@@ -128,8 +128,10 @@ subroutine mld_dsparse_biconjg_llk(n,a,p,z,w,nzrmax,sp_thresh,info)
     if (info == psb_success_) call psb_insert_heap(i,heap,info)
 
     if (info == psb_success_) call psb_init_heap(rheap,info)
+    
     do j = ac%icp(i), ac%icp(i+1)-1
       if (ac%ia(j) < i) then 
+!!$        write(0,*) i, ' Outer inserting ',ac%ia(j)
         if (info == psb_success_) call psb_insert_heap(ac%ia(j),rheap,info)
         izcr(ac%ia(j)) = 1
       end if
@@ -169,16 +171,18 @@ subroutine mld_dsparse_biconjg_llk(n,a,p,z,w,nzrmax,sp_thresh,info)
       end do
       nzra = max(0,ip2 - ip1 + 1) 
       p(i) = psb_spge_dot(nzra,a%ja(ip1:ip2),a%val(ip1:ip2),zval)
-      ! !$          write(psb_err_unit,*) j,i,p(i)
+      ! ! write(psb_err_unit,*) j,i,p(i)
 
       alpha = (-p(i)/p(j))
-
+!!$      write(0,*) 'At step ',i,j,' p(i) ',p(i),alpha
       if (.false..or.(abs(alpha) > sp_thresh)) then 
+!!$        write(0,*) 'At step ',i,j,' range ',z%icp(j), z%icp(j+1)-1, &
+!!$             & ' vals ',z%ia(z%icp(j):z%icp(j+1)-1)
         do k=z%icp(j), z%icp(j+1)-1
           kr     = z%ia(k)
           zval(kr) = zval(kr) + alpha*z%val(k)
           if (izkr(kr) == 0) then 
-
+!!$            write(0,*) ' main inner Inserting ',kr
             call psb_insert_heap(kr,heap,info) 
             if (info /= psb_success_) exit
             izkr(kr) = 1
@@ -191,6 +195,7 @@ subroutine mld_dsparse_biconjg_llk(n,a,p,z,w,nzrmax,sp_thresh,info)
               nextj=ac%ia(kc)
               if ((info == psb_success_).and.(izcr(nextj)==0)&
                    & .and.(nextj>j).and.(nextj<i)) then
+!!$                write(0,*) j,i,' Inner inserting ',nextj
                 call psb_insert_heap(nextj,rheap,info)
                 izcr(nextj) = 1
               end if
