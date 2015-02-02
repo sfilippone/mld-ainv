@@ -55,7 +55,7 @@ AC_MSG_NOTICE([
  	This  creates Make.inc, but if you read carefully the
 	docum entation, you can make your own by hand for your needs.
 
-        ./configure  --with-mld2p4=/path/to/mld2p4 --with-spgpu=/path/to/spgpu
+        ./configure  --with-mld2p4=/path/to/mld2p4 
 	See ./configure --help=short fore more info.
 --------------------------------------------------------------------------------
 		])
