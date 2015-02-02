@@ -50,7 +50,7 @@ subroutine mld_d_ainv_solver_check(sv,info)
   info = psb_success_
 
   call mld_check_def(sv%fill_in,&
-       & 'Level',0,is_legal_ml_lev)
+       & 'Level',1,is_legal_ml_lev)
   call mld_check_def(sv%thresh,&
        & 'Eps',dzero,is_legal_d_fact_thrs)
 
