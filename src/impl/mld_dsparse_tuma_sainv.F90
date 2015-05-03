@@ -25,7 +25,6 @@
     integer imodif,diag_one,fill,fillmax,ifillmax
     double precision mi,drfl,diagtol
 
-    type(psb_int_heap) :: heap 
     real(psb_dpk_)     :: alpha, t0, t1
     character(len=20)  :: name='mld_TUMA_sainv'
 

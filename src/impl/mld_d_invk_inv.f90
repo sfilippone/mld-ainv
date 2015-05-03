@@ -41,14 +41,14 @@ subroutine mld_d_invk_inv(fill_in,i,row,rowlevs,heap,ja,irp,val,uplevs,&
   implicit none 
 
   ! Arguments
-  type(psb_int_heap), intent(inout)    :: heap 
-  integer, intent(in)                  :: i, fill_in
-  integer, intent(inout)               :: nidx,info
-  integer, intent(inout)               :: rowlevs(:)
-  integer, allocatable, intent(inout)  :: idxs(:)
-  integer, intent(in)                  :: ja(:),irp(:),uplevs(:)
-  real(psb_dpk_), intent(in)           :: val(:)
-  real(psb_dpk_), intent(inout)        :: row(:)
+  type(psb_i_heap), intent(inout)     :: heap 
+  integer, intent(in)                 :: i, fill_in
+  integer, intent(inout)              :: nidx,info
+  integer, intent(inout)              :: rowlevs(:)
+  integer, allocatable, intent(inout) :: idxs(:)
+  integer, intent(in)                 :: ja(:),irp(:),uplevs(:)
+  real(psb_dpk_), intent(in)          :: val(:)
+  real(psb_dpk_), intent(inout)       :: row(:)
 
   ! Local variables
   integer             :: k,j,lrwk,jj,lastk, iret
@@ -68,7 +68,7 @@ subroutine mld_d_invk_inv(fill_in,i,row,rowlevs,heap,ja,irp,val,uplevs,&
   !
   do
     ! Beware: (iret < 0) means that the heap is empty, not an error.
-    call psb_heap_get_first(k,heap,iret) 
+    call heap%get_first(k,iret) 
     if (iret < 0) then 
 !!$        write(psb_err_unit,*) 'IINVK: ',i,' returning at ',lastk
       return
@@ -109,7 +109,7 @@ subroutine mld_d_invk_inv(fill_in,i,row,rowlevs,heap,ja,irp,val,uplevs,&
         ! need to insert it more than once. 
         !
         if (rowlevs(j)<0) then 
-          call psb_insert_heap(j,heap,info)
+          call heap%insert(j,info)
           if (info /= psb_success_) return
           rowlevs(j) = abs(rowlevs(j))
         end if

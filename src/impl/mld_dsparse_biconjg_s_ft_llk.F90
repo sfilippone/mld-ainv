@@ -57,7 +57,7 @@ subroutine mld_dsparse_biconjg_s_ft_llk(n,a,p,z,w,nzrmax,sp_thresh,info)
   integer :: i,j,k, kc, kr, err_act, nz, nzra, nzrz, ipzi,ipzj, nzww,&
        & nzzi,nzzj, nzz, ip1, ip2, ipza,ipzz, ipzn, nzzn, ipz1, ipz2,&
        &  ipj, lastj, nextj, nzw, nzrw
-  type(psb_int_heap) :: heap, rheap
+  type(psb_i_heap)   :: heap, rheap
   type(psb_d_csc_sparse_mat) :: ac
   real(psb_dpk_)     :: alpha, tmpq,tmpq2
   character(len=20)  :: name='mld_orth_llk'
@@ -126,12 +126,12 @@ subroutine mld_dsparse_biconjg_s_ft_llk(n,a,p,z,w,nzrmax,sp_thresh,info)
     ! !$        end do
     zval(i)  = done
     izkr(i) = 1
-    call psb_init_heap(heap,info)
-    if (info == psb_success_) call psb_insert_heap(i,heap,info)
-    if (info == psb_success_) call psb_init_heap(rheap,info)
+    call heap%init(info)
+    if (info == psb_success_) call heap%insert(i,info)
+    if (info == psb_success_) call rheap%init(info)
     do j = ac%icp(i), ac%icp(i+1)-1
       if (ac%ia(j)<i) then 
-        if (info == psb_success_) call psb_insert_heap(ac%ia(j),rheap,info)
+        if (info == psb_success_) call rheap%insert(ac%ia(j),info)
         izcr(ac%ia(j)) = 1
       end if
     end do
@@ -149,7 +149,7 @@ subroutine mld_dsparse_biconjg_s_ft_llk(n,a,p,z,w,nzrmax,sp_thresh,info)
     lastj = -1 
     outer: do 
       inner: do 
-        call psb_heap_get_first(j,rheap,info)
+        call rheap%get_first(j,info)
         if (debug) write(0,*) 'from get_first: ',j,info
         if (info == -1) exit outer ! Empty heap
         if (j > lastj) then 
@@ -180,7 +180,7 @@ subroutine mld_dsparse_biconjg_s_ft_llk(n,a,p,z,w,nzrmax,sp_thresh,info)
           kr     = z%ia(k)
           zval(kr) = zval(kr) + alpha*z%val(k)
           if (izkr(kr) == 0) then 
-            call psb_insert_heap(kr,heap,info) 
+            call heap%insert(kr,info) 
             if (info /= psb_success_) exit
             izkr(kr) = 1
             ! We have just added a new nonzero in KR. Thus, we will
@@ -192,7 +192,7 @@ subroutine mld_dsparse_biconjg_s_ft_llk(n,a,p,z,w,nzrmax,sp_thresh,info)
               nextj=ac%ia(kc)
               if ((info == psb_success_).and.(izcr(nextj)==0)&
                    & .and.(nextj>j).and.(nextj<i)) then
-                call psb_insert_heap(nextj,rheap,info)
+                call rheap%insert(nextj,info)
                 izcr(nextj) = 1
               end if
             end do
@@ -248,13 +248,13 @@ subroutine mld_dsparse_biconjg_s_ft_llk(n,a,p,z,w,nzrmax,sp_thresh,info)
     ! !$        end do
     zval(i)  = done
     izkr(i) = 1
-    call psb_init_heap(heap,info)
-    if (info == psb_success_) call psb_insert_heap(i,heap,info)
+    call heap%init(info)
+    if (info == psb_success_) call heap%insert(i,info)
 !!$      write(0,*) 'Inserting into heap ',i
-    if (info == psb_success_) call psb_init_heap(rheap,info)
+    if (info == psb_success_) call rheap%init(info)
     do j = a%irp(i), a%irp(i+1)-1
       if (a%ja(j)<i) then 
-        if (info == psb_success_) call psb_insert_heap(a%ja(j),rheap,info)
+        if (info == psb_success_) call rheap%insert(a%ja(j),info)
         izcr(a%ja(j)) = 1
       end if
     end do
@@ -272,7 +272,7 @@ subroutine mld_dsparse_biconjg_s_ft_llk(n,a,p,z,w,nzrmax,sp_thresh,info)
     lastj = -1 
     outerw: do 
       innerw: do 
-        call psb_heap_get_first(j,rheap,info)
+        call rheap%get_first(j,info)
         if (debug) write(0,*) 'from get_first: ',j,info
         if (info == -1) exit outerw ! Empty heap
         if (j > lastj) then 
@@ -316,7 +316,7 @@ subroutine mld_dsparse_biconjg_s_ft_llk(n,a,p,z,w,nzrmax,sp_thresh,info)
           kr     = w%ia(k)
           zval(kr) = zval(kr) + alpha*w%val(k)
           if (izkr(kr) == 0) then 
-            call psb_insert_heap(kr,heap,info) 
+            call heap%insert(kr,info) 
             if (info /= psb_success_) exit
             izkr(kr) = 1
             ! We have just added a new nonzero in KR. Thus, we will
@@ -328,7 +328,7 @@ subroutine mld_dsparse_biconjg_s_ft_llk(n,a,p,z,w,nzrmax,sp_thresh,info)
               nextj=a%ja(kc)
               if ((info == psb_success_).and.(izcr(nextj)==0)&
                    & .and.(nextj>j).and.(nextj<i)) then
-                call psb_insert_heap(nextj,rheap,info)
+                call rheap%insert(nextj,info)
                 izcr(nextj) = 1
               end if
             end do

@@ -52,8 +52,8 @@ subroutine mld_dsparse_invt(n,a,z,nzrmax,sp_thresh,info)
   real(psb_dpk_), allocatable :: row(:)
   type(psb_d_coo_sparse_mat)  :: trw
   type(psb_d_csr_sparse_mat)  :: acsr, zcsr
-  integer                  :: ktrw, nidx, nlw,nup,jmaxup
-  type(psb_int_heap)       :: heap
+  integer                     :: ktrw, nidx, nlw,nup,jmaxup
+  type(psb_i_heap)            :: heap
   real(psb_dpk_)     :: alpha, nrmi
   character(len=20)  :: name='mld_sp_invt'
 

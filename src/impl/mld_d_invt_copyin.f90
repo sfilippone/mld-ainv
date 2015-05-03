@@ -43,7 +43,7 @@ subroutine mld_d_invt_copyin(i,m,a,jd,jmin,jmax,nlw,nup,jmaxup,nrmi,row,heap,&
   integer, intent(inout)               :: ktrw,nlw,nup,jmaxup,info
   integer, intent(inout)               :: irwt(:)
   real(psb_dpk_), intent(inout)        :: nrmi,row(:)
-  type(psb_int_heap), intent(inout)    :: heap
+  type(psb_i_heap), intent(inout)      :: heap
   real(psb_dpk_), intent(in), optional :: sign
 
   integer                     :: k,j,irb,kin,nz, err_act
@@ -56,7 +56,7 @@ subroutine mld_d_invt_copyin(i,m,a,jd,jmin,jmax,nlw,nup,jmaxup,nrmi,row,heap,&
   info = psb_success_
   call psb_erractionsave(err_act)
 
-  call psb_init_heap(heap,info)
+  call heap%init(info)
   if (info /= psb_success_) then
     info=psb_err_from_subroutine_
     call psb_errpush(info,name,a_err='psb_init_heap')
@@ -81,7 +81,7 @@ subroutine mld_d_invt_copyin(i,m,a,jd,jmin,jmax,nlw,nup,jmaxup,nrmi,row,heap,&
     k = a%ja(j)
     if ((jmin<=k).and.(k<=jmax)) then 
       row(k)     = sign_ * a%val(j)
-      call psb_insert_heap(k,heap,info)
+      call heap%insert(k,info)
       irwt(k) = 1
       if (info /= psb_success_) then
         info=psb_err_from_subroutine_

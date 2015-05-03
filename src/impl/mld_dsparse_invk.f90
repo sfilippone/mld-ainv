@@ -51,8 +51,8 @@ subroutine mld_dsparse_invk(n,a,z,fill_in,info,inlevs)
   real(psb_dpk_), allocatable :: row(:)
   type(psb_d_coo_sparse_mat)  :: trw
   type(psb_d_csr_sparse_mat)  :: acsr, zcsr
-  integer                  :: ktrw, nidx
-  type(psb_int_heap)       :: heap
+  integer                     :: ktrw, nidx
+  type(psb_i_heap)            :: heap
 
   real(psb_dpk_)     :: alpha
   character(len=20)  :: name='mld_sp_invk'
@@ -106,7 +106,6 @@ subroutine mld_dsparse_invk(n,a,z,fill_in,info,inlevs)
          & sign=-done,inlevs=inlevs)
     row(i)     = done
     rowlevs(i) = 0
-!!$      call psb_insert_heap(i,heap,info) ! No we don't want to put I in. 
 
     ! Update loop
     call mld_invk_inv(fill_in,i,row,rowlevs,heap,&

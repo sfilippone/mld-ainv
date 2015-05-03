@@ -47,7 +47,7 @@ subroutine mld_d_invk_copyin(i,m,a,jmin,jmax,row,rowlevs,heap,ktrw,trw,info,sign
   integer, intent(inout)               :: ktrw,info
   integer, intent(inout)               :: rowlevs(:)
   real(psb_dpk_), intent(inout)        :: row(:)
-  type(psb_int_heap), intent(inout)    :: heap
+  type(psb_i_heap), intent(inout)      :: heap
   real(psb_dpk_), optional, intent(in) :: sign
   integer, intent(in), optional        :: inlevs(:)
 
@@ -61,7 +61,7 @@ subroutine mld_d_invk_copyin(i,m,a,jmin,jmax,row,rowlevs,heap,ktrw,trw,info,sign
   if (psb_get_errstatus() /= 0) return 
   info = psb_success_
   call psb_erractionsave(err_act)
-  call psb_init_heap(heap,info) 
+  call heap%init(info) 
   if (info /= psb_success_) then
     info=psb_err_from_subroutine_
     call psb_errpush(info,name,a_err='psb_init_heap')
@@ -84,7 +84,7 @@ subroutine mld_d_invk_copyin(i,m,a,jmin,jmax,row,rowlevs,heap,ktrw,trw,info,sign
       if ((jmin<=k).and.(k<=jmax)) then 
         row(k)     = sign_ * a%val(j)
         rowlevs(k) = inlevs(j)
-        call psb_insert_heap(k,heap,info)
+        call heap%insert(k,info)
       end if
     end do
   else
@@ -93,7 +93,7 @@ subroutine mld_d_invk_copyin(i,m,a,jmin,jmax,row,rowlevs,heap,ktrw,trw,info,sign
       if ((jmin<=k).and.(k<=jmax)) then 
         row(k)     = sign_ * a%val(j)
         rowlevs(k) = 0
-        call psb_insert_heap(k,heap,info)
+        call heap%insert(k,info)
       end if
     end do
   end if

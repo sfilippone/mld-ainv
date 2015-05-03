@@ -28,19 +28,19 @@ module mld_d_ainv_tools_mod
   interface sparsify
     subroutine mld_d_sparsify(idiag,nzrmax,sp_thresh,n,zw,nz,iz,valz,info, &
          & istart,iheap,ikr)
-      use psb_base_mod, only : psb_dpk_, psb_ipk_, psb_int_heap
+      use psb_base_mod, only : psb_dpk_, psb_ipk_, psb_i_heap
       implicit none 
       
-      real(psb_dpk_), intent(in)  :: sp_thresh
-      integer, intent(in)         :: idiag, n, nzrmax
-      real(psb_dpk_), intent(inout)  :: zw(:)
-      integer, intent(out)        :: nz
-      integer, intent(out)        :: iz(:)
-      real(psb_dpk_), intent(out) :: valz(:)
-      integer, intent(out)        :: info
+      real(psb_dpk_), intent(in)    :: sp_thresh
+      integer, intent(in)           :: idiag, n, nzrmax
+      real(psb_dpk_), intent(inout) :: zw(:)
+      integer, intent(out)          :: nz
+      integer, intent(out)          :: iz(:)
+      real(psb_dpk_), intent(out)   :: valz(:)
+      integer, intent(out)          :: info
       integer, intent(in), optional :: istart
-      type(psb_int_heap), optional :: iheap
-      integer, optional            :: ikr(:)
+      type(psb_i_heap), optional    :: iheap
+      integer, optional             :: ikr(:)
     end subroutine mld_d_sparsify
     subroutine mld_d_sparsify_list(idiag,nzrmax,sp_thresh,n,zw,nz,iz,valz,lhead,listv,ikr,info)
       use psb_base_mod, only : psb_dpk_, psb_ipk_

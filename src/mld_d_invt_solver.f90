@@ -209,7 +209,7 @@ module mld_d_invt_solver
     subroutine mld_d_invt_copyin(i,m,a,jd,jmin,jmax,nlw,nup,jmaxup,nrmi,row,heap,&
          & irwt,ktrw,trw,info,sign)
       use psb_base_mod, only : psb_d_csr_sparse_mat, psb_d_coo_sparse_mat,&
-           & psb_dpk_, psb_int_heap
+           & psb_dpk_, psb_i_heap
       implicit none 
       type(psb_d_csr_sparse_mat), intent(in)    :: a
       type(psb_d_coo_sparse_mat), intent(inout) :: trw
@@ -217,7 +217,7 @@ module mld_d_invt_solver
       integer, intent(inout)               :: ktrw,nlw,nup,jmaxup,info
       integer, intent(inout)               :: irwt(:)
       real(psb_dpk_), intent(inout)        :: nrmi,row(:)
-      type(psb_int_heap), intent(inout)    :: heap
+      type(psb_i_heap), intent(inout)    :: heap
       real(psb_dpk_), intent(in), optional :: sign
 
     end subroutine mld_d_invt_copyin
@@ -226,10 +226,10 @@ module mld_d_invt_solver
   interface mld_invt_inv
     subroutine mld_d_invt_inv(thres,i,nrmi,row,heap,irwt,uia1,uia2,uaspk,&
          & nidx,idxs,info)
-      use psb_base_mod, only : psb_dspmat_type, psb_dpk_, psb_int_heap
+      use psb_base_mod, only : psb_dspmat_type, psb_dpk_, psb_i_heap
       implicit none 
       ! Arguments
-      type(psb_int_heap), intent(inout)   :: heap 
+      type(psb_i_heap), intent(inout)   :: heap 
       integer, intent(in)                 :: i
       integer, intent(inout)              :: nidx,info
       integer, intent(inout)              :: irwt(:) 
@@ -246,7 +246,7 @@ module mld_d_invt_solver
     subroutine mld_d_invt_copyout(fill_in,thres,i,m,nlw,nup,jmaxup,nrmi,row, &
          & nidx,idxs,l2,uia1,uia2,uaspk,info)
 
-      use psb_base_mod, only : psb_dspmat_type, psb_dpk_, psb_int_heap
+      use psb_base_mod, only : psb_dspmat_type, psb_dpk_, psb_i_heap
 
       implicit none 
 
@@ -264,7 +264,7 @@ module mld_d_invt_solver
 
   interface  mld_sparse_invt
     subroutine mld_dsparse_invt(n,a,z,nzrmax,sp_thresh,info)
-      use psb_base_mod, only : psb_dspmat_type, psb_dpk_, psb_int_heap
+      use psb_base_mod, only : psb_dspmat_type, psb_dpk_
       implicit none 
       integer, intent(in)                  :: n
       type(psb_dspmat_type), intent(in)    :: a

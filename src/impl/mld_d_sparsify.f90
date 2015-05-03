@@ -11,7 +11,7 @@ subroutine mld_d_sparsify(idiag,nzrmax,sp_thresh,n,zw,nz,iz,valz,info,istart,ihe
   real(psb_dpk_), intent(out) :: valz(:)
   integer, intent(out)        :: info
   integer, intent(in), optional :: istart
-  type(psb_int_heap), optional :: iheap
+  type(psb_i_heap), optional :: iheap
   integer, optional            :: ikr(:)
 
   integer :: i, istart_, last_i, iret,k
@@ -19,7 +19,7 @@ subroutine mld_d_sparsify(idiag,nzrmax,sp_thresh,n,zw,nz,iz,valz,info,istart,ihe
   integer            :: widx
   real(psb_dpk_), allocatable :: xw(:)
   integer, allocatable        :: xwid(:), indx(:)
-  type(psb_dreal_idx_heap)    :: heap
+  type(psb_d_idx_heap)    :: heap
 
 
   info = psb_success_
@@ -42,7 +42,7 @@ subroutine mld_d_sparsify(idiag,nzrmax,sp_thresh,n,zw,nz,iz,valz,info,istart,ihe
       return
     end if
 
-    call psb_init_heap(heap,info,dir=psb_asort_down_)
+    call heap%init(info,dir=psb_asort_down_)
 
     ! Keep at least the diagonal
     nz = 0 
@@ -55,7 +55,7 @@ subroutine mld_d_sparsify(idiag,nzrmax,sp_thresh,n,zw,nz,iz,valz,info,istart,ihe
       end if
       last_i = -1
       do 
-        call psb_heap_get_first(i,iheap,iret) 
+        call iheap%get_first(i,iret) 
         if (iret < 0) exit
         ! An index may have been put on the heap more than once.
         if (i == last_i) cycle
@@ -64,7 +64,7 @@ subroutine mld_d_sparsify(idiag,nzrmax,sp_thresh,n,zw,nz,iz,valz,info,istart,ihe
           xw(1)   = zw(i)
           xwid(1) = i
         else if (abs(zw(i)) >= sp_thresh) then 
-          call psb_insert_heap(zw(i),i,heap,info)
+          call heap%insert(zw(i),i,info)
         end if
         zw(i)  = dzero
         ikr(i) = 0
@@ -77,7 +77,7 @@ subroutine mld_d_sparsify(idiag,nzrmax,sp_thresh,n,zw,nz,iz,valz,info,istart,ihe
           xw(1)   = zw(i)
           xwid(1) = i
         else if (abs(zw(i)) >= sp_thresh) then 
-          call psb_insert_heap(zw(i),i,heap,info)
+          call heap%insert(zw(i),i,info)
         end if
         zw(i) = dzero
       end do
@@ -86,7 +86,7 @@ subroutine mld_d_sparsify(idiag,nzrmax,sp_thresh,n,zw,nz,iz,valz,info,istart,ihe
     k = 1
     do 
       if (k == nzrmax) exit 
-      call psb_heap_get_first(witem,widx,heap,info)
+      call heap%get_first(witem,widx,info)
       if (info == -1) then 
         info = psb_success_
         exit 
@@ -99,7 +99,7 @@ subroutine mld_d_sparsify(idiag,nzrmax,sp_thresh,n,zw,nz,iz,valz,info,istart,ihe
       xw(k)   = witem
       xwid(k) = widx
     end do
-    call psb_free_heap(heap,info)
+    call heap%free(info)
     nz = k 
     call psb_msort(xwid(1:nz),indx(1:nz),dir=psb_sort_up_)
 !!$    write(0,*) 'sparsify output for idiag ',idiag,' :',nz,sp_thresh
@@ -167,7 +167,8 @@ subroutine mld_d_sparsify_list(idiag,nzrmax,sp_thresh,n,zw,nz,iz,valz,lhead,list
     current = next
   end do
   nz = i
-  if (nz > 2) call psb_hsort(xw(2:nz),ix=xwid(2:nz),dir=psb_asort_down_,flag=psb_sort_keep_idx_)
+  if (nz > 2) call psb_hsort(xw(2:nz),ix=xwid(2:nz),&
+       & dir=psb_asort_down_,flag=psb_sort_keep_idx_)
 !!$  write(0,*) 'Done first msort '
 !!$  write(0,*) '   after first msort for idiag ',idiag,' :',nz,sp_thresh
 !!$  do i=1, nz

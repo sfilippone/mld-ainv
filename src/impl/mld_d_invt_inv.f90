@@ -40,7 +40,7 @@ subroutine mld_d_invt_inv(thres,i,nrmi,row,heap,irwt,ja,irp,val,nidx,idxs,info)
   implicit none 
 
   ! Arguments
-  type(psb_int_heap), intent(inout)   :: heap 
+  type(psb_i_heap), intent(inout)     :: heap 
   integer, intent(in)                 :: i
   integer, intent(inout)              :: nidx,info
   integer, intent(inout)              :: irwt(:) 
@@ -68,7 +68,7 @@ subroutine mld_d_invt_inv(thres,i,nrmi,row,heap,irwt,ja,irp,val,nidx,idxs,info)
   !
   do
 
-    call psb_heap_get_first(k,heap,iret) 
+    call heap%get_first(k,iret) 
     if (iret < 0)  exit
 
     ! 
@@ -117,7 +117,7 @@ subroutine mld_d_invt_inv(thres,i,nrmi,row,heap,irwt,ja,irp,val,nidx,idxs,info)
             !
             ! Do the insertion.
             !
-            call psb_insert_heap(j,heap,info)
+            call heap%insert(j,info)
             if (info /= psb_success_) return
             irwt(j) = 1
           end if

@@ -55,7 +55,7 @@ subroutine mld_d_invt_copyout(fill_in,thres,i,m,nlw,nup,jmaxup,nrmi,row, &
   real(psb_dpk_)               :: witem, wmin
   integer                      :: widx
   integer                      :: k,isz,err_act,int_err(5),idxp, nz
-  type(psb_dreal_idx_heap)     :: heap
+  type(psb_d_idx_heap)         :: heap
   character(len=20), parameter :: name='invt_copyout'
   character(len=20)            :: ch_err
   logical                      :: fndmaxup
@@ -73,7 +73,7 @@ subroutine mld_d_invt_copyout(fill_in,thres,i,m,nlw,nup,jmaxup,nrmi,row, &
   ! is the largest absolute value. 
   !
 !!$  write(0,*) 'invt_copyout ',nidx,nup+fill_in
-  call psb_init_heap(heap,info,dir=psb_asort_down_)
+  call heap%init(info,dir=psb_asort_down_)
 
   if (info == psb_success_) allocate(xwid(nidx),xw(nidx),indx(nidx),stat=info)
   if (info /= psb_success_) then 
@@ -105,7 +105,7 @@ subroutine mld_d_invt_copyout(fill_in,thres,i,m,nlw,nup,jmaxup,nrmi,row, &
     nz       = nz + 1 
     xw(nz)   = witem 
     xwid(nz) = widx
-    call psb_insert_heap(witem,widx,heap,info)
+    call heap%insert(witem,widx,info)
     if (info /= psb_success_) then
       info=psb_err_from_subroutine_
       call psb_errpush(info,name,a_err='psb_insert_heap')
@@ -157,7 +157,7 @@ subroutine mld_d_invt_copyout(fill_in,thres,i,m,nlw,nup,jmaxup,nrmi,row, &
       nz       = nz + 1
       xw(nz)   = witem 
       xwid(nz) = widx
-      call psb_insert_heap(witem,widx,heap,info)
+      call heap%insert(witem,widx,info)
       if (info /= psb_success_) then
         info=psb_err_from_subroutine_
         call psb_errpush(info,name,a_err='psb_insert_heap')
@@ -179,7 +179,7 @@ subroutine mld_d_invt_copyout(fill_in,thres,i,m,nlw,nup,jmaxup,nrmi,row, &
       fndmaxup = .false.
       nz = nup+fill_in
       do k=1,nz
-        call psb_heap_get_first(witem,widx,heap,info)
+        call heap%get_first(witem,widx,info)
         xw(k)   = witem
         xwid(k) = widx
         if (widx == jmaxup) fndmaxup=.true.
@@ -224,7 +224,7 @@ subroutine mld_d_invt_copyout(fill_in,thres,i,m,nlw,nup,jmaxup,nrmi,row, &
       nz       = nz + 1
       xw(nz)   = witem 
       xwid(nz) = widx
-      call psb_insert_heap(witem,widx,heap,info)
+      call heap%insert(witem,widx,info)
       if (info /= psb_success_) then
         info=psb_err_from_subroutine_
         call psb_errpush(info,name,a_err='psb_insert_heap')
@@ -240,7 +240,7 @@ subroutine mld_d_invt_copyout(fill_in,thres,i,m,nlw,nup,jmaxup,nrmi,row, &
     if (nz >  nup+fill_in) then
       nz = nup+fill_in
       do k=1,nz
-        call psb_heap_get_first(witem,widx,heap,info)
+        call heap%get_first(witem,widx,info)
         xw(k)   = witem
         xwid(k) = widx
       end do

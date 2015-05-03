@@ -55,7 +55,7 @@ subroutine mld_dsparse_biconjg_mlk(n,a,p,z,w,nzrmax,sp_thresh,info)
   integer(psb_ipk_) :: i,j,k, kc, kr, err_act, nz, nzra, nzrz, ipzi,ipzj,&
        & nzzi,nzzj, nzz, ip1, ip2, ipza,ipzz, ipzn, nzzn, ipz1, ipz2,&
        &  ipj, lastj, nextj, nzw, hlhead, li, mj, kkc, ifrst, ilst, rwhead
-  type(psb_int_heap) :: heap, rheap
+  type(psb_i_heap)   :: heap, rheap
   type(psb_d_csc_sparse_mat) :: ac
   real(psb_dpk_)     :: alpha
   character(len=20)  :: name='mld_biconjg_mlk'

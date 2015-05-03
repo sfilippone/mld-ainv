@@ -174,7 +174,7 @@ module mld_d_invk_solver
          & ktrw,trw,info,sign,inlevs)
 
       use psb_base_mod, only : psb_d_csr_sparse_mat, psb_d_coo_sparse_mat,&
-           & psb_dpk_, psb_int_heap
+           & psb_dpk_, psb_i_heap
       implicit none
 
       ! Arguments 
@@ -184,7 +184,7 @@ module mld_d_invk_solver
       integer, intent(inout)               :: ktrw,info
       integer, intent(inout)               :: rowlevs(:)
       real(psb_dpk_), intent(inout)        :: row(:)
-      type(psb_int_heap), intent(inout)    :: heap
+      type(psb_i_heap), intent(inout)    :: heap
       real(psb_dpk_), optional, intent(in) :: sign
       integer, intent(in), optional        :: inlevs(:)
 
@@ -195,11 +195,11 @@ module mld_d_invk_solver
     subroutine mld_d_invk_inv(fill_in,i,row,rowlevs,heap,uia1,uia2,uaspk,uplevs,&
          & nidx,idxs,info)
 
-      use psb_base_mod, only : psb_dspmat_type, psb_dpk_, psb_int_heap
+      use psb_base_mod, only : psb_dspmat_type, psb_dpk_, psb_i_heap
       implicit none 
 
       ! Arguments
-      type(psb_int_heap), intent(inout)    :: heap 
+      type(psb_i_heap), intent(inout)    :: heap 
       integer, intent(in)                  :: i, fill_in
       integer, intent(inout)               :: nidx,info
       integer, intent(inout)               :: rowlevs(:)
@@ -216,7 +216,7 @@ module mld_d_invk_solver
     subroutine mld_d_invk_copyout(fill_in,i,m,row,rowlevs,nidx,idxs,&
          &  l2,uia1,uia2,uaspk,info)
 
-      use psb_base_mod, only : psb_dspmat_type, psb_dpk_, psb_int_heap
+      use psb_base_mod, only : psb_dspmat_type, psb_dpk_, psb_i_heap
 
       implicit none 
 
@@ -233,7 +233,7 @@ module mld_d_invk_solver
   
   interface mld_sparse_invk
     subroutine mld_dsparse_invk(n,a,z,fill_in,info,inlevs)
-      use psb_base_mod, only : psb_dspmat_type, psb_dpk_, psb_int_heap
+      use psb_base_mod, only : psb_dspmat_type, psb_dpk_
       integer, intent(in)                  :: n
       type(psb_dspmat_type), intent(in)    :: a
       type(psb_dspmat_type), intent(inout) :: z
