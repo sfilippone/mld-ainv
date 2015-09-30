@@ -47,6 +47,7 @@ module mld_d_invt_solver
     integer                     :: fill_in, inv_fill
     real(psb_dpk_)              :: thresh, inv_thresh
   contains
+    procedure, pass(sv) :: check   => mld_d_invt_solver_check
     procedure, pass(sv) :: clone   => mld_d_invt_solver_clone
     procedure, pass(sv) :: build   => mld_d_invt_solver_bld
     procedure, pass(sv) :: seti    => mld_d_invt_solver_seti

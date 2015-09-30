@@ -47,6 +47,7 @@ module mld_d_invk_solver
   type, extends(mld_d_base_ainv_solver_type) :: mld_d_invk_solver_type
     integer                     :: fill_in, inv_fill
   contains
+    procedure, pass(sv) :: check   => mld_d_invk_solver_check
     procedure, pass(sv) :: clone   => mld_d_invk_solver_clone
     procedure, pass(sv) :: build   => mld_d_invk_solver_bld
     procedure, pass(sv) :: seti    => mld_d_invk_solver_seti

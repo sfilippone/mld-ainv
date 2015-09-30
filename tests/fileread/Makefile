@@ -18,7 +18,8 @@ ZFSOBJS=zf_sample.o data_input.o
 
 EXEDIR=./runs
 
-all: sf_sample df_sample cf_sample zf_sample
+all: df_sample
+#sf_sample cf_sample zf_sample
 
 df_sample: $(DFSOBJS)
 	$(F90LINK) $(LINKOPT) $(DFSOBJS) -o df_sample \
