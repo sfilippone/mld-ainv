@@ -53,6 +53,7 @@ module mld_d_ainv_solver
     integer                     :: alg, fill_in
     real(psb_dpk_)              :: thresh
   contains
+    procedure, pass(sv) :: check   => mld_d_ainv_solver_check
     procedure, pass(sv) :: build   => mld_d_ainv_solver_bld
     procedure, pass(sv) :: clone   => mld_d_ainv_solver_clone
     procedure, pass(sv) :: seti    => mld_d_ainv_solver_seti
@@ -259,6 +260,16 @@ contains
     return
   end subroutine d_ainv_solver_default
 
+  function is_positive_nz_min(ip) result(res)
+    implicit none 
+    integer(psb_ipk_), intent(in) :: ip
+    logical             :: res
+
+    res = (ip >= 1)
+    return
+  end function is_positive_nz_min
+
+  
   function d_ainv_stringval(string) result(val)
     use psb_base_mod, only : psb_ipk_,psb_toupper
     implicit none 
