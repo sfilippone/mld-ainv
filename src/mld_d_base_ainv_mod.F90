@@ -90,7 +90,8 @@ module mld_d_base_ainv_mod
   end interface
 
   interface 
-    subroutine mld_d_base_ainv_solver_apply(alpha,sv,x,beta,y,desc_data,trans,work,info)
+    subroutine mld_d_base_ainv_solver_apply(alpha,sv,x,beta,y,desc_data,&
+         & trans,work,info,init,initu)
       import :: psb_desc_type, psb_dpk_,mld_d_base_ainv_solver_type
       type(psb_desc_type), intent(in)      :: desc_data
       class(mld_d_base_ainv_solver_type), intent(inout) :: sv
@@ -100,12 +101,14 @@ module mld_d_base_ainv_mod
       character(len=1),intent(in)          :: trans
       real(psb_dpk_),target, intent(inout) :: work(:)
       integer, intent(out)                 :: info
+      character, intent(in), optional       :: init
+      real(psb_dpk_),intent(inout), optional :: initu(:)
     end subroutine mld_d_base_ainv_solver_apply
   end interface
 
   interface 
     subroutine mld_d_base_ainv_solver_apply_vect(alpha,sv,x,beta,y,desc_data,&
-         &  trans,work,info)
+         &  trans,work,info,init,initu)
       import :: psb_desc_type, psb_dpk_,mld_d_base_ainv_solver_type, psb_d_vect_type
       type(psb_desc_type), intent(in)      :: desc_data
       class(mld_d_base_ainv_solver_type), intent(inout) :: sv
@@ -115,6 +118,8 @@ module mld_d_base_ainv_mod
       character(len=1),intent(in)          :: trans
       real(psb_dpk_),target, intent(inout) :: work(:)
       integer, intent(out)                 :: info
+      character, intent(in), optional                :: init
+      type(psb_d_vect_type),intent(inout), optional   :: initu
     end subroutine mld_d_base_ainv_solver_apply_vect
   end interface
  

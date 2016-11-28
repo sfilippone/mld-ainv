@@ -32,7 +32,8 @@
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
 !!$
-subroutine mld_d_base_ainv_solver_apply(alpha,sv,x,beta,y,desc_data,trans,work,info)
+subroutine mld_d_base_ainv_solver_apply(alpha,sv,x,beta,y,desc_data,&
+     & trans,work,info,init,initu)
   
   use psb_base_mod
   use mld_d_base_ainv_mod, mld_protect_name => mld_d_base_ainv_solver_apply
@@ -45,6 +46,8 @@ subroutine mld_d_base_ainv_solver_apply(alpha,sv,x,beta,y,desc_data,trans,work,i
   character(len=1),intent(in)          :: trans
   real(psb_dpk_),target, intent(inout) :: work(:)
   integer, intent(out)                 :: info
+  character, intent(in), optional       :: init
+  real(psb_dpk_),intent(inout), optional :: initu(:)
 
   integer    :: n_row,n_col
   real(psb_dpk_), pointer :: ww(:), aux(:), tx(:),ty(:)
@@ -64,6 +67,9 @@ subroutine mld_d_base_ainv_solver_apply(alpha,sv,x,beta,y,desc_data,trans,work,i
     call psb_errpush(psb_err_iarg_invalid_i_,name)
     goto 9999
   end select
+  !
+  ! For non-iterative solvers, init and initu are ignored.
+  !
 
   n_row = psb_cd_get_local_rows(desc_data)
   n_col = psb_cd_get_local_cols(desc_data)
