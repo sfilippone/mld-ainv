@@ -33,8 +33,8 @@
 !!$ 
 !!$
 subroutine mld_d_base_ainv_solver_apply_vect(alpha,sv,x,beta,y,desc_data,&
-     & trans,work,info,init,initu)
-  
+     & trans,work,info,init,initu,vw1,vw2)
+
   use psb_base_mod
   use mld_d_base_ainv_mod, mld_protect_name => mld_d_base_ainv_solver_apply_vect
   implicit none 
@@ -47,7 +47,7 @@ subroutine mld_d_base_ainv_solver_apply_vect(alpha,sv,x,beta,y,desc_data,&
   real(psb_dpk_),target, intent(inout) :: work(:)
   integer, intent(out)                 :: info
   character, intent(in), optional                :: init
-  type(psb_d_vect_type),intent(inout), optional   :: initu
+  type(psb_d_vect_type),intent(inout), optional   :: initu,vw1,vw2
 
   integer    :: n_row,n_col
   real(psb_dpk_), pointer :: ww(:), aux(:)
@@ -98,32 +98,61 @@ subroutine mld_d_base_ainv_solver_apply_vect(alpha,sv,x,beta,y,desc_data,&
     end if
   endif
 
-  call tx%bld(x%get_nrows(),mold=x%v)
-  call ty%bld(x%get_nrows(),mold=x%v)
+  if (present(vw1).and.present(vw2)) then
 
-  select case(trans_)
-  case('N')
-    call psb_spmm(done,sv%w,x,dzero,tx,desc_data,info,&
-         & trans=trans_,work=aux,doswap=.false.)
-    if (info == psb_success_) call ty%mlt(done,sv%dv,tx,dzero,info)
-    if (info == psb_success_) &
-         & call psb_spmm(alpha,sv%z,ty,beta,y,desc_data,info,&
-         & trans=trans_,work=aux,doswap=.false.)
+    select case(trans_)
+    case('N')
+      call psb_spmm(done,sv%w,x,dzero,vw1,desc_data,info,&
+           & trans=trans_,work=aux,doswap=.false.)
+      if (info == psb_success_) call vw2%mlt(done,sv%dv,vw1,dzero,info)
+      if (info == psb_success_) &
+           & call psb_spmm(alpha,sv%z,vw2,beta,y,desc_data,info,&
+           & trans=trans_,work=aux,doswap=.false.)
 
-  case('T','C')
-    call psb_spmm(done,sv%z,x,dzero,tx,desc_data,info,&
-         & trans=trans_,work=aux,doswap=.false.)
-    if (info == psb_success_) call ty%mlt(done,sv%dv,tx,dzero,info)
-    if (info == psb_success_) &
-         & call psb_spmm(alpha,sv%w,ty,beta,y,desc_data,info,&
-         & trans=trans_,work=aux,doswap=.false.)
+    case('T','C')
+      call psb_spmm(done,sv%z,x,dzero,vw1,desc_data,info,&
+           & trans=trans_,work=aux,doswap=.false.)
+      if (info == psb_success_) call vw2%mlt(done,sv%dv,vw1,dzero,info)
+      if (info == psb_success_) &
+           & call psb_spmm(alpha,sv%w,vw2,beta,y,desc_data,info,&
+           & trans=trans_,work=aux,doswap=.false.)
 
-  case default
-    call psb_errpush(psb_err_internal_error_,name,&
-         & a_err='Invalid TRANS in ainv subsolve')
-    goto 9999
-  end select
+    case default
+      call psb_errpush(psb_err_internal_error_,name,&
+           & a_err='Invalid TRANS in ainv subsolve')
+      goto 9999
+    end select
 
+  else
+
+    call tx%bld(x%get_nrows(),mold=x%v)
+    call ty%bld(x%get_nrows(),mold=x%v)
+
+    select case(trans_)
+    case('N')
+      call psb_spmm(done,sv%w,x,dzero,tx,desc_data,info,&
+           & trans=trans_,work=aux,doswap=.false.)
+      if (info == psb_success_) call ty%mlt(done,sv%dv,tx,dzero,info)
+      if (info == psb_success_) &
+           & call psb_spmm(alpha,sv%z,ty,beta,y,desc_data,info,&
+           & trans=trans_,work=aux,doswap=.false.)
+
+    case('T','C')
+      call psb_spmm(done,sv%z,x,dzero,tx,desc_data,info,&
+           & trans=trans_,work=aux,doswap=.false.)
+      if (info == psb_success_) call ty%mlt(done,sv%dv,tx,dzero,info)
+      if (info == psb_success_) &
+           & call psb_spmm(alpha,sv%w,ty,beta,y,desc_data,info,&
+           & trans=trans_,work=aux,doswap=.false.)
+
+    case default
+      call psb_errpush(psb_err_internal_error_,name,&
+           & a_err='Invalid TRANS in ainv subsolve')
+      goto 9999
+    end select
+    call tx%free(info) 
+    if (info == psb_success_) call ty%free(info)
+  end if
 
   if (info /= psb_success_) then
 
@@ -133,8 +162,6 @@ subroutine mld_d_base_ainv_solver_apply_vect(alpha,sv,x,beta,y,desc_data,&
   endif
 
 
-  call tx%free(info) 
-  if (info == psb_success_) call ty%free(info)
   if (n_col <= size(work)) then 
     if ((4*n_col+n_col) <= size(work)) then 
     else
