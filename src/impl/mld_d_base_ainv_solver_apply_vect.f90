@@ -72,8 +72,8 @@ subroutine mld_d_base_ainv_solver_apply_vect(alpha,sv,x,beta,y,desc_data,&
   ! For non-iterative solvers, init and initu are ignored.
   !
 
-  n_row = psb_cd_get_local_rows(desc_data)
-  n_col = psb_cd_get_local_cols(desc_data)
+  n_row = desc_data%get_local_rows()
+  n_col = desc_data%get_local_cols()
 
   if (n_col <= size(work)) then 
     ww => work(1:n_col)
@@ -99,7 +99,6 @@ subroutine mld_d_base_ainv_solver_apply_vect(alpha,sv,x,beta,y,desc_data,&
   endif
 
   if (present(vw1).and.present(vw2)) then
-
     select case(trans_)
     case('N')
       call psb_spmm(done,sv%w,x,dzero,vw1,desc_data,info,&
@@ -150,6 +149,7 @@ subroutine mld_d_base_ainv_solver_apply_vect(alpha,sv,x,beta,y,desc_data,&
            & a_err='Invalid TRANS in ainv subsolve')
       goto 9999
     end select
+    write(0,*) name,' NOT Present vw1 and vw2 end product'
     call tx%free(info) 
     if (info == psb_success_) call ty%free(info)
   end if

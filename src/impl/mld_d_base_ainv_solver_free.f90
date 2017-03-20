@@ -56,6 +56,7 @@ subroutine mld_d_base_ainv_solver_free(sv,info)
       goto 9999 
     end if
   end if
+
   call sv%w%free()
   call sv%z%free()
   call sv%dv%free(info)
