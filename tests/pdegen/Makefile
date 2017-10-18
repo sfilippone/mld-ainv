@@ -12,9 +12,9 @@ PSBLAS_LIB= -L$(PSBLIBDIR)  -lpsb_util  -lpsb_base
 FINCLUDES=$(FMFLAG). $(FMFLAG)$(MLDAINVINCDIR) $(FMFLAG)$(MLDINCDIR)  $(FMFLAG)$(PSBINCDIR) $(FIFLAG).
 
 D3DOBJS=ppde3d.o data_input.o  pde3d_exp_mod.o pde3d_gauss_mod.o pde3d_base_mod.o \
-	psb_d_genpde_impl.o
+	genpde_mod.o
 D2DOBJS=ppde2d.o data_input.o  pde2d_exp_mod.o pde2d_gauss_mod.o pde2d_base_mod.o \
-	psb_d_genpde_impl.o
+	genpde_mod.o
 
 EXEDIR=./runs
 
