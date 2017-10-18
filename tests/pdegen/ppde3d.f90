@@ -69,7 +69,7 @@ program ppde3d
   use psb_krylov_mod
   use psb_util_mod
   use pde3d_exp_mod
-  use gendpe_mod
+  use genpde_mod
   use mld_d_invt_solver
   use mld_d_invk_solver
   use mld_d_ainv_solver

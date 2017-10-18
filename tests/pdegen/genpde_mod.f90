@@ -17,10 +17,6 @@ module genpde_mod
     module procedure  psb_d_gen_pde3d
   end interface psb_gen_pde3d
 
-  use psb_base_mod, only : psb_dpk_, psb_ipk_, psb_desc_type,&
-       &  psb_dspmat_type, psb_d_vect_type, dzero,&
-       &  psb_d_base_sparse_mat, psb_d_base_vect_type, psb_i_base_vect_type
-
   interface 
     function d_func_2d(x,y) result(val)
       import :: psb_dpk_

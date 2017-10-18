@@ -359,7 +359,9 @@ echo "MLDDIR=$MLD2P4_DIR">MakeFile
 echo 'include $(MLDDIR)/include/Make.inc.mld2p4
 PSBINCDIR=$(PSBLASDIR)/include
 MLDINCDIR=$(MLDDIR)/include
-FINCLUDES=$(FMFLAG)$(MLDINCDIR)  $(FMFLAG)$(PSBINCDIR) '>>MakeFile
+PSBMODDIR=$(PSBLASDIR)/modules 
+MLDMODDIR=$(MLDDIR)/modules 
+FINCLUDES=$(FMFLAG)$(MLDMODDIR)  $(FMFLAG)$(PSBMODDIR) $(FMFLAG)$(MLDINCDIR)  $(FMFLAG)$(PSBINCDIR) '>>MakeFile
 
 cat >conftest.$ac_ext <<EOF
 program test
