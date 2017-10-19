@@ -7,7 +7,8 @@ library: libdir srcd
 libdir:
 	(if test ! -d lib ; then mkdir lib; fi)
 	(if test ! -d include ; then mkdir include; fi)
-	($(INSTALL_DATA) Make.inc  include/Make.inc.mldainv)
+	(if test ! -d modules ; then mkdir modules; fi)
+	($(INSTALL_DATA) Make.inc  include/Make.inc.mld-ainv)
 srcd:
 	cd src && $(MAKE)
 
@@ -16,8 +17,8 @@ install:
 	   $(INSTALL_DATA) Make.inc  $(INSTALL_DIR))
 	(./mkdir.sh $(INSTALL_LIBDIR) &&\
 	   $(INSTALL_DATA) lib/*.a  $(INSTALL_LIBDIR))
-	(./mkdir.sh $(INSTALL_INCLUDEDIR) && \
-	   $(INSTALL_DATA) include/*$(.mod) $(INSTALL_INCLUDEDIR))
+	(./mkdir.sh $(INSTALL_MODULESDIR) && \
+	   $(INSTALL_DATA) modules/*$(.mod) $(INSTALL_MODULESDIR))
 	(./mkdir.sh  $(INSTALL_INCLUDEDIR) &&\
 	   $(INSTALL_DATA) Make.inc  $(INSTALL_INCLUDEDIR)/Make.inc.mld-ainv)
 #	(./mkdir.sh  $(INSTALL_DOCSDIR) && \

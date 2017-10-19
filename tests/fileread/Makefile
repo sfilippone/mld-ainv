@@ -8,10 +8,11 @@ MLDLIBDIR=$(MLDDIR)/lib
 PSBMODDIR=$(PSBLASDIR)/modules
 MLD_LIB=-L$(MLDLIBDIR) -lpsb_krylov -lmld_prec -lpsb_prec
 MLDAINVINCDIR=$(MLDAINVDIR)/include
+MLDAINVMODDIR=$(MLDAINVDIR)/modules
 MLDAINVLIBDIR=$(MLDAINVDIR)/lib
 MLDAINV_LIB=-L$(MLDAINVLIBDIR) -lainv_prec
 PSBLAS_LIB= -L$(PSBLIBDIR)  -lpsb_util  -lpsb_base
-FINCLUDES=$(FMFLAG). $(FMFLAG)$(MLDAINVINCDIR)  $(FMFLAG)$(MLDINCDIR) $(FMFLAG)$(PSBINCDIR) $(FIFLAG).  $(FMFLAG)$(MLDMODDIR)  $(FMFLAG)$(PSBMODDIR) 
+FINCLUDES=$(FMFLAG). $(FMFLAG)$(MLDAINVMODDIR)  $(FMFLAG)$(MLDAINVINCDIR)  $(FMFLAG)$(MLDINCDIR) $(FMFLAG)$(PSBINCDIR) $(FIFLAG).  $(FMFLAG)$(MLDMODDIR)  $(FMFLAG)$(PSBMODDIR) 
 
 DFSOBJS=df_sample.o data_input.o
 SFSOBJS=sf_sample.o data_input.o
@@ -24,22 +25,22 @@ all: df_sample
 #sf_sample cf_sample zf_sample
 
 df_sample: $(DFSOBJS)
-	$(F90LINK) $(LINKOPT) $(DFSOBJS) -o df_sample \
+	$(FLINK) $(LINKOPT) $(DFSOBJS) -o df_sample \
 	$(MLDAINV_LIB) $(MLD_LIB)  $(PSBLAS_LIB) $(LDLIBS)
 	/bin/mv df_sample $(EXEDIR) 
 
 sf_sample: $(SFSOBJS)
-	$(F90LINK) $(LINKOPT) $(SFSOBJS) -o sf_sample \
+	$(FLINK) $(LINKOPT) $(SFSOBJS) -o sf_sample \
 	$(MLDAINV_LIB) $(MLD_LIB)  $(PSBLAS_LIB) $(LDLIBS)
 	/bin/mv sf_sample $(EXEDIR) 
 
 cf_sample: $(CFSOBJS)
-	$(F90LINK) $(LINKOPT) $(CFSOBJS) -o cf_sample \
+	$(FLINK) $(LINKOPT) $(CFSOBJS) -o cf_sample \
 	$(MLDAINV_LIB) $(MLD_LIB)  $(PSBLAS_LIB) $(LDLIBS)
 	/bin/mv cf_sample $(EXEDIR) 
 
 zf_sample: $(ZFSOBJS)
-	$(F90LINK) $(LINKOPT) $(ZFSOBJS) -o zf_sample \
+	$(FLINK) $(LINKOPT) $(ZFSOBJS) -o zf_sample \
 	$(MLDAINV_LIB) $(MLD_LIB)  $(PSBLAS_LIB) $(LDLIBS)
 	/bin/mv zf_sample $(EXEDIR) 
 

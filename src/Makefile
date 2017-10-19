@@ -1,6 +1,7 @@
 include ../Make.inc
 LIBDIR=../lib
 INCDIR=../include
+MODDIR=../modules
 PSBLIBDIR=$(PSBLASDIR)/lib
 PSBINCDIR=$(PSBLASDIR)/include
 PSBMODDIR=$(PSBLASDIR)/modules
@@ -29,7 +30,7 @@ LIBNAME=libainv_prec.a
 
 libcopy: lib impld
 	/bin/cp -p $(HERE)/$(LIBNAME) $(LIBDIR)
-	/bin/cp -p $(LIBMOD) *$(.mod) $(INCDIR)
+	/bin/cp -p $(LIBMOD) *$(.mod) $(MODDIR)
 
 lib: $(OBJS) 
 	$(AR) $(HERE)/$(LIBNAME) $(OBJS)

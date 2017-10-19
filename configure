@@ -610,6 +610,7 @@ EXT_AINV_DEFS
 CDEFINES
 FDEFINES
 INSTALL_DOCSDIR
+INSTALL_MODULESDIR
 INSTALL_INCLUDEDIR
 INSTALL_LIBDIR
 INSTALL_DIR
@@ -2049,6 +2050,7 @@ case $includedir in
    \/* )   eval "INSTALL_INCLUDEDIR=$includedir";;
    * ) eval "INSTALL_INCLUDEDIR=$INSTALL_DIR/include";;
 esac
+INSTALL_MODULESDIR=$INSTALL_DIR/modules
 case $docsdir in
    \/* )   eval "INSTALL_DOCSDIR=$docsdir";;
    * ) eval "INSTALL_DOCSDIR=$INSTALL_DIR/docs";;
@@ -6180,6 +6182,7 @@ fi
 ###############################################################################
 # Variable substitutions : the Make.inc.in will have these @VARIABLES@
 # substituted.
+
 
 
 
