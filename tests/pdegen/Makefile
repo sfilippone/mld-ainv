@@ -24,6 +24,9 @@ EXEDIR=./runs
 
 all: ppde3d ppde2d
 
+
+gen_mod.o: genpde_mod.o
+
 ppde3d: $(D3DOBJS)
 	$(FLINK) $(D3DOBJS) -o ppde3d $(MLDAINV_LIB) $(MLD_LIB) $(PSBLAS_LIB) $(LDLIBS)
 	/bin/mv ppde3d $(EXEDIR)

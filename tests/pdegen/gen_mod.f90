@@ -161,7 +161,7 @@ contains
 subroutine psb_gen_min(ictxt,idim,a,bv,xv,desc_a,afmt,&
      & a1,a2,a3,b1,b2,b3,c,g,info,f,amold,vmold,imold,nrl)
   use psb_base_mod
-  use psb_d_genpde_mod, psb_protect_name => psb_d_gen_pde3d
+  use genpde_mod, psb_protect_name => psb_d_gen_pde3d
   !
   !   Discretizes the partial differential equation
   ! 
