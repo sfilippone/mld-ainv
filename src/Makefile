@@ -1,13 +1,17 @@
 include ../Make.inc
 LIBDIR=../lib
 INCDIR=../include
+MODDIR=../modules
 PSBLIBDIR=$(PSBLASDIR)/lib
 PSBINCDIR=$(PSBLASDIR)/include
+PSBMODDIR=$(PSBLASDIR)/modules
 MLDLIBDIR=$(MLDDIR)/lib
 MLDINCDIR=$(MLDDIR)/include
+MLDMODDIR=$(MLDDIR)/modules
 HERE=.
 
-FINCLUDES=$(FMFLAG). $(FMFLAG)$(LIBDIR) $(FMFLAG)$(MLDINCDIR)  $(FMFLAG)$(PSBINCDIR) 
+FINCLUDES=$(FMFLAG). $(FMFLAG)$(LIBDIR) $(FMFLAG)$(MLDINCDIR)  $(FMFLAG)$(PSBINCDIR) \
+ $(FMFLAG)$(MLDMODDIR)  $(FMFLAG)$(PSBMODDIR) 
 
 
 MODOBJS=mld_d_invt_solver.o mld_base_ainv_mod.o \
@@ -26,7 +30,7 @@ LIBNAME=libainv_prec.a
 
 libcopy: lib impld
 	/bin/cp -p $(HERE)/$(LIBNAME) $(LIBDIR)
-	/bin/cp -p $(LIBMOD) *$(.mod) $(INCDIR)
+	/bin/cp -p $(LIBMOD) *$(.mod) $(MODDIR)
 
 lib: $(OBJS) 
 	$(AR) $(HERE)/$(LIBNAME) $(OBJS)

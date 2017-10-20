@@ -69,6 +69,7 @@ program ppde2d
   use psb_util_mod
 !  use pde2d_base_mod
   use pde2d_exp_mod
+  use genpde_mod
   use mld_d_invt_solver
   use mld_d_invk_solver
   use mld_d_ainv_solver
