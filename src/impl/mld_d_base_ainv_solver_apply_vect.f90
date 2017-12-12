@@ -33,7 +33,7 @@
 !   
 !  
 subroutine mld_d_base_ainv_solver_apply_vect(alpha,sv,x,beta,y,desc_data,&
-     & trans,work,info,init,initu)
+     & trans,work,wv,info,init,initu)
   
   use psb_base_mod
   use mld_d_base_ainv_mod, mld_protect_name => mld_d_base_ainv_solver_apply_vect
@@ -45,6 +45,7 @@ subroutine mld_d_base_ainv_solver_apply_vect(alpha,sv,x,beta,y,desc_data,&
   real(psb_dpk_), intent(in)           :: alpha,beta
   character(len=1), intent(in)         :: trans
   real(psb_dpk_),target, intent(inout) :: work(:)
+  type(psb_d_vect_type),intent(inout)  :: wv(:)
   integer, intent(out)                 :: info
   character, intent(in), optional                :: init
   type(psb_d_vect_type),intent(inout), optional   :: initu
@@ -98,43 +99,49 @@ subroutine mld_d_base_ainv_solver_apply_vect(alpha,sv,x,beta,y,desc_data,&
     end if
   endif
 
-  call tx%bld(x%get_nrows(),mold=x%v)
-  call ty%bld(x%get_nrows(),mold=x%v)
-
-  select case(trans_)
-  case('N')
-    call psb_spmm(done,sv%w,x,dzero,tx,desc_data,info,&
-         & trans=trans_,work=aux,doswap=.false.)
-    if (info == psb_success_) call ty%mlt(done,sv%dv,tx,dzero,info)
-    if (info == psb_success_) &
-         & call psb_spmm(alpha,sv%z,ty,beta,y,desc_data,info,&
-         & trans=trans_,work=aux,doswap=.false.)
-
-  case('T','C')
-    call psb_spmm(done,sv%z,x,dzero,tx,desc_data,info,&
-         & trans=trans_,work=aux,doswap=.false.)
-    if (info == psb_success_) call ty%mlt(done,sv%dv,tx,dzero,info)
-    if (info == psb_success_) &
-         & call psb_spmm(alpha,sv%w,ty,beta,y,desc_data,info,&
-         & trans=trans_,work=aux,doswap=.false.)
-
-  case default
-    call psb_errpush(psb_err_internal_error_,name,&
-         & a_err='Invalid TRANS in ainv subsolve')
+  if (size(wv) < 2) then
+    info = psb_err_internal_error_
+    call psb_errpush(info,name,&
+         & a_err='invalid wv size')
     goto 9999
-  end select
+  end if
+
+  
+  associate(tx => wv(1), ty => wv(2))
+
+    select case(trans_)
+    case('N')
+      call psb_spmm(done,sv%w,x,dzero,tx,desc_data,info,&
+           & trans=trans_,work=aux,doswap=.false.)
+      if (info == psb_success_) call ty%mlt(done,sv%dv,tx,dzero,info)
+      if (info == psb_success_) &
+           & call psb_spmm(alpha,sv%z,ty,beta,y,desc_data,info,&
+           & trans=trans_,work=aux,doswap=.false.)
+
+    case('T','C')
+      call psb_spmm(done,sv%z,x,dzero,tx,desc_data,info,&
+           & trans=trans_,work=aux,doswap=.false.)
+      if (info == psb_success_) call ty%mlt(done,sv%dv,tx,dzero,info)
+      if (info == psb_success_) &
+           & call psb_spmm(alpha,sv%w,ty,beta,y,desc_data,info,&
+           & trans=trans_,work=aux,doswap=.false.)
+
+    case default
+      call psb_errpush(psb_err_internal_error_,name,&
+           & a_err='Invalid TRANS in ainv subsolve')
+      goto 9999
+    end select
 
 
-  if (info /= psb_success_) then
+    if (info /= psb_success_) then
 
-    call psb_errpush(psb_err_internal_error_,name,&
-         & a_err='Error in subsolve')
-    goto 9999
-  endif
+      call psb_errpush(psb_err_internal_error_,name,&
+           & a_err='Error in subsolve')
+      goto 9999
+    endif
 
-
-  call tx%free(info) 
-  if (info == psb_success_) call ty%free(info)
+  end associate
+  
   if (n_col <= size(work)) then 
     if ((4*n_col+n_col) <= size(work)) then 
     else
