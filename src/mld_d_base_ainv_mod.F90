@@ -61,10 +61,15 @@ module mld_d_base_ainv_mod
     procedure, pass(sv) :: free    => mld_d_base_ainv_solver_free
     procedure, pass(sv) :: sizeof  => d_base_ainv_solver_sizeof
     procedure, pass(sv) :: get_nzeros => d_base_ainv_get_nzeros
+    procedure, nopass   :: get_wrksz => d_base_ainv_get_wrksize
     procedure, pass(sv) :: update_a => mld_d_base_ainv_update_a
     generic, public     :: update => update_a
   end type mld_d_base_ainv_solver_type
 
+  private ::  d_base_ainv_solver_sizeof, &
+       & d_base_ainv_get_nzeros, d_base_ainv_solver_get_wrksize
+
+  
   interface 
     subroutine mld_d_base_ainv_solver_cnv(sv,info,amold,vmold,imold)
       import :: psb_d_base_sparse_mat, psb_d_base_vect_type, psb_dpk_, &
@@ -187,6 +192,12 @@ contains
     return
   end function d_base_ainv_solver_sizeof
 
+  function d_base_ainv_get_wrksize() result(val)
+    implicit none 
+    integer(psb_ipk_)  :: val
+
+    val = 2
+  end function d_base_ainv_get_wrksize
 
 end module mld_d_base_ainv_mod
 
