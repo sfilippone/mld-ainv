@@ -228,7 +228,7 @@ PAC_CHECK_HAVE_GFORTRAN(
 if test "X$mld_ainv_cv_fc" == "Xgcc" ; then
 PAC_HAVE_MODERN_GFORTRAN(
 	[],
-        [AC_MSG_ERROR([Sorry, we require GNU Fortran 4.6 or later.])]
+        [AC_MSG_ERROR([Sorry, we require GNU Fortran 4.8 or later.])]
 )
 fi
 
@@ -267,6 +267,28 @@ FIFLAG=-I
 PAC_FORTRAN_HAVE_MLD2P4([AC_MSG_RESULT([yes.])],
 	[AC_MSG_ERROR([no. Could not find working version of MLD2P4.])]
 )
+
+
+PAC_FORTRAN_MLD2P4_VERSION()
+
+if test "x$pac_cv_mld2p4_major" == "xunknown"; then
+  AC_MSG_ERROR([MLD2P4 version major "$pac_cv_mld2p4_major".])
+fi
+if test "x$pac_cv_mld2p4_minor" == "xunknown"; then
+   AC_MSG_ERROR([MLD2P4 version minor "$pac_cv_mld2p4_minor".])
+fi
+if test "x$pac_cv_mld2p4_patchlevel" == "xunknown"; then
+   AC_MSG_ERROR([MLD2P4 patchlevel "$pac_cv_mld2p4_patchlevel".])
+fi
+if (( $pac_cv_mld2p4_major < 2 )) ||
+    (  (( $pac_cv_mld2p4_major == 2 )) && (( $pac_cv_mld2p4_minor < 1 )) ) ||
+      ( (( $pac_cv_mld2p4_major == 2 )) && (( $pac_cv_mld2p4_minor == 1 )) && (( $pac_cv_mld2p4_patchlevel < 1 )) )
+      	then			
+  AC_MSG_ERROR([I need at least MLD2P4 version 2.1.1.]) 
+else
+  AC_MSG_NOTICE([Am configuring with MLD2P4 version $pac_cv_mld2p4_major.$pac_cv_mld2p4_minor.$pac_cv_mld2p4_patchlevel.])
+fi
+
 
 PAC_ARG_WITH_SAINV
 

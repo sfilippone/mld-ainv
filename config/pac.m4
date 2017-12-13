@@ -141,7 +141,7 @@ dnl Warning : square brackets are EVIL!
 [AC_MSG_CHECKING([GNU Fortran version at least 4.6])
 cat > conftest.$ac_ext <<EOF
            program main
-#if ( __GNUC__ >= 4 && __GNUC_MINOR__ >= 6 ) || ( __GNUC__ > 4 )
+#if ( __GNUC__ >= 4 && __GNUC_MINOR__ >= 8 ) || ( __GNUC__ > 4 )
               print *, "ok"
 #else
         this program will fail
@@ -381,7 +381,68 @@ ifelse([$2], , , [  rm -rf conftest*
 ])dnl
 fi
 cd ..
-rm -fr tmpdir_$i])g
+rm -fr tmpdir_$i])g 
+dnl @synopsis PAC_FORTRAN_MLD2P4_VERSION( )
+dnl
+dnl Will try to compile, link and run  a program using the MLD2P4 library. \
+dnl  Checks for version major,  minor and patchlevel
+dnl
+dnl Will use MPIFC, otherwise '$FC'.
+dnl
+dnl If the test passes, will execute ACTION-IF-FOUND. Otherwise, ACTION-IF-NOT-FOUND.
+dnl
+dnl @author Michele Martone <michele.martone@uniroma2.it>
+dnl @author Salvatore Filippone <salvatore.filippone@uniroma2.it>
+dnl
+AC_DEFUN(PAC_FORTRAN_MLD2P4_VERSION,
+[AC_MSG_CHECKING([for version of MLD2P4])
+AC_LANG_PUSH([Fortran])	  
+ac_exeext=''
+ac_objext='o'
+ac_ext='f90'
+save_FCFLAGS=$FCFLAGS;
+FCFLAGS="${FMFLAG}$pac_cv_mld2p4_dir/modules $FINCLUDES $save_FCFLAGS"
+save_LDFLAGS=$LDFLAGS;
+## if test "x$pac_cv_mld2p4_libdir" != "x"; then 
+## dnl AC_MSG_NOTICE([mld2p4 lib dir $pac_cv_mld2p4_libdir])
+##  MLD2P4_LIBS="-L$pac_cv_mld2p4_libdir"
+## elif test "x$pac_cv_mld2p4_dir" != "x"; then 
+## dnl AC_MSG_NOTICE([mld2p4 dir $pac_cv_mld2p4_dir])
+##  MLD2P4_LIBS="-L$pac_cv_mld2p4_dir/lib"
+## fi
+MLD2P4_LIBS="-lmld_prec -L$pac_cv_mld2p4_dir/lib"
+LDFLAGS=" $MLD2P4_LIBS $save_LDFLAGS"
+
+
+AC_LINK_IFELSE([
+		program test
+		use mld_base_prec_type, only : mld_version_major_
+		print *,mld_version_major_
+		end program test],
+	       [pac_cv_mld2p4_major=`./conftest${ac_exeext} | sed 's/^ *//'`],
+	       [pac_cv_mld2p4_major="unknown"])
+  
+AC_LINK_IFELSE([
+		program test
+		use mld_base_prec_type, only : mld_version_minor_
+		print *,mld_version_minor_
+		end program test],
+	       [pac_cv_mld2p4_minor=`./conftest${ac_exeext} | sed 's/^ *//'`],
+	       [pac_cv_mld2p4_minor="unknown"])
+  
+AC_LINK_IFELSE([
+		program test
+		use mld_base_prec_type, only : mld_patchlevel_
+		print *,mld_patchlevel_
+		end program test],
+	       [pac_cv_mld2p4_patchlevel=`./conftest${ac_exeext} | sed 's/^ *//'`],
+	       [pac_cv_mld2p4_patchlevel="unknown"])
+LDFLAGS="$save_LDFLAGS";
+FCFLAGS="$save_FCFLAGS";
+
+AC_MSG_RESULT([Done])
+AC_LANG_POP([Fortran])])
+
 
 
 dnl @synopsis PAC_ARG_WITH_SAINV
