@@ -94,7 +94,7 @@ program sf_sample
   ! solver paramters
   integer            :: iter, itmax, ierr, itrace, ircode, ipart,&
        & methd, istopc, irst, nlv
-  integer(psb_long_int_k_) :: amatsize, precsize, descsize
+  integer(psb_epk_) :: amatsize, precsize, descsize
   real(psb_spk_)   :: err, eps
 
   character(len=5)   :: afmt

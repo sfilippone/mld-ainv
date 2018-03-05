@@ -38,7 +38,7 @@ module mld_d_base_ainv_mod
   use mld_base_ainv_mod
   use mld_d_prec_type
   use mld_d_ainv_tools_mod
-  use psb_base_mod, only : psb_d_vect_type, psb_dpk_,psb_long_int_k_
+  use psb_base_mod, only : psb_d_vect_type, psb_dpk_,psb_epk_
 
   
 
@@ -166,7 +166,7 @@ contains
     implicit none 
     ! Arguments
     class(mld_d_base_ainv_solver_type), intent(in) :: sv
-    integer(psb_long_int_k_) :: val
+    integer(psb_epk_) :: val
     integer             :: i
 
     val = 0
@@ -181,10 +181,10 @@ contains
     implicit none 
     ! Arguments
     class(mld_d_base_ainv_solver_type), intent(in) :: sv
-    integer(psb_long_int_k_) :: val
+    integer(psb_epk_) :: val
     integer             :: i
 
-    val = 2*psb_sizeof_int + psb_sizeof_dp
+    val = 2*psb_sizeof_ip + psb_sizeof_dp
     val = val + sv%dv%sizeof()
     val = val + sv%w%sizeof()
     val = val + sv%z%sizeof()

@@ -103,7 +103,7 @@
     ! solver paramters
     integer            :: iter, itmax, ierr, itrace, ircode, ipart,&
          & methd, istopc, irst, nlv, giter
-    integer(psb_long_int_k_) :: amatsize, precsize, descsize, amatnz, precnz
+    integer(psb_epk_) :: amatsize, precsize, descsize, amatnz, precnz
     real(psb_dpk_)   :: err, eps, gerr
 
     character(len=5)   :: afmt
