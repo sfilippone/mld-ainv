@@ -3,8 +3,8 @@ This is the AINV  plugin for MLD2P4 2, version 1.0-alpha.
 
 The algorithms are described in
 D. Bertaccini, S. Filippone
-MLD-AINV: Sparse Approximate Inverse Preconditioners for Krylov Methods on GPGPUs
-submitted to ACM TOMS. 
+Sparse approximate inverse preconditioners on high performance GPU
+platforms,  Computers and Mathematics with Applications,  71 (2016), pp. 693--711
 
 
 PREREQUISITES
