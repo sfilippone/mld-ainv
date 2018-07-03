@@ -41,28 +41,30 @@ subroutine mld_d_invt_copyout(fill_in,thres,i,m,nlw,nup,jmaxup,nrmi,row, &
   implicit none 
 
   ! Arguments
-  integer, intent(in)                       :: fill_in,i,m,nidx,nlw,nup,jmaxup
-  integer, intent(in)                       :: idxs(:)
-  integer, intent(inout)                    :: l2, info
-  integer, allocatable, intent(inout)       :: ja(:),irp(:)
-  real(psb_dpk_), intent(in)                :: thres,nrmi
-  real(psb_dpk_),allocatable, intent(inout) :: val(:)
-  real(psb_dpk_), intent(inout)             :: row(:)
+  integer(psb_ipk_), intent(in)                 :: fill_in,i,m,nidx,nlw,nup,jmaxup
+  integer(psb_ipk_), intent(in)                 :: idxs(:)
+  integer(psb_ipk_), intent(inout)              :: l2, info
+  integer(psb_ipk_), allocatable, intent(inout) :: ja(:),irp(:)
+  real(psb_dpk_), intent(in)                    :: thres,nrmi
+  real(psb_dpk_),allocatable, intent(inout)     :: val(:)
+  real(psb_dpk_), intent(inout)                 :: row(:)
 
   ! Local variables
-  real(psb_dpk_),allocatable   :: xw(:)
-  integer, allocatable         :: xwid(:), indx(:)
-  real(psb_dpk_)               :: witem, wmin
-  integer                      :: widx
-  integer                      :: k,isz,err_act,int_err(5),idxp, nz
-  type(psb_d_idx_heap)         :: heap
-  character(len=20), parameter :: name='invt_copyout'
-  character(len=20)            :: ch_err
-  logical                      :: fndmaxup
+  real(psb_dpk_),allocatable     :: xw(:)
+  integer(psb_ipk_), allocatable :: xwid(:), indx(:)
+  real(psb_dpk_)                 :: witem, wmin
+  integer(psb_ipk_)              :: widx
+  integer(psb_ipk_)              :: k,isz,err_act,int_err(5),idxp, nz
+  type(psb_d_idx_heap)           :: heap
+  character(len=20), parameter   :: name='invt_copyout'
+  character(len=20)              :: ch_err
+  logical                        :: fndmaxup
 
-  if (psb_get_errstatus() /= 0) return 
   info = psb_success_
   call psb_erractionsave(err_act)
+  if (psb_errstatus_fatal()) then
+    info = psb_err_internal_error_; goto 9999
+  end if
 
   !
   ! Here we need to apply also the dropping rule base on the fill-in. 
@@ -78,7 +80,7 @@ subroutine mld_d_invt_copyout(fill_in,thres,i,m,nlw,nup,jmaxup,nrmi,row, &
   if (info == psb_success_) allocate(xwid(nidx),xw(nidx),indx(nidx),stat=info)
   if (info /= psb_success_) then 
     info=psb_err_alloc_request_
-    call psb_errpush(info,name,i_err=(/3*nidx,0,0,0,0/),&
+    call psb_errpush(info,name,i_err=(/3*nidx/),&
          & a_err='real(psb_dpk_)')
     goto 9999      
   end if
@@ -286,11 +288,6 @@ subroutine mld_d_invt_copyout(fill_in,thres,i,m,nlw,nup,jmaxup,nrmi,row, &
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
-  if (err_act.eq.psb_act_abort_) then
-    call psb_error()
-    return
-  end if
-
+9999 call psb_error_handler(err_act)
+  return
 end subroutine mld_d_invt_copyout

@@ -78,7 +78,7 @@ program ppde2d
   ! input parameters
   character(len=20) :: kmethd, ptype, renum
   character(len=5)  :: afmt
-  integer   :: idim
+  integer(psb_ipk_)   :: idim
 
   ! miscellaneous 
   real(psb_dpk_), parameter :: one = 1.d0
@@ -93,7 +93,7 @@ program ppde2d
   type(mld_d_ainv_solver_type) :: ainvsv
   type ainvparms 
     character(len=12) :: alg, orth_alg
-    integer           :: fill, inv_fill
+    integer(psb_ipk_) :: fill, inv_fill
     real(psb_dpk_)    :: thresh, inv_thresh
   end type ainvparms
   type(ainvparms)     :: parms
@@ -104,17 +104,17 @@ program ppde2d
   real(psb_dpk_), allocatable :: b(:), x(:)
   type(psb_d_vect_type)      :: xv,bv, vtst, xg, bg 
   ! blacs parameters
-  integer            :: ictxt, iam, np
+  integer(psb_ipk_)   :: ictxt, iam, np
 
   ! solver parameters
-  integer            :: iter, itmax,itrace, istopc, irst,giter, nr
+  integer(psb_ipk_) :: iter, itmax,itrace, istopc, irst,giter, nr
   integer(psb_epk_) :: amatsize, precsize, descsize, d2size, precnz,amatnz
-  real(psb_dpk_)   :: err, eps, gerr, amxval
-  integer, allocatable :: perm(:)
+  real(psb_dpk_)    :: err, eps, gerr, amxval
+  integer(psb_ipk_), allocatable :: perm(:)
 
   ! other variables
   logical            :: pdump=.false.
-  integer            :: info, i
+  integer(psb_ipk_)  :: info, i
   character(len=20)  :: name,ch_err
   character(len=40)  :: fname
 
@@ -129,7 +129,7 @@ program ppde2d
     call psb_exit(ictxt)
     stop
   endif
-  if(psb_get_errstatus() /= 0) goto 9999
+  if (psb_errstatus_fatal()) goto 9999
   name='ppde2d'
   call psb_set_errverbosity(2)
   !
@@ -322,13 +322,13 @@ contains
   !
   subroutine  get_parms(ictxt,kmethd,ptype,afmt,renum,&
        & idim,istopc,itmax,itrace,irst,nu,parms)
-    integer      :: ictxt
-    character(len=*) :: kmethd, ptype, afmt,renum
-    integer      :: idim, istopc,itmax,itrace,irst
-    real(psb_dpk_)  :: nu
-    type(ainvparms) :: parms
-    integer      :: np, iam
-    integer      :: intbuf(10), ip
+    integer(psb_ipk_) :: ictxt
+    character(len=*)  :: kmethd, ptype, afmt,renum
+    integer(psb_ipk_) :: idim, istopc,itmax,itrace,irst
+    real(psb_dpk_)    :: nu
+    type(ainvparms)   :: parms
+    integer(psb_ipk_) :: np, iam
+    integer(psb_ipk_) :: intbuf(10), ip
 
     call psb_info(ictxt, iam, np)
 
@@ -382,7 +382,7 @@ contains
   !  print an error message 
   !  
   subroutine pr_usage(iout)
-    integer :: iout
+    integer(psb_ipk_) :: iout
     write(iout,*)'incorrect parameter(s) found'
     write(iout,*)' usage:  pde90 methd prec dim &
          &[istop itmax itrace]'  

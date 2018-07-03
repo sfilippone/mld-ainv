@@ -41,9 +41,10 @@ subroutine mld_d_base_ainv_solver_free(sv,info)
 
   ! Arguments
   class(mld_d_base_ainv_solver_type), intent(inout) :: sv
-  integer, intent(out)                       :: info
-  Integer :: err_act
-  character(len=20)  :: name='mld_d_base_ainv_solver_free'
+  integer(psb_ipk_), intent(out)                    :: info
+  !
+  integer(psb_ipk_) :: err_act
+  character(len=20) :: name='mld_d_base_ainv_solver_free'
 
   call psb_erractionsave(err_act)
   info = psb_success_
@@ -63,11 +64,6 @@ subroutine mld_d_base_ainv_solver_free(sv,info)
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
+9999 call psb_error_handler(err_act)
   return
 end subroutine mld_d_base_ainv_solver_free

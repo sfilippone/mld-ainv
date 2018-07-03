@@ -41,27 +41,27 @@ subroutine mld_d_invk_copyout(fill_in,i,m,row,rowlevs,nidx,idxs,&
   implicit none 
 
   ! Arguments
-  integer, intent(in)                        :: fill_in, i, m, nidx
-  integer, intent(inout)                     :: l2, info
-  integer, intent(inout)                     :: rowlevs(:), idxs(:)
-  integer, allocatable, intent(inout)        :: uia1(:), uia2(:)
-  real(psb_dpk_), allocatable, intent(inout) :: uaspk(:)
-  real(psb_dpk_), intent(inout)              :: row(:)
+  integer(psb_ipk_), intent(in)                 :: fill_in, i, m, nidx
+  integer(psb_ipk_), intent(inout)              :: l2, info
+  integer(psb_ipk_), intent(inout)              :: rowlevs(:), idxs(:)
+  integer(psb_ipk_), allocatable, intent(inout) :: uia1(:), uia2(:)
+  real(psb_dpk_), allocatable, intent(inout)    :: uaspk(:)
+  real(psb_dpk_), intent(inout)                 :: row(:)
 
   ! Local variables
-  integer               :: j,isz,err_act,int_err(5),idxp
+  integer(psb_ipk_)              :: j,isz,err_act,int_err(5),idxp
   character(len=20), parameter  :: name='mld_diluk_factint'
   character(len=20)             :: ch_err
 
-  if (psb_get_errstatus() /= 0) return 
   info = psb_success_
   call psb_erractionsave(err_act)
-
+  if (psb_errstatus_fatal()) then
+    info = psb_err_internal_error_; goto 9999
+  end if
 
   do idxp=1,nidx
 
     j = idxs(idxp)
-
 
     if (j>=i) then 
       !
@@ -98,11 +98,6 @@ subroutine mld_d_invk_copyout(fill_in,i,m,row,rowlevs,nidx,idxs,&
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
-  if (err_act.eq.psb_act_abort_) then
-    call psb_error()
-    return
-  end if
-
+9999 call psb_error_handler(err_act)
+  return
 end subroutine mld_d_invk_copyout

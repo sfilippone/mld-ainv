@@ -42,10 +42,11 @@ subroutine mld_d_ainv_solver_setc(sv,what,val,info)
 
   ! Arguments
   class(mld_d_ainv_solver_type), intent(inout) :: sv
-  integer, intent(in)                    :: what 
-  character(len=*), intent(in)           :: val
-  integer, intent(out)                   :: info
-  Integer :: err_act, ival
+  integer(psb_ipk_), intent(in)                :: what 
+  character(len=*), intent(in)                 :: val
+  integer(psb_ipk_), intent(out)               :: info
+  !
+  integer(psb_ipk_)  :: err_act, ival
   character(len=20)  :: name='mld_d_ainv_solver_setc'
 
   info = psb_success_
@@ -65,11 +66,6 @@ subroutine mld_d_ainv_solver_setc(sv,what,val,info)
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
+9999 call psb_error_handler(err_act)
   return
 end subroutine mld_d_ainv_solver_setc

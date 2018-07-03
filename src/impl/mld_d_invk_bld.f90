@@ -42,27 +42,29 @@ subroutine mld_d_invk_bld(a,fill1, fill2,lmat,d,umat,desc,info,blck)
 
   ! Arguments                                                     
   type(psb_dspmat_type), intent(in), target   :: a
-  integer, intent(in)                         :: fill1, fill2 
+  integer(psb_ipk_), intent(in)               :: fill1, fill2 
   type(psb_dspmat_type), intent(inout)        :: lmat, umat
   real(psb_dpk_), allocatable                 :: d(:)
   Type(psb_desc_type), Intent(in)             :: desc
-  integer, intent(out)                        :: info
+  integer(psb_ipk_), intent(out)              :: info
   type(psb_dspmat_type), intent(in), optional :: blck
-  integer   :: i, nztota, err_act, n_row, nrow_a, n_col
-  type(psb_dspmat_type)          :: atmp
+  !
+  integer(psb_ipk_)      :: i, nztota, err_act, n_row, nrow_a, n_col
+  type(psb_dspmat_type)  :: atmp
   real(psb_dpk_), allocatable :: pq(:), pd(:)
-  integer, allocatable :: uplevs(:)
-  integer   :: debug_level, debug_unit
-  integer   :: ictxt,np,me
-  integer            :: nzrmax
+  integer(psb_ipk_), allocatable :: uplevs(:)
+  integer(psb_ipk_)   :: debug_level, debug_unit
+  integer(psb_ipk_)   :: ictxt,np,me
+  integer(psb_ipk_)   :: nzrmax
+  character(len=20)   :: name, ch_err
 
-  character(len=20)  :: name, ch_err
 
-
-  if(psb_get_errstatus() /= psb_success_) return 
   info = psb_success_
   name='mld_dainv_bld'
   call psb_erractionsave(err_act)
+  if (psb_errstatus_fatal()) then
+    info = psb_err_internal_error_; goto 9999
+  end if
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
   ictxt       = psb_cd_get_context(desc)
@@ -141,11 +143,6 @@ subroutine mld_d_invk_bld(a,fill1, fill2,lmat,d,umat,desc,info,blck)
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
-  if (err_act.eq.psb_act_abort_) then
-    call psb_error()
-    return
-  end if
+9999 call psb_error_handler(err_act)
   return
 end subroutine mld_d_invk_bld

@@ -130,7 +130,7 @@
 
 
     name='df_sample'
-    if(psb_get_errstatus() /= 0) goto 9999
+    if (psb_errstatus_fatal()) goto 9999
     info=psb_success_
     call psb_set_errverbosity(2)
     !

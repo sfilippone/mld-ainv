@@ -39,22 +39,24 @@ subroutine mld_d_invt_copyin(i,m,a,jd,jmin,jmax,nlw,nup,jmaxup,nrmi,row,heap,&
   implicit none 
   type(psb_d_csr_sparse_mat), intent(in)    :: a
   type(psb_d_coo_sparse_mat), intent(inout) :: trw
-  integer, intent(in)                  :: i, m,jmin,jmax,jd
-  integer, intent(inout)               :: ktrw,nlw,nup,jmaxup,info
-  integer, intent(inout)               :: irwt(:)
-  real(psb_dpk_), intent(inout)        :: nrmi,row(:)
-  type(psb_i_heap), intent(inout)      :: heap
-  real(psb_dpk_), intent(in), optional :: sign
+  integer(psb_ipk_), intent(in)             :: i, m,jmin,jmax,jd
+  integer(psb_ipk_), intent(inout)          :: ktrw,nlw,nup,jmaxup,info
+  integer(psb_ipk_), intent(inout)          :: irwt(:)
+  real(psb_dpk_), intent(inout)             :: nrmi,row(:)
+  type(psb_i_heap), intent(inout)           :: heap
+  real(psb_dpk_), intent(in), optional      :: sign
+  !
+  integer(psb_ipk_)            :: k,j,irb,kin,nz, err_act
+  integer(psb_ipk_), parameter :: nrb=16
+  real(psb_dpk_)               :: dmaxup, sign_
+  real(psb_dpk_), external     :: dnrm2
+  character(len=20), parameter :: name='invt_copyin'
 
-  integer                     :: k,j,irb,kin,nz, err_act
-  integer, parameter          :: nrb=16
-  real(psb_dpk_)              :: dmaxup, sign_
-  real(psb_dpk_), external    :: dnrm2
-  character(len=20), parameter  :: name='invt_copyin'
-
-  if (psb_get_errstatus() /= 0) return 
   info = psb_success_
   call psb_erractionsave(err_act)
+  if (psb_errstatus_fatal()) then
+    info = psb_err_internal_error_; goto 9999
+  end if
 
   call heap%init(info)
   if (info /= psb_success_) then
@@ -103,12 +105,6 @@ subroutine mld_d_invt_copyin(i,m,a,jd,jmin,jmax,nlw,nup,jmaxup,nrmi,row,heap,&
 
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
-  if (err_act.eq.psb_act_abort_) then
-    call psb_error()
-    return
-  end if
+9999 call psb_error_handler(err_act)
   return
-
 end subroutine mld_d_invt_copyin

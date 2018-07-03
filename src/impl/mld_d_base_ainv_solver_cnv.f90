@@ -44,8 +44,8 @@ subroutine mld_d_base_ainv_solver_cnv(sv,info,amold,vmold,imold)
   class(psb_i_base_vect_type), intent(in), optional  :: imold
 
   !local
-  integer :: i, j, il1, iln, lname, lev
-  integer :: icontxt,iam, np
+  integer(psb_ipk_)  :: i, j, il1, iln, lname, lev
+  integer(psb_ipk_)  :: icontxt,iam, np
   character(len=80)  :: prefix_
   character(len=120) :: fname ! len should be at least 20 more than
   logical :: solver_

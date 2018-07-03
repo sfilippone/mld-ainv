@@ -38,29 +38,30 @@ subroutine mld_dsparse_invt(n,a,z,nzrmax,sp_thresh,info)
   use mld_d_invt_solver, mld_protect_name => mld_dsparse_invt
 
   implicit none 
-  integer, intent(in)                  :: n
+  integer(psb_ipk_), intent(in)        :: n
   type(psb_dspmat_type), intent(in)    :: a
   type(psb_dspmat_type), intent(inout) :: z
-  integer, intent(in)                  :: nzrmax
+  integer(psb_ipk_), intent(in)        :: nzrmax
   real(psb_dpk_), intent(in)           :: sp_thresh
-  integer, intent(out)                 :: info
-
-  integer :: i,j,k, err_act, nz, nzra, nzrz, ipz1,ipz2, nzz, ip1, ip2, l2
-  integer, allocatable        :: ia(:), ja(:), iz(:),jz(:) 
-  real(psb_dpk_), allocatable :: zw(:), val(:), valz(:)
-  integer, allocatable        :: uplevs(:), rowlevs(:),idxs(:)
+  integer(psb_ipk_), intent(out)       :: info
+  !
+  integer(psb_ipk_) :: i,j,k, err_act, nz, nzra, nzrz, ipz1,ipz2, nzz, ip1, ip2, l2
+  integer(psb_ipk_), allocatable :: ia(:), ja(:), iz(:),jz(:) 
+  real(psb_dpk_), allocatable    :: zw(:), val(:), valz(:)
+  integer(psb_ipk_), allocatable :: uplevs(:), rowlevs(:),idxs(:)
   real(psb_dpk_), allocatable :: row(:)
   type(psb_d_coo_sparse_mat)  :: trw
   type(psb_d_csr_sparse_mat)  :: acsr, zcsr
-  integer                     :: ktrw, nidx, nlw,nup,jmaxup
+  integer(psb_ipk_)           :: ktrw, nidx, nlw,nup,jmaxup
   type(psb_i_heap)            :: heap
   real(psb_dpk_)     :: alpha, nrmi
   character(len=20)  :: name='mld_sp_invt'
 
-
-  if(psb_get_errstatus() /= psb_success_) return 
-  info = psb_success_
+  info = psb_success_  
   call psb_erractionsave(err_act)
+  if (psb_errstatus_fatal()) then
+    info = psb_err_internal_error_; goto 9999
+  end if
 
   if (.not.(a%is_triangle().and.a%is_unit().and.a%is_upper())) then 
     write(psb_err_unit,*) 'Wrong A ' 
@@ -69,7 +70,7 @@ subroutine mld_dsparse_invt(n,a,z,nzrmax,sp_thresh,info)
     goto 9999      
   end if
   call a%cp_to(acsr)
-  call trw%allocate(0,0,1)
+  call trw%allocate(izero,izero,ione)
   if (info == psb_success_) allocate(zw(n),iz(n),valz(n),&
        & row(n),rowlevs(n),stat=info)
   if (info /= psb_success_) then 
@@ -91,7 +92,7 @@ subroutine mld_dsparse_invt(n,a,z,nzrmax,sp_thresh,info)
 
   outer: do i = 1, n-1
     ! ZW = e_i
-    call mld_invt_copyin(i,n,acsr,i,1,n,nlw,nup,jmaxup,nrmi,row,&
+    call mld_invt_copyin(i,n,acsr,i,ione,n,nlw,nup,jmaxup,nrmi,row,&
          & heap,rowlevs,ktrw,trw,info,sign=-done)
     if (info /= 0) exit
     row(i) = done
@@ -129,12 +130,6 @@ subroutine mld_dsparse_invt(n,a,z,nzrmax,sp_thresh,info)
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
-  if (err_act.eq.psb_act_abort_) then
-    call psb_error()
-    return
-  end if
+9999 call psb_error_handler(err_act)
   return
-
 end subroutine mld_dsparse_invt
