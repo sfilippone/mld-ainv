@@ -32,7 +32,7 @@
 !    POSSIBILITY OF SUCH DAMAGE.
 !   
 !  
-subroutine mld_d_invt_solver_cseti(sv,what,val,info)  
+subroutine mld_d_invt_solver_cseti(sv,what,val,info,idx)  
 
   use psb_base_mod
   use mld_d_invt_solver, mld_protect_name => mld_d_invt_solver_cseti
@@ -44,6 +44,7 @@ subroutine mld_d_invt_solver_cseti(sv,what,val,info)
   character(len=*), intent(in)                 :: what 
   integer, intent(in)                    :: val
   integer, intent(out)                   :: info
+  integer, intent(in), optional                :: idx
   Integer :: err_act
   character(len=20)  :: name='mld_d_invt_solver_cseti'
 
