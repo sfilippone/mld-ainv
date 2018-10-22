@@ -3,16 +3,16 @@ This is the AINV  plugin for MLD2P4 2, version 1.0-alpha.
 
 The algorithms are described in
 D. Bertaccini, S. Filippone
-MLD-AINV: Sparse Approximate Inverse Preconditioners for Krylov Methods on GPGPUs
-submitted to ACM TOMS. 
+Sparse approximate inverse preconditioners on high performance GPU
+platforms,  Computers and Mathematics with Applications,  71 (2016), pp. 693--711
 
 
 PREREQUISITES
 
-To build this code you need to have PSBLAS 3.1 or later from
-http://www.ce.uniroma2.it/psblas,  and MLD2P4
-2.0-beta or later from http://www.mld2p4.it, together with their
-prerequisites.  
+To build this code you need to have PSBLAS 3.4 or later from
+https://github.com/sfilippone/psblas3   and MLD2P4
+2.1 from https://github.com/sfilippone/mld2p4-2
+together with their prerequisites.  
 
 We provide an interface to the SAINV code by M. Tuma, and specifically
 the code for sainvsr

@@ -32,7 +32,7 @@
 !    POSSIBILITY OF SUCH DAMAGE.
 !   
 !  
-subroutine mld_d_ainv_solver_csetc(sv,what,val,info)
+subroutine mld_d_ainv_solver_csetc(sv,what,val,info,idx)
   
 
   use psb_base_mod
@@ -45,6 +45,7 @@ subroutine mld_d_ainv_solver_csetc(sv,what,val,info)
   character(len=*), intent(in)                 :: what 
   character(len=*), intent(in)                 :: val
   integer(psb_ipk_), intent(out)               :: info
+  integer(psb_ipk_), intent(in), optional      :: idx
   !
   integer(psb_ipk_ ) :: err_act, ival
   character(len=20)  :: name='mld_d_ainv_solver_setc'

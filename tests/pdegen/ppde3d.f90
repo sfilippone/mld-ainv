@@ -197,9 +197,9 @@ program ppde3d
   !  
   if(iam == psb_root_) write(psb_out_unit,'("Setting preconditioner to : ",a)')ptype
   if (psb_toupper(trim(ptype)) == "AINV") then 
-    call mld_precinit(prec,"BJAC",info)
+    call prec%init(ictxt,"BJAC",info)
   else
-    call mld_precinit(prec,ptype,info)
+    call prec%init(ictxt,ptype,info)
   end if
 
   info = psb_get_errstatus()
