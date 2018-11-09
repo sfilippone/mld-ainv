@@ -289,40 +289,6 @@
 
     ! 
 
-!!$  if (psb_toupper(prec_choice%prec) == 'ML') then 
-!!$    nlv = prec_choice%nlev
-!!$    call mld_precinit(prec,prec_choice%prec,info,nlev=nlv)
-!!$    call mld_precset(prec,mld_smoother_type_,   prec_choice%smther,  info)
-!!$    call mld_precset(prec,mld_smoother_sweeps_, prec_choice%jsweeps, info)
-!!$    call mld_precset(prec,mld_sub_ovr_,         prec_choice%novr,    info)
-!!$    call mld_precset(prec,mld_sub_restr_,       prec_choice%restr,   info)
-!!$    call mld_precset(prec,mld_sub_prol_,        prec_choice%prol,    info)
-!!$    call mld_precset(prec,mld_sub_solve_,       prec_choice%solve,   info)
-!!$    call mld_precset(prec,mld_sub_fillin_,      prec_choice%fill,   info)
-!!$    call mld_precset(prec,mld_sub_iluthrs_,     prec_choice%thr,    info)
-!!$    call mld_precset(prec,mld_aggr_kind_,       prec_choice%aggrkind,info)
-!!$    call mld_precset(prec,mld_aggr_alg_,        prec_choice%aggr_alg,info)
-!!$    call mld_precset(prec,mld_ml_type_,         prec_choice%mltype,  info)
-!!$    call mld_precset(prec,mld_smoother_pos_,    prec_choice%smthpos, info)
-!!$    call mld_precset(prec,mld_aggr_thresh_,     prec_choice%athres,  info)
-!!$    call mld_precset(prec,mld_coarse_solve_,    prec_choice%csolve,  info)
-!!$    call mld_precset(prec,mld_coarse_subsolve_, prec_choice%csbsolve,info)
-!!$    call mld_precset(prec,mld_coarse_mat_,      prec_choice%cmat,    info)
-!!$    call mld_precset(prec,mld_coarse_fillin_,   prec_choice%cfill,   info)
-!!$    call mld_precset(prec,mld_coarse_iluthrs_,  prec_choice%cthres,  info)
-!!$    call mld_precset(prec,mld_coarse_sweeps_,   prec_choice%cjswp,   info)
-!!$  else
-!!$    nlv = 1
-!!$    call mld_precinit(prec,prec_choice%prec,info)
-!!$    call mld_precset(prec,mld_smoother_sweeps_, prec_choice%jsweeps, info)
-!!$    call mld_precset(prec,mld_sub_ovr_,         prec_choice%novr,    info)
-!!$    call mld_precset(prec,mld_sub_restr_,       prec_choice%restr,   info)
-!!$    call mld_precset(prec,mld_sub_prol_,        prec_choice%prol,    info)
-!!$    call mld_precset(prec,mld_sub_solve_,       prec_choice%solve,   info)
-!!$    call mld_precset(prec,mld_sub_fillin_,      prec_choice%fill,   info)
-!!$    call mld_precset(prec,mld_sub_iluthrs_,     prec_choice%thr,    info)
-!!$  end if
-
     if (psb_toupper(trim(prec_choice%prec)) == "AINV") then 
       call mld_precinit(prec,"BJAC",info)
     else

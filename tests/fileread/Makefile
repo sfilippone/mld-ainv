@@ -22,7 +22,6 @@ ZFSOBJS=zf_sample.o data_input.o
 EXEDIR=./runs
 
 all: df_sample
-#sf_sample cf_sample zf_sample
 
 df_sample: $(DFSOBJS)
 	$(FLINK) $(LINKOPT) $(DFSOBJS) -o df_sample \
