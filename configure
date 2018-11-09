@@ -5824,7 +5824,7 @@ ac_link='${MPIFC-$FC} -o conftest${ac_exeext} $FFLAGS $LDFLAGS conftest.$ac_ext 
 $as_echo_n "checking GNU Fortran version at least 4.6... " >&6; }
 cat > conftest.$ac_ext <<EOF
            program main
-#if ( __GNUC__ >= 4 && __GNUC_MINOR__ >= 6 ) || ( __GNUC__ > 4 )
+#if ( __GNUC__ >= 4 && __GNUC_MINOR__ >= 8 ) || ( __GNUC__ > 4 )
               print *, "ok"
 #else
         this program will fail
@@ -5846,8 +5846,8 @@ $as_echo " no." >&6; }
   echo "configure: failed program was:" >&5
   cat conftest.$ac_ext >&5
   rm -rf conftest*
-  { { $as_echo "$as_me:$LINENO: error: Sorry, we require GNU Fortran 4.6 or later." >&5
-$as_echo "$as_me: error: Sorry, we require GNU Fortran 4.6 or later." >&2;}
+  { { $as_echo "$as_me:$LINENO: error: Sorry, we require GNU Fortran 4.8 or later." >&5
+$as_echo "$as_me: error: Sorry, we require GNU Fortran 4.8 or later." >&2;}
    { (exit 1); exit 1; }; }
 
 fi
@@ -6116,6 +6116,190 @@ $as_echo "$as_me: error: no. Could not find working version of MLD2P4." >&2;}
 fi
 cd ..
 rm -fr tmpdir_$i
+
+
+{ $as_echo "$as_me:$LINENO: checking for version of MLD2P4" >&5
+$as_echo_n "checking for version of MLD2P4... " >&6; }
+ac_ext=${ac_fc_srcext-f}
+ac_compile='$FC -c $FCFLAGS $ac_fcflags_srcext conftest.$ac_ext >&5'
+ac_link='$FC -o conftest$ac_exeext $FCFLAGS $LDFLAGS $ac_fcflags_srcext conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_fc_compiler_gnu
+
+ac_exeext=''
+ac_objext='o'
+ac_ext='f90'
+save_FCFLAGS=$FCFLAGS;
+FCFLAGS="${FMFLAG}$pac_cv_mld2p4_dir/modules $FINCLUDES $save_FCFLAGS"
+save_LDFLAGS=$LDFLAGS;
+## if test "x$pac_cv_mld2p4_libdir" != "x"; then
+## dnl AC_MSG_NOTICE([mld2p4 lib dir $pac_cv_mld2p4_libdir])
+##  MLD2P4_LIBS="-L$pac_cv_mld2p4_libdir"
+## elif test "x$pac_cv_mld2p4_dir" != "x"; then
+## dnl AC_MSG_NOTICE([mld2p4 dir $pac_cv_mld2p4_dir])
+##  MLD2P4_LIBS="-L$pac_cv_mld2p4_dir/lib"
+## fi
+MLD2P4_LIBS="-lmld_prec -L$pac_cv_mld2p4_dir/lib"
+LDFLAGS=" $MLD2P4_LIBS $save_LDFLAGS"
+
+
+cat >conftest.$ac_ext <<_ACEOF
+
+		program test
+		use mld_base_prec_type, only : mld_version_major_
+		print *,mld_version_major_
+		end program test
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (ac_try="$ac_link"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval ac_try_echo="\"\$as_me:$LINENO: $ac_try_echo\""
+$as_echo "$ac_try_echo") >&5
+  (eval "$ac_link") 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && {
+	 test -z "$ac_fc_werror_flag" ||
+	 test ! -s conftest.err
+       } && test -s conftest$ac_exeext && {
+	 test "$cross_compiling" = yes ||
+	 $as_test_x conftest$ac_exeext
+       }; then
+  pac_cv_mld2p4_major=`./conftest${ac_exeext} | sed 's/^ *//'`
+else
+  $as_echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+	pac_cv_mld2p4_major="unknown"
+fi
+
+rm -rf conftest.dSYM
+rm -f core conftest.err conftest.$ac_objext conftest_ipa8_conftest.oo \
+      conftest$ac_exeext conftest.$ac_ext
+
+cat >conftest.$ac_ext <<_ACEOF
+
+		program test
+		use mld_base_prec_type, only : mld_version_minor_
+		print *,mld_version_minor_
+		end program test
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (ac_try="$ac_link"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval ac_try_echo="\"\$as_me:$LINENO: $ac_try_echo\""
+$as_echo "$ac_try_echo") >&5
+  (eval "$ac_link") 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && {
+	 test -z "$ac_fc_werror_flag" ||
+	 test ! -s conftest.err
+       } && test -s conftest$ac_exeext && {
+	 test "$cross_compiling" = yes ||
+	 $as_test_x conftest$ac_exeext
+       }; then
+  pac_cv_mld2p4_minor=`./conftest${ac_exeext} | sed 's/^ *//'`
+else
+  $as_echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+	pac_cv_mld2p4_minor="unknown"
+fi
+
+rm -rf conftest.dSYM
+rm -f core conftest.err conftest.$ac_objext conftest_ipa8_conftest.oo \
+      conftest$ac_exeext conftest.$ac_ext
+
+cat >conftest.$ac_ext <<_ACEOF
+
+		program test
+		use mld_base_prec_type, only : mld_patchlevel_
+		print *,mld_patchlevel_
+		end program test
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (ac_try="$ac_link"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval ac_try_echo="\"\$as_me:$LINENO: $ac_try_echo\""
+$as_echo "$ac_try_echo") >&5
+  (eval "$ac_link") 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && {
+	 test -z "$ac_fc_werror_flag" ||
+	 test ! -s conftest.err
+       } && test -s conftest$ac_exeext && {
+	 test "$cross_compiling" = yes ||
+	 $as_test_x conftest$ac_exeext
+       }; then
+  pac_cv_mld2p4_patchlevel=`./conftest${ac_exeext} | sed 's/^ *//'`
+else
+  $as_echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+	pac_cv_mld2p4_patchlevel="unknown"
+fi
+
+rm -rf conftest.dSYM
+rm -f core conftest.err conftest.$ac_objext conftest_ipa8_conftest.oo \
+      conftest$ac_exeext conftest.$ac_ext
+LDFLAGS="$save_LDFLAGS";
+FCFLAGS="$save_FCFLAGS";
+
+{ $as_echo "$as_me:$LINENO: result: Done" >&5
+$as_echo "Done" >&6; }
+ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+
+if test "x$pac_cv_mld2p4_major" == "xunknown"; then
+  { { $as_echo "$as_me:$LINENO: error: MLD2P4 version major \"$pac_cv_mld2p4_major\"." >&5
+$as_echo "$as_me: error: MLD2P4 version major \"$pac_cv_mld2p4_major\"." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test "x$pac_cv_mld2p4_minor" == "xunknown"; then
+   { { $as_echo "$as_me:$LINENO: error: MLD2P4 version minor \"$pac_cv_mld2p4_minor\"." >&5
+$as_echo "$as_me: error: MLD2P4 version minor \"$pac_cv_mld2p4_minor\"." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test "x$pac_cv_mld2p4_patchlevel" == "xunknown"; then
+   { { $as_echo "$as_me:$LINENO: error: MLD2P4 patchlevel \"$pac_cv_mld2p4_patchlevel\"." >&5
+$as_echo "$as_me: error: MLD2P4 patchlevel \"$pac_cv_mld2p4_patchlevel\"." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if (( $pac_cv_mld2p4_major < 2 )) ||
+    (  (( $pac_cv_mld2p4_major == 2 )) && (( $pac_cv_mld2p4_minor < 1 )) ) ||
+      ( (( $pac_cv_mld2p4_major == 2 )) && (( $pac_cv_mld2p4_minor == 1 )) && (( $pac_cv_mld2p4_patchlevel < 1 )) )
+      	then
+  { { $as_echo "$as_me:$LINENO: error: I need at least MLD2P4 version 2.1.1." >&5
+$as_echo "$as_me: error: I need at least MLD2P4 version 2.1.1." >&2;}
+   { (exit 1); exit 1; }; }
+else
+  { $as_echo "$as_me:$LINENO: Am configuring with MLD2P4 version $pac_cv_mld2p4_major.$pac_cv_mld2p4_minor.$pac_cv_mld2p4_patchlevel." >&5
+$as_echo "$as_me: Am configuring with MLD2P4 version $pac_cv_mld2p4_major.$pac_cv_mld2p4_minor.$pac_cv_mld2p4_patchlevel." >&6;}
+fi
+
 
 
 

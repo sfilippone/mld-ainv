@@ -56,9 +56,6 @@ module mld_d_ainv_solver
     procedure, pass(sv) :: check   => mld_d_ainv_solver_check
     procedure, pass(sv) :: build   => mld_d_ainv_solver_bld
     procedure, pass(sv) :: clone   => mld_d_ainv_solver_clone
-    procedure, pass(sv) :: seti    => mld_d_ainv_solver_seti
-    procedure, pass(sv) :: setc    => mld_d_ainv_solver_setc
-    procedure, pass(sv) :: setr    => mld_d_ainv_solver_setr
     procedure, pass(sv) :: cseti   => mld_d_ainv_solver_cseti
     procedure, pass(sv) :: csetc   => mld_d_ainv_solver_csetc
     procedure, pass(sv) :: csetr   => mld_d_ainv_solver_csetr
@@ -118,51 +115,7 @@ module mld_d_ainv_solver
   end interface
   
   interface 
-    subroutine mld_d_ainv_solver_seti(sv,what,val,info)
-      import :: psb_desc_type, psb_dspmat_type,  psb_d_base_sparse_mat, &
-           & psb_d_vect_type, psb_d_base_vect_type, psb_dpk_, mld_d_ainv_solver_type
-      
-      Implicit None
-      
-      ! Arguments
-      class(mld_d_ainv_solver_type), intent(inout) :: sv 
-      integer, intent(in)                          :: what 
-      integer, intent(in)                          :: val
-      integer, intent(out)                         :: info
-    end subroutine mld_d_ainv_solver_seti
-  end interface
-  
-  interface 
-    subroutine mld_d_ainv_solver_setc(sv,what,val,info)
-      import :: psb_desc_type, psb_dspmat_type,  psb_d_base_sparse_mat, &
-           & psb_d_vect_type, psb_d_base_vect_type, psb_dpk_, mld_d_ainv_solver_type
-      Implicit None
-      
-      ! Arguments
-      class(mld_d_ainv_solver_type), intent(inout) :: sv
-      integer, intent(in)                          :: what 
-      character(len=*), intent(in)                 :: val
-      integer, intent(out)                         :: info
-    end subroutine mld_d_ainv_solver_setc
-  end interface 
-  
-  interface 
-    subroutine mld_d_ainv_solver_setr(sv,what,val,info)
-      import :: psb_desc_type, psb_dspmat_type,  psb_d_base_sparse_mat, &
-           & psb_d_vect_type, psb_d_base_vect_type, psb_dpk_, mld_d_ainv_solver_type
-            
-      Implicit None
-      
-      ! Arguments
-      class(mld_d_ainv_solver_type), intent(inout) :: sv 
-      integer, intent(in)                          :: what 
-      real(psb_dpk_), intent(in)                   :: val
-      integer, intent(out)                         :: info
-    end subroutine mld_d_ainv_solver_setr
-  end interface 
-  
-  interface 
-    subroutine mld_d_ainv_solver_cseti(sv,what,val,info)
+    subroutine mld_d_ainv_solver_cseti(sv,what,val,info,idx)
       import :: psb_desc_type, psb_dspmat_type,  psb_d_base_sparse_mat, &
            & psb_d_vect_type, psb_d_base_vect_type, psb_dpk_, mld_d_ainv_solver_type
       
@@ -173,12 +126,13 @@ module mld_d_ainv_solver
       character(len=*), intent(in)                 :: what 
       integer, intent(in)                          :: val
       integer, intent(out)                         :: info
+      integer, intent(in), optional                :: idx
     end subroutine mld_d_ainv_solver_cseti
   end interface 
   
   
   interface 
-    subroutine mld_d_ainv_solver_csetc(sv,what,val,info)
+    subroutine mld_d_ainv_solver_csetc(sv,what,val,info,idx)
       import :: psb_desc_type, psb_dspmat_type,  psb_d_base_sparse_mat, &
            & psb_d_vect_type, psb_d_base_vect_type, psb_dpk_, mld_d_ainv_solver_type
       
@@ -189,11 +143,12 @@ module mld_d_ainv_solver
       character(len=*), intent(in)                 :: what 
       character(len=*), intent(in)                 :: val
       integer, intent(out)                         :: info
+      integer, intent(in), optional                :: idx
     end subroutine mld_d_ainv_solver_csetc
   end interface 
   
   interface 
-    subroutine mld_d_ainv_solver_csetr(sv,what,val,info)
+    subroutine mld_d_ainv_solver_csetr(sv,what,val,info,idx)
       import :: psb_desc_type, psb_dspmat_type,  psb_d_base_sparse_mat, &
            & psb_d_vect_type, psb_d_base_vect_type, psb_dpk_, mld_d_ainv_solver_type
             
@@ -204,6 +159,7 @@ module mld_d_ainv_solver
       character(len=*), intent(in)                 :: what 
       real(psb_dpk_), intent(in)                   :: val
       integer, intent(out)                         :: info
+      integer, intent(in), optional                :: idx
     end subroutine mld_d_ainv_solver_csetr
   end interface 
  
