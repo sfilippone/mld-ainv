@@ -45,7 +45,7 @@ module mld_d_invk_solver
   use psb_base_mod, only : psb_d_vect_type
 
   type, extends(mld_d_base_ainv_solver_type) :: mld_d_invk_solver_type
-    integer                     :: fill_in, inv_fill
+    integer(psb_ipk_)   :: fill_in, inv_fill
   contains
     procedure, pass(sv) :: check   => mld_d_invk_solver_check
     procedure, pass(sv) :: clone   => mld_d_invk_solver_clone
@@ -74,7 +74,7 @@ module mld_d_invk_solver
     subroutine mld_d_invk_solver_bld(a,desc_a,sv,info,b,amold,vmold,imold)
       import :: psb_desc_type, psb_dspmat_type,  psb_d_base_sparse_mat, &
        & psb_d_vect_type, psb_d_base_vect_type, psb_dpk_, &
-       & mld_d_invk_solver_type, psb_i_base_vect_type
+       & mld_d_invk_solver_type, psb_i_base_vect_type, psb_ipk_
       
       Implicit None
       
@@ -82,30 +82,29 @@ module mld_d_invk_solver
       type(psb_dspmat_type), intent(in), target           :: a
       Type(psb_desc_type), Intent(in)                     :: desc_a 
       class(mld_d_invk_solver_type), intent(inout)        :: sv
-      integer, intent(out)                                :: info
+      integer(psb_ipk_), intent(out)                      :: info
       type(psb_dspmat_type), intent(in), target, optional :: b
       class(psb_d_base_sparse_mat), intent(in), optional  :: amold
       class(psb_d_base_vect_type), intent(in), optional   :: vmold
-      class(psb_i_base_vect_type), intent(in), optional  :: imold
+      class(psb_i_base_vect_type), intent(in), optional   :: imold
     end subroutine mld_d_invk_solver_bld
   end interface
   
   interface 
     subroutine mld_d_invk_solver_check(sv,info)
-      import :: psb_desc_type, psb_dspmat_type,  psb_d_base_sparse_mat, &
-           & psb_d_vect_type, psb_d_base_vect_type, psb_dpk_, mld_d_invk_solver_type
+      import :: psb_dpk_, mld_d_invk_solver_type, psb_ipk_
 
       Implicit None
       
       ! Arguments
       class(mld_d_invk_solver_type), intent(inout) :: sv
-      integer, intent(out)                   :: info
+      integer(psb_ipk_), intent(out)               :: info
     end subroutine mld_d_invk_solver_check
   end interface
   
   interface 
     subroutine mld_d_invk_solver_cseti(sv,what,val,info,idx)
-      import :: psb_desc_type, psb_dspmat_type,  psb_d_base_sparse_mat, &
+      import :: psb_desc_type, psb_dspmat_type,  psb_d_base_sparse_mat, psb_ipk_,&
            & psb_d_vect_type, psb_d_base_vect_type, psb_dpk_, mld_d_invk_solver_type
       
       Implicit None
@@ -113,23 +112,22 @@ module mld_d_invk_solver
       ! Arguments
       class(mld_d_invk_solver_type), intent(inout) :: sv 
       character(len=*), intent(in)                 :: what 
-      integer, intent(in)                          :: val
-      integer, intent(out)                         :: info
-      integer, intent(in), optional                :: idx
+      integer(psb_ipk_), intent(in)                :: val
+      integer(psb_ipk_), intent(out)               :: info
+      integer(psb_ipk_), intent(in), optional      :: idx
     end subroutine mld_d_invk_solver_cseti
   end interface
   
   interface
     subroutine mld_d_invk_solver_descr(sv,info,iout,coarse)
-      import :: psb_desc_type, psb_dspmat_type,  psb_d_base_sparse_mat, &
-           & psb_d_vect_type, psb_d_base_vect_type, psb_dpk_, mld_d_invk_solver_type
+      import :: psb_dpk_, mld_d_invk_solver_type, psb_ipk_
       
       Implicit None
       
       ! Arguments
       class(mld_d_invk_solver_type), intent(in) :: sv
-      integer, intent(out)                      :: info
-      integer, intent(in), optional             :: iout
+      integer(psb_ipk_), intent(out)            :: info
+      integer(psb_ipk_), intent(in), optional   :: iout
       logical, intent(in), optional             :: coarse
 
     end subroutine mld_d_invk_solver_descr
@@ -139,17 +137,15 @@ module mld_d_invk_solver
   interface mld_invk_bld
     subroutine mld_d_invk_bld(a,fill1, fill2,lmat,d,umat,desc,info,blck)
       import :: psb_desc_type, psb_dspmat_type,  psb_d_base_sparse_mat, &
-           & psb_dpk_ 
-      
-      implicit none
-      
+           & psb_dpk_, psb_ipk_      
+      implicit none      
       ! Arguments                                                     
       type(psb_dspmat_type), intent(in), target   :: a
-      integer, intent(in)                         :: fill1, fill2 
+      integer(psb_ipk_), intent(in)               :: fill1, fill2 
       type(psb_dspmat_type), intent(inout)        :: lmat, umat
       real(psb_dpk_), allocatable                 :: d(:)
       Type(psb_desc_type), Intent(in)             :: desc
-      integer, intent(out)                        :: info
+      integer(psb_ipk_), intent(out)              :: info
       type(psb_dspmat_type), intent(in), optional :: blck
     end subroutine mld_d_invk_bld
   end interface
@@ -159,19 +155,19 @@ module mld_d_invk_solver
          & ktrw,trw,info,sign,inlevs)
 
       use psb_base_mod, only : psb_d_csr_sparse_mat, psb_d_coo_sparse_mat,&
-           & psb_dpk_, psb_i_heap
+           & psb_dpk_, psb_i_heap, psb_ipk_
       implicit none
 
       ! Arguments 
       type(psb_d_csr_sparse_mat), intent(in)    :: a
       type(psb_d_coo_sparse_mat), intent(inout) :: trw
-      integer, intent(in)                  :: i,m,jmin,jmax
-      integer, intent(inout)               :: ktrw,info
-      integer, intent(inout)               :: rowlevs(:)
-      real(psb_dpk_), intent(inout)        :: row(:)
-      type(psb_i_heap), intent(inout)    :: heap
-      real(psb_dpk_), optional, intent(in) :: sign
-      integer, intent(in), optional        :: inlevs(:)
+      integer(psb_ipk_), intent(in)             :: i,m,jmin,jmax
+      integer(psb_ipk_), intent(inout)          :: ktrw,info
+      integer(psb_ipk_), intent(inout)          :: rowlevs(:)
+      real(psb_dpk_), intent(inout)             :: row(:)
+      type(psb_i_heap), intent(inout)           :: heap
+      real(psb_dpk_), optional, intent(in)      :: sign
+      integer(psb_ipk_), intent(in), optional   :: inlevs(:)
 
     end subroutine mld_d_invk_copyin
   end interface
@@ -180,18 +176,18 @@ module mld_d_invk_solver
     subroutine mld_d_invk_inv(fill_in,i,row,rowlevs,heap,uia1,uia2,uaspk,uplevs,&
          & nidx,idxs,info)
 
-      use psb_base_mod, only : psb_dspmat_type, psb_dpk_, psb_i_heap
+      use psb_base_mod, only : psb_dspmat_type, psb_dpk_, psb_i_heap, psb_ipk_
       implicit none 
 
       ! Arguments
-      type(psb_i_heap), intent(inout)    :: heap 
-      integer, intent(in)                  :: i, fill_in
-      integer, intent(inout)               :: nidx,info
-      integer, intent(inout)               :: rowlevs(:)
-      integer, allocatable, intent(inout)  :: idxs(:)
-      integer, intent(in)                  :: uia1(:),uia2(:),uplevs(:)
-      real(psb_dpk_), intent(in)           :: uaspk(:)
-      real(psb_dpk_), intent(inout)        :: row(:)
+      type(psb_i_heap), intent(inout)               :: heap 
+      integer(psb_ipk_), intent(in)                 :: i, fill_in
+      integer(psb_ipk_), intent(inout)              :: nidx,info
+      integer(psb_ipk_), intent(inout)              :: rowlevs(:)
+      integer(psb_ipk_), allocatable, intent(inout) :: idxs(:)
+      integer(psb_ipk_), intent(in)                 :: uia1(:),uia2(:),uplevs(:)
+      real(psb_dpk_), intent(in)                    :: uaspk(:)
+      real(psb_dpk_), intent(inout)                 :: row(:)
 
 
     end subroutine mld_d_invk_inv
@@ -201,30 +197,30 @@ module mld_d_invk_solver
     subroutine mld_d_invk_copyout(fill_in,i,m,row,rowlevs,nidx,idxs,&
          &  l2,uia1,uia2,uaspk,info)
 
-      use psb_base_mod, only : psb_dspmat_type, psb_dpk_, psb_i_heap
+      use psb_base_mod, only : psb_dspmat_type, psb_dpk_, psb_i_heap, psb_ipk_
 
       implicit none 
 
       ! Arguments
-      integer, intent(in)                        :: fill_in, i, m, nidx
-      integer, intent(inout)                     :: l2, info
-      integer, intent(inout)                     :: rowlevs(:), idxs(:)
-      integer, allocatable, intent(inout)        :: uia1(:), uia2(:)
-      real(psb_dpk_), allocatable, intent(inout) :: uaspk(:)
-      real(psb_dpk_), intent(inout)              :: row(:)
+      integer(psb_ipk_), intent(in)                 :: fill_in, i, m, nidx
+      integer(psb_ipk_), intent(inout)              :: l2, info
+      integer(psb_ipk_), intent(inout)              :: rowlevs(:), idxs(:)
+      integer(psb_ipk_), allocatable, intent(inout) :: uia1(:), uia2(:)
+      real(psb_dpk_), allocatable, intent(inout)    :: uaspk(:)
+      real(psb_dpk_), intent(inout)                 :: row(:)
 
     end subroutine mld_d_invk_copyout
   end interface
   
   interface mld_sparse_invk
     subroutine mld_dsparse_invk(n,a,z,fill_in,info,inlevs)
-      use psb_base_mod, only : psb_dspmat_type, psb_dpk_
-      integer, intent(in)                  :: n
-      type(psb_dspmat_type), intent(in)    :: a
-      type(psb_dspmat_type), intent(inout) :: z
-      integer, intent(in)                  :: fill_in
-      integer, intent(out)                 :: info
-      integer, intent(in), optional        :: inlevs(:)
+      use psb_base_mod, only : psb_dspmat_type, psb_dpk_, psb_ipk_
+      integer(psb_ipk_), intent(in)           :: n
+      type(psb_dspmat_type), intent(in)       :: a
+      type(psb_dspmat_type), intent(inout)    :: z
+      integer(psb_ipk_), intent(in)           :: fill_in
+      integer(psb_ipk_), intent(out)          :: info
+      integer(psb_ipk_), intent(in), optional :: inlevs(:)
 
     end subroutine mld_dsparse_invk
   end interface

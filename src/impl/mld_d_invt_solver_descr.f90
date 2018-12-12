@@ -42,15 +42,15 @@ subroutine mld_d_invt_solver_descr(sv,info,iout,coarse)
 
   ! Arguments
   class(mld_d_invt_solver_type), intent(in) :: sv
-  integer, intent(out)                     :: info
-  integer, intent(in), optional            :: iout
-  logical, intent(in), optional       :: coarse
+  integer(psb_ipk_), intent(out)            :: info
+  integer(psb_ipk_), intent(in), optional   :: iout
+  logical, intent(in), optional             :: coarse
 
   ! Local variables
-  integer      :: err_act
-  integer      :: ictxt, me, np
+  integer(psb_ipk_) :: err_act
+  integer(psb_ipk_) :: ictxt, me, np
   character(len=20), parameter :: name='mld_mld_d_invt_solver_descr'
-  integer :: iout_
+  integer(psb_ipk_) :: iout_
 
   call psb_erractionsave(err_act)
   info = psb_success_
@@ -69,11 +69,6 @@ subroutine mld_d_invt_solver_descr(sv,info,iout,coarse)
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
+9999 call psb_error_handler(err_act)
   return
 end subroutine mld_d_invt_solver_descr

@@ -41,18 +41,18 @@ subroutine mld_d_invk_inv(fill_in,i,row,rowlevs,heap,ja,irp,val,uplevs,&
   implicit none 
 
   ! Arguments
-  type(psb_i_heap), intent(inout)     :: heap 
-  integer, intent(in)                 :: i, fill_in
-  integer, intent(inout)              :: nidx,info
-  integer, intent(inout)              :: rowlevs(:)
-  integer, allocatable, intent(inout) :: idxs(:)
-  integer, intent(in)                 :: ja(:),irp(:),uplevs(:)
-  real(psb_dpk_), intent(in)          :: val(:)
-  real(psb_dpk_), intent(inout)       :: row(:)
+  type(psb_i_heap), intent(inout)               :: heap 
+  integer(psb_ipk_), intent(in)                 :: i, fill_in
+  integer(psb_ipk_), intent(inout)              :: nidx,info
+  integer(psb_ipk_), intent(inout)              :: rowlevs(:)
+  integer(psb_ipk_), allocatable, intent(inout) :: idxs(:)
+  integer(psb_ipk_), intent(in)                 :: ja(:),irp(:),uplevs(:)
+  real(psb_dpk_), intent(in)                    :: val(:)
+  real(psb_dpk_), intent(inout)                 :: row(:)
 
   ! Local variables
-  integer             :: k,j,lrwk,jj,lastk, iret
-  real(psb_dpk_)      :: rwk
+  integer(psb_ipk_) :: k,j,lrwk,jj,lastk, iret
+  real(psb_dpk_)    :: rwk
 
 
   info = psb_success_

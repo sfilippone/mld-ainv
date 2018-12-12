@@ -43,18 +43,18 @@ subroutine mld_dsparse_biconjg_s_ft_llk(n,a,p,z,w,nzrmax,sp_thresh,info)
   !
   !
   implicit none 
-  integer, intent(in)                       :: n
+  integer(psb_ipk_), intent(in)             :: n
   type(psb_d_csr_sparse_mat), intent(in)    :: a
   type(psb_d_csc_sparse_mat), intent(inout) :: z,w
-  integer, intent(in)                       :: nzrmax
+  integer(psb_ipk_), intent(in)             :: nzrmax
   real(psb_dpk_), intent(in)                :: sp_thresh
   real(psb_dpk_), intent(out)               :: p(:)
-  integer, intent(out)                      :: info
+  integer(psb_ipk_), intent(out)            :: info
 
   ! Locals
-  integer, allocatable        :: ia(:), ja(:), izkr(:), izcr(:),iww(:) 
-  real(psb_dpk_), allocatable :: zval(:),val(:), q(:),  ww(:) 
-  integer :: i,j,k, kc, kr, err_act, nz, nzra, nzrz, ipzi,ipzj, nzww,&
+  integer(psb_ipk_), allocatable :: ia(:), ja(:), izkr(:), izcr(:),iww(:) 
+  real(psb_dpk_), allocatable    :: zval(:),val(:), q(:),  ww(:) 
+  integer(psb_ipk_)  :: i,j,k, kc, kr, err_act, nz, nzra, nzrz, ipzi,ipzj, nzww,&
        & nzzi,nzzj, nzz, ip1, ip2, ipza,ipzz, ipzn, nzzn, ipz1, ipz2,&
        &  ipj, lastj, nextj, nzw, nzrw
   type(psb_i_heap)   :: heap, rheap
@@ -214,7 +214,7 @@ subroutine mld_dsparse_biconjg_s_ft_llk(n,a,p,z,w,nzrmax,sp_thresh,info)
     if (.false.) then 
       ! We can't do the proper thing until we have bot Z_i and W_i. 
       call a%csget(i,i,nzra,ia,ja,val,info)
-      call rwclip(nzra,ia,ja,val,1,n,1,n)      
+      call rwclip(nzra,ia,ja,val,ione,n,ione,n)      
       p(i) = psb_spge_dot(nzra,ja,val,zval)
       if (abs(p(i)) < d_epstol) &
            & p(i) = 1.d-3 
@@ -404,7 +404,7 @@ subroutine mld_dsparse_biconjg_s_ft_llk(n,a,p,z,w,nzrmax,sp_thresh,info)
 !!$        write(0,*) 'On negative dot prod a ',ac%ia(ip1:ip2),ac%val(ip1:ip2)
 
     end if
-!!$      write(0,*) i,p(i),q(i)
+
     if (abs(q(i)) < d_epstol) &
          & q(i) = 1.d-3 
     p(i) = q(i)

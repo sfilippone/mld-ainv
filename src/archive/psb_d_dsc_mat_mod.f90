@@ -301,7 +301,7 @@ module psb_d_dsc_mat_mod
 
   interface 
     subroutine psb_d_dsc_mold(a,b,info) 
-      import :: psb_d_dsc_sparse_mat, psb_d_base_sparse_mat, psb_long_int_k_
+      import :: psb_d_dsc_sparse_mat, psb_d_base_sparse_mat, psb_epk_
       class(psb_d_dsc_sparse_mat), intent(in)               :: a
       class(psb_d_base_sparse_mat), intent(out), allocatable :: b
       integer, intent(out)                                 :: info
@@ -602,15 +602,15 @@ contains
   function d_dsc_sizeof(a) result(res)
     implicit none 
     class(psb_d_dsc_sparse_mat), intent(in) :: a
-    integer(psb_long_int_k_) :: res
+    integer(psb_epk_) :: res
     integer :: i
 
     res = 12
     
     if (allocated(a%cols)) then     
       do i=1, size(a%cols)
-        res = res + psb_sizeof_int + psb_sizeof_dp  * size(a%cols(i)%val) &
-             &  + psb_sizeof_int * size(a%cols(i)%idx)
+        res = res + psb_sizeof_ip + psb_sizeof_dp  * size(a%cols(i)%val) &
+             &  + psb_sizeof_ip * size(a%cols(i)%idx)
       end do
     end if
     

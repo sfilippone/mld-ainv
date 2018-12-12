@@ -78,7 +78,7 @@ program ppde3d
   ! input parameters
   character(len=20) :: kmethd, ptype, renum
   character(len=5)  :: afmt
-  integer   :: idim
+  integer(psb_ipk_) :: idim
 
   ! miscellaneous 
   real(psb_dpk_), parameter :: one = 1.d0
@@ -93,7 +93,7 @@ program ppde3d
   type(mld_d_ainv_solver_type) :: ainvsv
   type ainvparms 
     character(len=12) :: alg, orth_alg
-    integer           :: fill, inv_fill
+    integer(psb_ipk_) :: fill, inv_fill
     real(psb_dpk_)    :: thresh, inv_thresh
   end type ainvparms
   type(ainvparms)     :: parms
@@ -102,19 +102,19 @@ program ppde3d
   type(psb_desc_type)   :: desc_a, desc_b
   ! dense matrices
   real(psb_dpk_), allocatable :: b(:), x(:)
-  type(psb_d_vect_type)      :: xv,bv, vtst, xg, bg 
+  type(psb_d_vect_type)       :: xv,bv, vtst, xg, bg 
   ! blacs parameters
-  integer            :: ictxt, iam, np
+  integer(psb_ipk_)            :: ictxt, iam, np
 
   ! solver parameters
-  integer            :: iter, itmax,itrace, istopc, irst,giter, nr
-  integer(psb_long_int_k_) :: amatsize, precsize, descsize, d2size, precnz,amatnz
-  real(psb_dpk_)   :: err, eps, gerr, amxval
-  integer, allocatable :: perm(:)
+  integer(psb_ipk_) :: iter, itmax,itrace, istopc, irst,giter, nr
+  integer(psb_epk_) :: amatsize, precsize, descsize, d2size, precnz,amatnz
+  real(psb_dpk_)    :: err, eps, gerr, amxval
+  integer(psb_ipk_), allocatable :: perm(:)
 
   ! other variables
   logical            :: pdump=.false.
-  integer            :: info, i
+  integer(psb_ipk_)  :: info, i
   character(len=20)  :: name,ch_err
   character(len=40)  :: fname
 
@@ -129,7 +129,7 @@ program ppde3d
     call psb_exit(ictxt)
     stop
   endif
-  if(psb_get_errstatus() /= 0) goto 9999
+  if (psb_errstatus_fatal()) goto 9999
   name='ppde3d'
   call psb_set_errverbosity(2)
   !
@@ -206,7 +206,7 @@ program ppde3d
   if (info /= 0) call psb_error(ictxt)
 
   if (psb_toupper(ptype) == 'DIAG') then 
-    call mld_precset(prec,mld_smoother_sweeps_,1,info)
+    call prec%set('smoother_sweeps',1,info)
   end if
   if (psb_toupper(ptype) == 'AINV') then 
     select case (psb_toupper(parms%alg)) 
@@ -228,7 +228,7 @@ program ppde3d
 
   call psb_barrier(ictxt)
   t1 = psb_wtime()
-  call mld_precbld(a,desc_a,prec,info)
+  call prec%build(a,desc_a,info)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
     ch_err='psb_precbld'
@@ -300,7 +300,7 @@ program ppde3d
   call psb_gefree(bv,desc_a,info)
   call psb_gefree(xv,desc_a,info)
   call psb_spfree(a,desc_a,info)
-  call mld_precfree(prec,info)
+  call prec%free(info)
   call psb_cdfree(desc_a,info)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
@@ -322,13 +322,13 @@ contains
   !
   subroutine  get_parms(ictxt,kmethd,ptype,afmt,renum,&
        & idim,istopc,itmax,itrace,irst,nu,parms)
-    integer      :: ictxt
-    character(len=*) :: kmethd, ptype, afmt,renum
-    integer      :: idim, istopc,itmax,itrace,irst
-    real(psb_dpk_)  :: nu
-    type(ainvparms) :: parms
-    integer      :: np, iam
-    integer      :: intbuf(10), ip
+    integer(psb_ipk_) :: ictxt
+    character(len=*)  :: kmethd, ptype, afmt,renum
+    integer(psb_ipk_) :: idim, istopc,itmax,itrace,irst
+    real(psb_dpk_)    :: nu
+    type(ainvparms)   :: parms
+    integer(psb_ipk_) :: np, iam
+    integer(psb_ipk_) :: intbuf(10), ip
 
     call psb_info(ictxt, iam, np)
 
@@ -382,7 +382,7 @@ contains
   !  print an error message 
   !  
   subroutine pr_usage(iout)
-    integer :: iout
+    integer(psb_ipk_) :: iout
     write(iout,*)'incorrect parameter(s) found'
     write(iout,*)' usage:  pde90 methd prec dim &
          &[istop itmax itrace]'  

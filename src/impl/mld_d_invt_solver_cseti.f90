@@ -42,11 +42,12 @@ subroutine mld_d_invt_solver_cseti(sv,what,val,info,idx)
   ! Arguments
   class(mld_d_invt_solver_type), intent(inout) :: sv 
   character(len=*), intent(in)                 :: what 
-  integer, intent(in)                    :: val
-  integer, intent(out)                   :: info
-  integer, intent(in), optional                :: idx
-  Integer :: err_act
-  character(len=20)  :: name='mld_d_invt_solver_cseti'
+  integer(psb_ipk_), intent(in)                :: val
+  integer(psb_ipk_), intent(out)               :: info
+  integer(psb_ipk_), intent(in), optional      :: idx
+  !
+  integer(psb_ipk_) :: err_act
+  character(len=20) :: name='mld_d_invt_solver_cseti'
 
   info = psb_success_
   call psb_erractionsave(err_act)
@@ -63,11 +64,6 @@ subroutine mld_d_invt_solver_cseti(sv,what,val,info,idx)
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
+9999 call psb_error_handler(err_act)
   return
 end subroutine mld_d_invt_solver_cseti

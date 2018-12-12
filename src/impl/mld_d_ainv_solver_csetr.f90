@@ -42,11 +42,12 @@ subroutine mld_d_ainv_solver_csetr(sv,what,val,info,idx)
   ! Arguments
   class(mld_d_ainv_solver_type), intent(inout) :: sv 
   character(len=*), intent(in)                 :: what 
-  real(psb_dpk_), intent(in)             :: val
-  integer, intent(out)                   :: info
-  integer, intent(in), optional                :: idx
-  Integer :: err_act
-  character(len=20)  :: name='mld_d_ainv_solver_csetr'
+  real(psb_dpk_), intent(in)                   :: val
+  integer(psb_ipk_), intent(out)               :: info
+  integer(psb_ipk_), intent(in), optional      :: idx
+  !
+  integer(psb_ipk_) :: err_act
+  character(len=20) :: name='mld_d_ainv_solver_csetr'
 
   call psb_erractionsave(err_act)
   info = psb_success_
@@ -61,11 +62,6 @@ subroutine mld_d_ainv_solver_csetr(sv,what,val,info,idx)
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
+9999 call psb_error_handler(err_act)
   return
 end subroutine mld_d_ainv_solver_csetr

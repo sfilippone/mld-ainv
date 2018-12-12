@@ -42,15 +42,16 @@ subroutine mld_d_ainv_solver_check(sv,info)
 
   ! Arguments
   class(mld_d_ainv_solver_type), intent(inout) :: sv
-  integer, intent(out)                   :: info
-  Integer           :: err_act
+  integer(psb_ipk_), intent(out)               :: info
+  !
+  integer(psb_ipk_) :: err_act
   character(len=20) :: name='mld_d_ainv_solver_check'
 
   call psb_erractionsave(err_act)
   info = psb_success_
 
   call mld_check_def(sv%fill_in,&
-       & 'Nzmin',1,is_positive_nz_min)
+       & 'Nzmin',ione,is_positive_nz_min)
   call mld_check_def(sv%thresh,&
        & 'Eps',dzero,is_legal_d_fact_thrs)
 
@@ -59,11 +60,6 @@ subroutine mld_d_ainv_solver_check(sv,info)
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
+9999 call psb_error_handler(err_act)
   return
 end subroutine mld_d_ainv_solver_check

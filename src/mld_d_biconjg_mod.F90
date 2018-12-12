@@ -45,13 +45,13 @@ module mld_d_biconjg_mod
            &  psb_dpk_, psb_ipk_
       !
       implicit none 
-      integer, intent(in)                       :: n
+      integer(psb_ipk_), intent(in)             :: n
       type(psb_d_csr_sparse_mat), intent(in)    :: a
       type(psb_d_csc_sparse_mat), intent(inout) :: z,w
-      integer, intent(in)                       :: nzrmax
+      integer(psb_ipk_), intent(in)             :: nzrmax
       real(psb_dpk_), intent(in)                :: sp_thresh
       real(psb_dpk_), intent(out)               :: p(:)
-      integer, intent(out)                      :: info
+      integer(psb_ipk_), intent(out)            :: info
     end subroutine mld_dsparse_biconjg_variant
   end interface
 
@@ -71,25 +71,26 @@ contains
   subroutine mld_dsparse_biconjg(alg,n,acsr,p,z,w,nzrmax,sp_thresh,info)
     use psb_base_mod
     use mld_base_ainv_mod
-    integer, intent(in)                    :: alg,n
+    integer(psb_ipk_), intent(in)          :: alg,n
     type(psb_d_csr_sparse_mat), intent(in) :: acsr
     type(psb_dspmat_type), intent(out)     :: z, w
-    integer, intent(in)                    :: nzrmax
+    integer(psb_ipk_), intent(in)          :: nzrmax
     real(psb_dpk_), intent(in)             :: sp_thresh
     real(psb_dpk_), intent(out)            :: p(:)
-    integer, intent(out)                   :: info
+    integer(psb_ipk_), intent(out)         :: info
 
     type(psb_d_csc_sparse_mat)             :: zcsc,wcsc
-    integer :: i,j,k,nrm
-    integer :: err_act
+    integer(psb_ipk_) :: i,j,k,nrm
+    integer(psb_ipk_) :: err_act
     character(len=20)  :: name='mld_sparse_biconjg'
-    integer, parameter :: variant=1
+    integer(psb_ipk_), parameter :: variant=1
     
 
-
-    if (psb_get_errstatus() /= psb_success_) return 
     info = psb_success_
     call psb_erractionsave(err_act)
+    if (psb_errstatus_fatal()) then
+      info = psb_err_internal_error_; goto 9999
+    end if
 
     if (size(p)<n) then 
       write(psb_err_unit,*) 'Size of P wrong'
@@ -136,13 +137,8 @@ contains
     call psb_erractionrestore(err_act)
     return
 
-9999 continue
-    call psb_erractionrestore(err_act)
-    if (err_act.eq.psb_act_abort_) then
-      call psb_error()
-      return
-    end if
-    return
+9999 call psb_error_handler(err_act)
+  return
   end subroutine mld_dsparse_biconjg
 
 
@@ -152,16 +148,16 @@ contains
     !
     use psb_base_mod
     implicit none 
-    integer, intent(in)           :: nx, ix(:) 
-    real(psb_dpk_), intent(in)    :: alpha, beta, vx(:)
-    integer, intent(inout)        :: ny, iy(:) 
-    real(psb_dpk_), intent(inout) :: vy(:)
-    type(psb_d_csc_sparse_mat), intent(in)  :: a
-    integer, intent(out)          :: info 
+    integer(psb_ipk_), intent(in)          :: nx, ix(:) 
+    real(psb_dpk_), intent(in)             :: alpha, beta, vx(:)
+    integer(psb_ipk_), intent(inout)       :: ny, iy(:) 
+    real(psb_dpk_), intent(inout)          :: vy(:)
+    type(psb_d_csc_sparse_mat), intent(in) :: a
+    integer(psb_ipk_), intent(out)         :: info 
 
-    integer :: i,j,k,m,n, nv, na, iszy
-    integer, allocatable        :: iv(:)
-    real(psb_dpk_), allocatable :: vv(:)
+    integer(psb_ipk_) :: i,j,k,m,n, nv, na, iszy
+    integer(psb_ipk_), allocatable        :: iv(:)
+    real(psb_dpk_), allocatable           :: vv(:)
 
     info = 0
 ! !$    write(0,*) 'd_spmspv ',alpha,beta
@@ -229,16 +225,16 @@ contains
     !
     use psb_base_mod
     implicit none 
-    integer, intent(in)           :: nx, ix(:) 
-    real(psb_dpk_), intent(in)    :: alpha, beta, vx(:)
-    integer, intent(inout)        :: ny, iy(:) 
-    real(psb_dpk_), intent(inout) :: vy(:)
-    type(psb_d_csr_sparse_mat), intent(in)  :: a
-    integer, intent(out)          :: info 
+    integer(psb_ipk_), intent(in)          :: nx, ix(:) 
+    real(psb_dpk_), intent(in)             :: alpha, beta, vx(:)
+    integer(psb_ipk_), intent(inout)       :: ny, iy(:) 
+    real(psb_dpk_), intent(inout)          :: vy(:)
+    type(psb_d_csr_sparse_mat), intent(in) :: a
+    integer(psb_ipk_), intent(out)         :: info 
 
-    integer :: i,j,k,m,n, nv, na, iszy
-    integer, allocatable        :: iv(:)
-    real(psb_dpk_), allocatable :: vv(:)
+    integer(psb_ipk_)              :: i,j,k,m,n, nv, na, iszy
+    integer(psb_ipk_), allocatable :: iv(:)
+    real(psb_dpk_), allocatable    :: vv(:)
 
     info = 0
 ! !$    write(0,*) 'd_spvspm ',alpha,beta

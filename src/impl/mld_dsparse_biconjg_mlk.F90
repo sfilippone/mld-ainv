@@ -41,17 +41,17 @@ subroutine mld_dsparse_biconjg_mlk(n,a,p,z,w,nzrmax,sp_thresh,info)
   !
   !
   implicit none 
-  integer(psb_ipk_), intent(in)                       :: n
+  integer(psb_ipk_), intent(in)             :: n
   type(psb_d_csr_sparse_mat), intent(in)    :: a
   type(psb_d_csc_sparse_mat), intent(inout) :: z,w
-  integer(psb_ipk_), intent(in)                       :: nzrmax
+  integer(psb_ipk_), intent(in)             :: nzrmax
   real(psb_dpk_), intent(in)                :: sp_thresh
   real(psb_dpk_), intent(out)               :: p(:)
-  integer(psb_ipk_), intent(out)                      :: info
+  integer(psb_ipk_), intent(out)            :: info
 
   ! Locals
-  integer(psb_ipk_), allocatable        :: ia(:), ja(:), izkr(:), izcr(:), hlist(:), bfr(:), rwlist(:)
-  real(psb_dpk_), allocatable :: zval(:),val(:), q(:)
+  integer(psb_ipk_), allocatable :: ia(:), ja(:), izkr(:), izcr(:), hlist(:), bfr(:), rwlist(:)
+  real(psb_dpk_), allocatable    :: zval(:),val(:), q(:)
   integer(psb_ipk_) :: i,j,k, kc, kr, err_act, nz, nzra, nzrz, ipzi,ipzj,&
        & nzzi,nzzj, nzz, ip1, ip2, ipza,ipzz, ipzn, nzzn, ipz1, ipz2,&
        &  ipj, lastj, nextj, nzw, hlhead, li, mj, kkc, ifrst, ilst, rwhead
@@ -257,7 +257,7 @@ subroutine mld_dsparse_biconjg_mlk(n,a,p,z,w,nzrmax,sp_thresh,info)
       end if
     end do outer
     call a%csget(i,i,nzra,ia,ja,val,info)
-    call rwclip(nzra,ia,ja,val,1,n,1,n)      
+    call rwclip(nzra,ia,ja,val,ione,n,ione,n)      
     p(i) = psb_spge_dot(nzra,ja,val,zval)
     if (abs(p(i)) < d_epstol) &
          & p(i) = 1.d-3 

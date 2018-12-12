@@ -41,20 +41,20 @@ subroutine mld_d_invk_solver_bld(a,desc_a,sv,info,b,amold,vmold,imold)
   Implicit None
 
   ! Arguments
-  type(psb_dspmat_type), intent(in), target  :: a
-  Type(psb_desc_type), Intent(in)            :: desc_a
-  class(mld_d_invk_solver_type), intent(inout) :: sv
-  integer, intent(out)                       :: info
+  type(psb_dspmat_type), intent(in), target            :: a
+  Type(psb_desc_type), Intent(in)                     :: desc_a
+  class(mld_d_invk_solver_type), intent(inout)        :: sv
+  integer(psb_ipk_), intent(out)                      :: info
   type(psb_dspmat_type), intent(in), target, optional :: b
   class(psb_d_base_sparse_mat), intent(in), optional  :: amold
   class(psb_d_base_vect_type), intent(in), optional   :: vmold
-  class(psb_i_base_vect_type), intent(in), optional  :: imold
+  class(psb_i_base_vect_type), intent(in), optional   :: imold
 
   ! Local variables
-  integer :: n_row,n_col, nrow_a, nztota
+  integer(psb_ipk_) :: n_row,n_col, nrow_a, nztota
   real(psb_dpk_), pointer :: ww(:), aux(:), tx(:),ty(:)
-  integer :: ictxt,np,me,i, err_act, debug_unit, debug_level
-  character(len=20)  :: name='d_invk_solver_bld', ch_err
+  integer(psb_ipk_) :: ictxt,np,me,i, err_act, debug_unit, debug_level
+  character(len=20) :: name='d_invk_solver_bld', ch_err
 
   info=psb_success_
   call psb_erractionsave(err_act)
@@ -85,11 +85,6 @@ subroutine mld_d_invk_solver_bld(a,desc_a,sv,info,b,amold,vmold,imold)
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
+9999 call psb_error_handler(err_act)
   return
 end subroutine mld_d_invk_solver_bld

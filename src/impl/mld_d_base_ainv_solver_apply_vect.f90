@@ -38,24 +38,24 @@ subroutine mld_d_base_ainv_solver_apply_vect(alpha,sv,x,beta,y,desc_data,&
   use psb_base_mod
   use mld_d_base_ainv_mod, mld_protect_name => mld_d_base_ainv_solver_apply_vect
   implicit none 
-  type(psb_desc_type), intent(in)      :: desc_data
+  type(psb_desc_type), intent(in)               :: desc_data
   class(mld_d_base_ainv_solver_type), intent(inout) :: sv
-  type(psb_d_vect_type), intent(inout) :: x
-  type(psb_d_vect_type), intent(inout) :: y
-  real(psb_dpk_), intent(in)           :: alpha,beta
-  character(len=1), intent(in)         :: trans
-  real(psb_dpk_),target, intent(inout) :: work(:)
-  type(psb_d_vect_type),intent(inout)  :: wv(:)
-  integer, intent(out)                 :: info
-  character, intent(in), optional                :: init
-  type(psb_d_vect_type),intent(inout), optional   :: initu
-
-  integer    :: n_row,n_col
+  type(psb_d_vect_type), intent(inout)          :: x
+  type(psb_d_vect_type), intent(inout)          :: y
+  real(psb_dpk_), intent(in)                    :: alpha,beta
+  character(len=1), intent(in)                  :: trans
+  real(psb_dpk_),target, intent(inout)          :: work(:)
+  type(psb_d_vect_type),intent(inout)           :: wv(:)
+  integer(psb_ipk_), intent(out)                :: info
+  character, intent(in), optional               :: init
+  type(psb_d_vect_type),intent(inout), optional :: initu
+  !
+  integer(psb_ipk_)     :: n_row,n_col
   real(psb_dpk_), pointer :: ww(:), aux(:)
-  type(psb_d_vect_type)   :: tx,ty
-  integer    :: ictxt,np,me,i, err_act
-  character          :: trans_
-  character(len=20)  :: name='d_base_ainv_solver_apply'
+  type(psb_d_vect_type) :: tx,ty
+  integer(psb_ipk_)     :: ictxt,np,me,i, err_act
+  character             :: trans_
+  character(len=20)     :: name='d_base_ainv_solver_apply'
 
   call psb_erractionsave(err_act)
 
@@ -84,7 +84,7 @@ subroutine mld_d_base_ainv_solver_apply_vect(alpha,sv,x,beta,y,desc_data,&
       allocate(aux(4*n_col),stat=info)
       if (info /= psb_success_) then 
         info=psb_err_alloc_request_
-        call psb_errpush(info,name,i_err=(/4*n_col,0,0,0,0/),&
+        call psb_errpush(info,name,i_err=(/4*n_col/),&
              & a_err='real(psb_dpk_)')
         goto 9999      
       end if
@@ -93,7 +93,7 @@ subroutine mld_d_base_ainv_solver_apply_vect(alpha,sv,x,beta,y,desc_data,&
     allocate(ww(n_col),aux(4*n_col),stat=info)
     if (info /= psb_success_) then 
       info=psb_err_alloc_request_
-      call psb_errpush(info,name,i_err=(/5*n_col,0,0,0,0/),&
+      call psb_errpush(info,name,i_err=(/5*n_col/),&
            & a_err='real(psb_dpk_)')
       goto 9999      
     end if
@@ -161,12 +161,6 @@ subroutine mld_d_base_ainv_solver_apply_vect(alpha,sv,x,beta,y,desc_data,&
   call psb_erractionrestore(err_act)
   return
 
-9999 continue
-  call psb_erractionrestore(err_act)
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
+9999 call psb_error_handler(err_act)
   return
-
 end subroutine mld_d_base_ainv_solver_apply_vect
