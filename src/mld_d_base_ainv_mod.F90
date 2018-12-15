@@ -67,7 +67,7 @@ module mld_d_base_ainv_mod
   end type mld_d_base_ainv_solver_type
 
   private ::  d_base_ainv_solver_sizeof, &
-       & d_base_ainv_get_nzeros, d_base_ainv_solver_get_wrksize
+       & d_base_ainv_get_nzeros, d_base_ainv_get_wrksize
 
   
   interface 
