@@ -91,7 +91,7 @@ module mld_d_ainv_solver
       
       ! Arguments
       type(psb_dspmat_type), intent(in), target           :: a
-      Type(psb_desc_type), Intent(in)                     :: desc_a 
+      Type(psb_desc_type), Intent(inout)                  :: desc_a 
       class(mld_d_ainv_solver_type), intent(inout)        :: sv
       integer(psb_ipk_), intent(out)                      :: info
       type(psb_dspmat_type), intent(in), target, optional :: b
@@ -181,7 +181,7 @@ module mld_d_ainv_solver
       real(psb_dpk_), intent(in)                  :: thresh
       type(psb_dspmat_type), intent(inout)        :: wmat, zmat
       real(psb_dpk_), allocatable                 :: d(:)
-      Type(psb_desc_type), Intent(in)             :: desc
+      Type(psb_desc_type), Intent(inout)          :: desc
       integer(psb_ipk_), intent(out)              :: info
       type(psb_dspmat_type), intent(in), optional :: blck
       integer(psb_ipk_), intent(in), optional     :: iscale

@@ -80,7 +80,7 @@ module mld_d_invk_solver
       
       ! Arguments
       type(psb_dspmat_type), intent(in), target           :: a
-      Type(psb_desc_type), Intent(in)                     :: desc_a 
+      Type(psb_desc_type), Intent(inout)                  :: desc_a 
       class(mld_d_invk_solver_type), intent(inout)        :: sv
       integer(psb_ipk_), intent(out)                      :: info
       type(psb_dspmat_type), intent(in), target, optional :: b
@@ -144,7 +144,7 @@ module mld_d_invk_solver
       integer(psb_ipk_), intent(in)               :: fill1, fill2 
       type(psb_dspmat_type), intent(inout)        :: lmat, umat
       real(psb_dpk_), allocatable                 :: d(:)
-      Type(psb_desc_type), Intent(in)             :: desc
+      Type(psb_desc_type), Intent(inout)          :: desc
       integer(psb_ipk_), intent(out)              :: info
       type(psb_dspmat_type), intent(in), optional :: blck
     end subroutine mld_d_invk_bld

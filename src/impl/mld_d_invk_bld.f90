@@ -45,7 +45,7 @@ subroutine mld_d_invk_bld(a,fill1, fill2,lmat,d,umat,desc,info,blck)
   integer(psb_ipk_), intent(in)               :: fill1, fill2 
   type(psb_dspmat_type), intent(inout)        :: lmat, umat
   real(psb_dpk_), allocatable                 :: d(:)
-  Type(psb_desc_type), Intent(in)             :: desc
+  Type(psb_desc_type), Intent(inout)          :: desc
   integer(psb_ipk_), intent(out)              :: info
   type(psb_dspmat_type), intent(in), optional :: blck
   !

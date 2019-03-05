@@ -48,7 +48,7 @@ subroutine mld_d_invt_bld(a,fillin,invfill,thresh,invthresh,&
   real(psb_dpk_), intent(in)                  :: invthresh
   type(psb_dspmat_type), intent(inout)        :: lmat, umat
   real(psb_dpk_), allocatable                 :: d(:)
-  Type(psb_desc_type), Intent(in)             :: desc
+  Type(psb_desc_type), Intent(inout)          :: desc
   integer(psb_ipk_), intent(out)              :: info
   type(psb_dspmat_type), intent(in), optional :: blck
   !
