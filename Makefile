@@ -13,15 +13,15 @@ srcd:
 	cd src && $(MAKE)
 
 install:
-	(./mkdir.sh  $(INSTALL_DIR) &&\
+	(mkdir -p $(INSTALL_DIR) &&\
 	   $(INSTALL_DATA) Make.inc  $(INSTALL_DIR))
-	(./mkdir.sh $(INSTALL_LIBDIR) &&\
+	(mkdir -p $(INSTALL_LIBDIR) &&\
 	   $(INSTALL_DATA) lib/*.a  $(INSTALL_LIBDIR))
-	(./mkdir.sh $(INSTALL_MODULESDIR) && \
+	(mkdir -p $(INSTALL_MODULESDIR) && \
 	   $(INSTALL_DATA) modules/*$(.mod) $(INSTALL_MODULESDIR))
-	(./mkdir.sh  $(INSTALL_INCLUDEDIR) &&\
+	(mkdir -p $(INSTALL_INCLUDEDIR) &&\
 	   $(INSTALL_DATA) Make.inc  $(INSTALL_INCLUDEDIR)/Make.inc.mld-ainv)
-#	(./mkdir.sh  $(INSTALL_DOCSDIR) && \
+#	(mkdir -p $(INSTALL_DOCSDIR) && \
 #	   /bin/cp -fr docs/*pdf docs/html $(INSTALL_DOCSDIR))
 
 veryclean: 
