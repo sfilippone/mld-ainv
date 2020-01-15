@@ -247,7 +247,7 @@
         ivg(i) = ipv(1)
       enddo
       call psb_matdist(aux_a, a, ictxt, &
-           & desc_a,b_col_glob,b_col,info,fmt=afmt,v=ivg)
+           & desc_a,b_col_glob,b_col,info,fmt=afmt,vg=ivg)
     else if (ipart == 2) then 
       if (iam == psb_root_) then 
         write(psb_out_unit,'("Partition type: graph")')
@@ -259,7 +259,7 @@
       call distr_mtpart(psb_root_,ictxt)
       call getv_mtpart(ivg)
       call psb_matdist(aux_a, a, ictxt, &
-           & desc_a,b_col_glob,b_col,info,fmt=afmt,v=ivg)
+           & desc_a,b_col_glob,b_col,info,fmt=afmt,vg=ivg)
     else 
       if (iam == psb_root_) write(psb_out_unit,'("Partition type: block")')
       call psb_matdist(aux_a, a,  ictxt, &
