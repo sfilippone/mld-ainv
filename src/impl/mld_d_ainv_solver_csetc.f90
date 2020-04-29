@@ -53,11 +53,12 @@ subroutine mld_d_ainv_solver_csetc(sv,what,val,info,idx)
   info = psb_success_
   call psb_erractionsave(err_act)
 
-  ival =  sv%stringval(val)
-
-  if (ival >=0) then 
-    call sv%set(what,ival,info)
-  end if
+  select case(psb_toupper(trim(what)))
+  case('AINV_ALG')
+    sv%alg  = sv%stringval(val)
+  case default
+    call sv%mld_d_base_solver_type%set(what,val,info)
+  end select
 
   if (info /= psb_success_) then
     info = psb_err_from_subroutine_
