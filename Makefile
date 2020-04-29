@@ -10,7 +10,7 @@ libdir:
 	(if test ! -d modules ; then mkdir modules; fi)
 	($(INSTALL_DATA) Make.inc  include/Make.inc.mld-ainv)
 srcd:
-	cd src && $(MAKE)
+	$(MAKE) -C src
 
 install:
 	(mkdir -p $(INSTALL_DIR) &&\
@@ -25,7 +25,7 @@ install:
 #	   /bin/cp -fr docs/*pdf docs/html $(INSTALL_DOCSDIR))
 
 veryclean: 
-	cd src && $(MAKE) veryclean
+	$(MAKE) -C src veryclean
 	(cd lib; /bin/rm -fr *.a *$(.mod))
 	(cd tests/pdegen; make clean)
 

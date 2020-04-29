@@ -37,7 +37,7 @@ lib: $(OBJS)
 	$(RANLIB) $(HERE)/$(LIBNAME)
 
 impld: lib
-	cd impl && $(MAKE) LIBNAME=$(LIBNAME)
+	$(MAKE) -C impl LIBNAME=$(LIBNAME)
 
 mld_d_base_ainv_mod.o mld_d_biconjg_mod.o: mld_base_ainv_mod.o mld_d_ainv_tools_mod.o
 mld_d_ainv_solver.o mld_d_invt_solver.o mld_d_invk_solver.o: mld_d_base_ainv_mod.o
@@ -48,4 +48,4 @@ veryclean: clean
 clean: iclean
 	/bin/rm -f $(OBJS) $(LOCAL_MODS) *$(.mod)
 iclean:
-	cd impl && $(MAKE) clean
+	$(MAKE) -C impl clean
