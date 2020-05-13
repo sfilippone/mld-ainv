@@ -32,10 +32,10 @@
 !    POSSIBILITY OF SUCH DAMAGE.
 !   
 !  
-subroutine mld_d_base_ainv_solver_free(sv,info)
+subroutine mld_d_base_ainv_solver_clear_data(sv,info)
   
   use psb_base_mod
-  use mld_d_base_ainv_mod, mld_protect_name => mld_d_base_ainv_solver_free
+  use mld_d_base_ainv_mod, mld_protect_name => mld_d_base_ainv_solver_clear_data
 
   Implicit None
 
@@ -44,15 +44,26 @@ subroutine mld_d_base_ainv_solver_free(sv,info)
   integer(psb_ipk_), intent(out)                    :: info
   !
   integer(psb_ipk_) :: err_act
-  character(len=20) :: name='mld_d_base_ainv_solver_free'
+  character(len=20) :: name='mld_d_base_ainv_solver_clear_data'
 
   call psb_erractionsave(err_act)
   info = psb_success_
-  call sv%clear_data(info) 
+
+  if (allocated(sv%d)) then 
+    deallocate(sv%d,stat=info)
+    if (info /= psb_success_) then 
+      info = psb_err_alloc_dealloc_
+      call psb_errpush(info,name)
+      goto 9999 
+    end if
+  end if
+  call sv%w%free()
+  call sv%z%free()
+  call sv%dv%free(info)
 
   call psb_erractionrestore(err_act)
   return
 
 9999 call psb_error_handler(err_act)
   return
-end subroutine mld_d_base_ainv_solver_free
+end subroutine mld_d_base_ainv_solver_clear_data

@@ -32,27 +32,42 @@
 !    POSSIBILITY OF SUCH DAMAGE.
 !   
 !  
-subroutine mld_d_base_ainv_solver_free(sv,info)
+!
+!
+!
+!
+!
+subroutine mld_d_invt_solver_clone_settings(sv,svout,info)
   
   use psb_base_mod
-  use mld_d_base_ainv_mod, mld_protect_name => mld_d_base_ainv_solver_free
-
+  use mld_d_invt_solver, mld_protect_name =>  mld_d_invt_solver_clone_settings
   Implicit None
-
   ! Arguments
-  class(mld_d_base_ainv_solver_type), intent(inout) :: sv
-  integer(psb_ipk_), intent(out)                    :: info
-  !
-  integer(psb_ipk_) :: err_act
-  character(len=20) :: name='mld_d_base_ainv_solver_free'
+  class(mld_d_invt_solver_type), intent(inout) :: sv
+  class(mld_d_base_solver_type), intent(inout) :: svout
+  integer(psb_ipk_), intent(out)                 :: info
+  integer(psb_ipk_)  :: err_act
+  character(len=20) :: name='d_invt_solver_clone_settings'
 
   call psb_erractionsave(err_act)
-  info = psb_success_
-  call sv%clear_data(info) 
+
+  select type(svout)
+  class is(mld_d_invt_solver_type)
+    svout%fill_in    = sv%fill_in
+    svout%inv_fill   = sv%inv_fill
+    svout%thresh     = sv%thresh
+    svout%inv_thresh = sv%inv_thresh
+    
+  class default    
+    info = psb_err_internal_error_
+    call psb_errpush(info,name)
+    goto 9999 
+  end select
 
   call psb_erractionrestore(err_act)
   return
 
 9999 call psb_error_handler(err_act)
+
   return
-end subroutine mld_d_base_ainv_solver_free
+end subroutine mld_d_invt_solver_clone_settings

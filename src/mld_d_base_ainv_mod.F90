@@ -58,6 +58,7 @@ module mld_d_base_ainv_mod
     procedure, pass(sv) :: dump    => mld_d_base_ainv_solver_dmp
     procedure, pass(sv) :: apply_v => mld_d_base_ainv_solver_apply_vect
     procedure, pass(sv) :: apply_a => mld_d_base_ainv_solver_apply
+    procedure, pass(sv) :: clear_data  => mld_d_base_ainv_solver_clear_data
     procedure, pass(sv) :: free    => mld_d_base_ainv_solver_free
     procedure, pass(sv) :: sizeof  => d_base_ainv_solver_sizeof
     procedure, pass(sv) :: get_nzeros => d_base_ainv_get_nzeros
@@ -140,6 +141,18 @@ module mld_d_base_ainv_mod
       class(mld_d_base_ainv_solver_type), intent(inout) :: sv
       integer(psb_ipk_), intent(out)                    :: info
     end subroutine mld_d_base_ainv_solver_free
+  end interface
+  
+  interface
+    subroutine mld_d_base_ainv_solver_clear_data(sv,info)
+      import :: psb_desc_type, psb_dspmat_type,  psb_d_base_sparse_mat, &
+           & psb_d_vect_type, psb_d_base_vect_type, psb_dpk_, mld_d_base_ainv_solver_type, psb_ipk_
+      Implicit None
+      
+      ! Arguments
+      class(mld_d_base_ainv_solver_type), intent(inout) :: sv
+      integer(psb_ipk_), intent(out)                    :: info
+    end subroutine mld_d_base_ainv_solver_clear_data
   end interface
   
   
