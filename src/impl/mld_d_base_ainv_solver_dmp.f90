@@ -32,22 +32,25 @@
 !    POSSIBILITY OF SUCH DAMAGE.
 !   
 !  
-subroutine mld_d_base_ainv_solver_dmp(sv,ictxt,level,info,prefix,head,solver)
-  
+subroutine mld_d_base_ainv_solver_dmp(sv,desc,level,info,prefix,head,solver,global_num)
+
   use psb_base_mod
   use mld_d_base_ainv_mod, mld_protect_name => mld_d_base_ainv_solver_dmp
   implicit none 
   class(mld_d_base_ainv_solver_type), intent(in) :: sv
-  integer(psb_ipk_), intent(in)              :: ictxt,level
+  type(psb_desc_type), intent(in)             :: desc
+  integer(psb_ipk_), intent(in)              :: level
   integer(psb_ipk_), intent(out)             :: info
   character(len=*), intent(in), optional     :: prefix, head
-  logical, optional, intent(in)              :: solver
+  logical, optional, intent(in)              :: solver, global_num
   !
   integer(psb_ipk_)  :: i, j, il1, iln, lname, lev
-  integer(psb_ipk_)  :: icontxt,iam, np
+  integer(psb_ipk_)  :: ictxt,iam, np
   character(len=80)  :: prefix_
   character(len=120) :: fname ! len should be at least 20 more than
-  logical :: solver_
+  logical :: solver_, global_num_
+  integer(psb_lpk_), allocatable :: iv(:)
+
   !  len of prefix_ 
 
   info = 0
@@ -58,6 +61,7 @@ subroutine mld_d_base_ainv_solver_dmp(sv,ictxt,level,info,prefix,head,solver)
     prefix_ = "dump_ainv_d"
   end if
 
+  ictxt = desc%get_context()
   call psb_info(ictxt,iam,np)
 
   if (present(solver)) then 
@@ -70,16 +74,31 @@ subroutine mld_d_base_ainv_solver_dmp(sv,ictxt,level,info,prefix,head,solver)
   write(fname(lname+1:lname+5),'(a,i3.3)') '_p',iam
   lname = lname + 5
 
-  if (solver_) then 
-    write(fname(lname+1:),'(a,i3.3,a)')'_l',level,'_wmat.mtx'
-    if (sv%w%is_asb()) &
-         & call sv%w%print(fname,head=head)
-    write(fname(lname+1:),'(a,i3.3,a)')'_l',level,'_diag.mtx'
-    if (allocated(sv%d)) &
-         & call psb_geprt(fname,sv%d,head=head)
-    write(fname(lname+1:),'(a,i3.3,a)')'_l',level,'_zmat.mtx'
-    if (sv%z%is_asb()) &
-         & call sv%z%print(fname,head=head)
+  if (solver_) then
+    if (global_num_) then
+      
+      iv = desc%get_global_indices(owned=.false.)      
+      write(fname(lname+1:),'(a,i3.3,a)')'_l',level,'_wmat.mtx'
+      if (sv%w%is_asb()) &
+           & call sv%w%print(fname,head=head,iv=iv)
+      write(fname(lname+1:),'(a,i3.3,a)')'_l',level,'_diag.mtx'
+      if (allocated(sv%d)) &
+           & call psb_geprt(fname,sv%d,head=head)
+      write(fname(lname+1:),'(a,i3.3,a)')'_l',level,'_zmat.mtx'
+      if (sv%z%is_asb()) &
+           & call sv%z%print(fname,head=head,iv=iv)
+    else
+
+      write(fname(lname+1:),'(a,i3.3,a)')'_l',level,'_wmat.mtx'
+      if (sv%w%is_asb()) &
+           & call sv%w%print(fname,head=head)
+      write(fname(lname+1:),'(a,i3.3,a)')'_l',level,'_diag.mtx'
+      if (allocated(sv%d)) &
+           & call psb_geprt(fname,sv%d,head=head)
+      write(fname(lname+1:),'(a,i3.3,a)')'_l',level,'_zmat.mtx'
+      if (sv%z%is_asb()) &
+           & call sv%z%print(fname,head=head)
+    end if
 
   end if
 
