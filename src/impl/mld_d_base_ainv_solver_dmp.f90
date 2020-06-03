@@ -69,6 +69,11 @@ subroutine mld_d_base_ainv_solver_dmp(sv,desc,level,info,prefix,head,solver,glob
   else
     solver_ = .false. 
   end if
+  if (present(global_num)) then 
+    global_num_ = global_num
+  else
+    global_num_ = .false. 
+  end if
   lname = len_trim(prefix_)
   fname = trim(prefix_)
   write(fname(lname+1:lname+5),'(a,i3.3)') '_p',iam
